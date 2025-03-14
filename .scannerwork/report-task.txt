@@ -1,0 +1,7 @@
+organization=luciocanepa-1
+projectKey=luciocanepa_SOPRA_group11_client
+serverUrl=https://sonarcloud.io
+serverVersion=8.0.0.60731
+dashboardUrl=https://sonarcloud.io/dashboard?id=luciocanepa_SOPRA_group11_client
+ceTaskId=AZWV316DnbWD7YoOJo_c
+ceTaskUrl=https://sonarcloud.io/api/ce/task?id=AZWV316DnbWD7YoOJo_c
