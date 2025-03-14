@@ -21,13 +21,15 @@ FROM node:22.14.0-alpine
 ENV NODE_ENV production
 # Set npm cache to a directory the non-root user can access
 RUN npm config set cache /app/.npm-cache --global
+# Create the app directory and set proper ownership
+RUN mkdir -p /app && chown -R 3301:3301 /app
 # Get non-root user
 USER 3301
 # Set container working directory to /app
 WORKDIR /app
 # Copy node modules and app
-COPY --chown=node:node --from=build /app/node_modules /app/node_modules
-COPY --chown=node:node --from=build /app/build build
+COPY --chown=3301:3301 --from=build /app/node_modules /app/node_modules
+COPY --chown=3301:3301 --from=build /app/build /app/build
 # Expose port for serve
 EXPOSE 3000
 # Start app
