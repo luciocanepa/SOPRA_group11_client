@@ -66,8 +66,8 @@ const Login: React.FC = () => {
           <Input placeholder="Enter username" />
         </Form.Item>
         <Form.Item
-          name="name"
-          label="Name"
+          name="password"
+          label="Password"
           rules={[{ required: true, message: "Please input your name!" }]}
         >
           <Input placeholder="Enter name" />
