@@ -1,9 +1,9 @@
 // app/components/RealTimeStatusDisplay.tsx
-import { useRealTimeStatus } from "@/hooks/useRealTimeStatus"; // Custom hook for status updates
-import { User } from "@/types/user"; // Assuming you have a user type with a status property
+import { useRealTimeStatus } from "@/hooks/useRealTimeStatus";
+import { User } from "@/types/user"; // Ensure the User type is imported
 
 const RealTimeStatusDisplay: React.FC = () => {
-    const { statuses, error } = useRealTimeStatus(); // Custom hook to fetch real-time status
+    const { statuses, error } = useRealTimeStatus();
 
     if (error) {
         return <div>Error loading statuses</div>;
@@ -13,7 +13,7 @@ const RealTimeStatusDisplay: React.FC = () => {
         <div className="status-container">
             {statuses.map((user: User) => (
                 <div key={user.id} className="status-card">
-                    <div className="avatar">{/* User Avatar */}</div>
+                    <div className="avatar">{/* Avatar Here */}</div>
                     <div className="username">{user.username}</div>
                     <div
                         className={`status-indicator ${

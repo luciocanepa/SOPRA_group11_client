@@ -10,6 +10,9 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="Git.Rebase.Settings">
+    <option name="NEW_BASE" value="main" />
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
@@ -50,23 +53,10 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "ts.external.directory.path": "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.3\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
+    "ts.external.directory.path": "\\\\wsl.localhost\\Ubuntu\\home\\annap\\SOPRA_group11_client\\node_modules\\typescript\\lib",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager">
-    <configuration default="true" type="JetRunConfigurationType">
-      <module name="SOPRA_group11_client" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
-      <module name="SOPRA_group11_client" />
-      <option name="filePath" />
-      <method v="2" />
-    </configuration>
-  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -166,6 +156,7 @@
     <MESSAGE value="small test commit" />
     <MESSAGE value="I have added the register page including password complexity and success message." />
     <MESSAGE value="Second try, since the first commit somehow didn't work: I have added the register page including password complexity and success message." />
-    <option name="LAST_COMMIT_MESSAGE" value="Second try, since the first commit somehow didn't work: I have added the register page including password complexity and success message." />
+    <MESSAGE value="noticed some repeats and unused code. I cleaned it up." />
+    <option name="LAST_COMMIT_MESSAGE" value="noticed some repeats and unused code. I cleaned it up." />
   </component>
 </project>

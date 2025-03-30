@@ -65,3 +65,35 @@ li {
   min-height: 100vh;
   padding: 2rem;
 }
+
+/*styling for the user status indicators */
+.user-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.user-card {
+  background: white;
+  border: 1px solid #ccc;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.status-indicator {
+  padding: 5px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.status-indicator.green {
+  background-color: #4caf50;
+}
+
+.status-indicator.red {
+  background-color: #f44336;
+}
+
+.status-indicator.grey {
+  background-color: #9e9e9e;
+}
