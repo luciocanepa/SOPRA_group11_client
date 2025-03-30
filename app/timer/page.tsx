@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-
+import "../styles/pages/timer.css";
 
 
 export default function PomodoroTimer() {
