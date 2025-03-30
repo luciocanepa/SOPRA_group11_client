@@ -2,11 +2,11 @@
 import { useState, useEffect } from "react";
 
 export const useRealTimeStatus = () => {
-    const [statuses, setStatuses] = useState([]);
-    const [error, setError] = useState(null);
+    const [statuses, setStatuses] = useState([]); // For storing statuses of users
+    const [error, setError] = useState<string | null>(null); // Update the type to accept both string and null
 
     useEffect(() => {
-        const socket = new WebSocket("ws://your-websocket-url");
+        const socket = new WebSocket("ws://your-websocket-url"); // Insert our own WebSocket URL
 
         socket.onopen = () => {
             console.log("WebSocket connection established.");
@@ -18,7 +18,7 @@ export const useRealTimeStatus = () => {
         };
 
         socket.onerror = (err) => {
-            setError("Failed to connect to the WebSocket.");
+            setError("Failed to connect to the WebSocket."); // Now setError can accept a string
             console.error("WebSocket error:", err);
         };
 
