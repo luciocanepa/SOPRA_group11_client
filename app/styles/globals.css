@@ -69,13 +69,6 @@ li {
   padding: 2rem;
 }
 
-:root {
-  /* ... existing properties ... */
-  /* Registration page colors */
-  --reg-light: #fcd1d1;   /* A softer pastel red */
-  --reg-dark: #b91c1c;    /* Dark red */
-}
-
 /* Registration Page Styles */
 .register-container {
   background-color: #fcd1d1; /* Soft pastel red */

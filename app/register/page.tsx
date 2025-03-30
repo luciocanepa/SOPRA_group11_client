@@ -71,7 +71,7 @@ const Register: React.FC = () => {
             </Form>
             <p>
                 Already have an account?{" "}
-                <Link href="/login" className="hover:underline">
+                <Link href="/login">
                     Log in
                 </Link>
             </p>
