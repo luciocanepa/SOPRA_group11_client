@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="47a97122-9ad1-4ef8-a705-038b2a5212f6" name="Changes" comment="Second try, since the first commit somehow didn't work: I have added the register page including password complexity and success message." />
+    <list default="true" id="47a97122-9ad1-4ef8-a705-038b2a5212f6" name="Changes" comment="I updated the websocket stuff so that it not only updates user status, but everything user / group related.">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/components/RealTimeStatusDisplay.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/components/GroupDisplay.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/hooks/useRealTimeStatus.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/hooks/useGroupUpdates.tsx" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -45,7 +49,7 @@
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "register",
+    "git-widget-placeholder": "groupUpdates",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "//wsl.localhost/Ubuntu/home/annap/SOPRA_group11_client",
     "node.js.detected.package.eslint": "true",
@@ -157,6 +161,8 @@
     <MESSAGE value="I have added the register page including password complexity and success message." />
     <MESSAGE value="Second try, since the first commit somehow didn't work: I have added the register page including password complexity and success message." />
     <MESSAGE value="noticed some repeats and unused code. I cleaned it up." />
-    <option name="LAST_COMMIT_MESSAGE" value="noticed some repeats and unused code. I cleaned it up." />
+    <MESSAGE value="I finished the status updates task, with the component returning the user with its status using websockets. Will be integrated into the group dashboard." />
+    <MESSAGE value="I updated the websocket stuff so that it not only updates user status, but everything user / group related." />
+    <option name="LAST_COMMIT_MESSAGE" value="I updated the websocket stuff so that it not only updates user status, but everything user / group related." />
   </component>
 </project>
