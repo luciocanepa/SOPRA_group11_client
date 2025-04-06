@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap');
+/*@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap');*/
 @import url('https://fonts.googleapis.com/css2?family=Tektur:wght@400..900&display=swap');
 
 body {
@@ -14,7 +14,7 @@ body {
 
 .white-container {
     background: white;
-    padding: 40px; /* Creates space around pink container */
+    padding: 30px; /* Creates space around pink container */
     border-radius: 20px; /* Optional rounded corners */
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* Optional subtle shadow */
     margin: 20px; /* Prevents touching screen edges */
@@ -22,7 +22,14 @@ body {
     flex-direction: column;
     gap: 30px; /* Space between timer and buttons */
 
+
 }
+.timer-grid {
+    display: flex;
+    justify-content: center;
+    padding: 1rem;
+}
+
 
 .pink-container {
     background: #fbe3e4;
@@ -73,9 +80,19 @@ button {
     color: white;
 }
 
+.start:hover {
+    background-color: #004912;
+    transform: translateY(2px);
+}
+
 .stop {
     background: #720000;
     color: white;
+}
+
+.stop:hover {
+    background-color: #470000;
+    transform: translateY(2px);
 }
 
 .reset {
@@ -83,11 +100,20 @@ button {
     color: white;
 }
 
+.reset:hover {
+    background-color: #272727;
+    transform: translateY(2px);
+}
+
 .close {
     background: darkred;
     color: white;
 }
 
+.close:hover {
+    background-color: #610101;
+    transform: translateY(2px);
+}
 
 .settings-btn {
     background: #f93c3a;
@@ -95,6 +121,11 @@ button {
     width: 100%;
     padding: 10px 20px;
     margin-top: -30px;
+}
+
+.settings-btn:hover {
+    background-color: #cc302e;
+    transform: translateY(2px);
 }
 
 .settings-popup {
@@ -162,9 +193,19 @@ button {
     width: 100%;
 }
 
+.default-btn:hover {
+    background-color: #da5a7e;
+    transform: translateY(2px);
+}
+
 .apply-btn {
     background: #005f13;
     color: white;
+}
+
+.apply-btn:hover {
+    background-color: #00450d;
+    transform: translateY(2px);
 }
 
 .close-btn {
