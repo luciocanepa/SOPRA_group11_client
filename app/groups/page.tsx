@@ -15,6 +15,7 @@ interface FormFieldProps {
     image: string;
     adminId: string;
     members: string[];
+    token: string;
   }
 
 
@@ -23,23 +24,32 @@ interface FormFieldProps {
     const apiService = useApi();
     const [form] = Form.useForm();
     const {set: setToken, } = useLocalStorage<string>("token", "");
-    const {set: setGroupId, } = useLocalStorage<string>("locallyStoredID", "");
   
+    const [loggedInUserId, setLoggedInUserId] = useState<string | null>(null);
 
-    //const [loggedInUser, setLoggedInUser] = useState<string | null>(null);
+
+    useEffect(() => {
+      const fetchLoggedInUser = async () => {
+        const token = localStorage.getItem("token");
+        if (!token) return;
     
-    //const adminId = "1" // useLocalStorage<string>("userId", "");
-
-    /*useEffect(() => {
-        // Retrieve the logged-in user's ID from local storage
-        const fetchLoggedUser = localStorage.getItem("locallyStoredID") ?? "";
-        if (fetchLoggedUser) {
-            setLoggedInUser(fetchLoggedUser);
+        try {
+          const users = await apiService.get<User[]>("/users"); // fetching all users
+          const matchedUser = users.find((user) => user.token === token);
+    
+          if (matchedUser) {
+            setLoggedInUserId(matchedUser.id); // store the ID in order to use it as adminId for group creation
+          } else {
+            console.warn("No matching user found for stored token");
+          }
+        } catch (error) {
+          console.error("Error fetching users:", error);
         }
-    }, []);  */
+      };
+    
+      fetchLoggedInUser();
+    }, []);
 
-//--> maybe the user ID for the admin can be filled in automatically
-// --> <Input placeholder="Admin ID" disabled value={adminId} />
 
 
 
@@ -49,15 +59,13 @@ interface FormFieldProps {
         const requestBody = {
             ...values,
             image: uploadedImage || null,  // Use uploadedImage or set null if not uploaded
+            adminId: loggedInUserId
         };
         const response = await apiService.post<Group>("/groups", requestBody);
   
         if (response.token) {
           setToken(response.token);
         }
-        if (response.id) {
-            setGroupId(response.id);
-            }
 
         router.push("/dashboard"); // --> going back to the dashboard, since there is no UI for group display yet
 
@@ -142,14 +150,6 @@ interface FormFieldProps {
           </Form.Item>
 
           <Form.Item
-            name="adminId"
-            label="Admin ID"
-            rules={[{ required: true, message: "Admin ID is required!" }]}
-            >
-            <Input  placeholder="Admin ID"  />
-          </Form.Item>
-
-          <Form.Item
             name="members"
             label="Members"
             rules={[{ required: true, message: "Please input usernames of the members you want to add, use a comma to seperate!" }]}
@@ -173,8 +173,6 @@ interface FormFieldProps {
                 <Button className="groupCreation-upload" icon={<UploadOutlined />}>Upload Group Picture</Button>
             </Upload>
           </Form.Item>
-
-          
 
           
           <Form.Item>

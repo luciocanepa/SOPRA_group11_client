@@ -7,7 +7,6 @@
     padding: 2rem;
     gap: 2.5rem;
     width: 100%;
-    /*background-color: rgb(255, 244, 240);*/
     overflow: auto;
     position:relative
 
@@ -39,8 +38,6 @@
     padding: 2rem;
     gap: 2.5rem;
     width: 100%;
-    /*background-color: rgb(255, 221, 209, 0.956);*/
-    background-color: white;
     overflow: auto;
     
     max-width: 600px; 
@@ -52,20 +49,24 @@
 
   }
 .groupCreation-container h2 {
-    color: rgba(244, 112, 100, 0.9) !important;
+    color: rgba(185, 0, 23, 1) !important;
     text-align: center;
     font-weight: bold;
+}
+.groupCreation-container p {
+    color: rgba(185, 0, 23, 1) !important;
+    text-align: center;
 }
 
 .groupCreation-button {
     width: 100%;
     min-width: 120px;
-    background-color: rgba(244, 112, 100, 0.877) !important;
+    background-color: rgba(185, 0, 23, 1) !important;
     color :white !important;
     border: none;
   }
 .groupCreation-button:hover {
-    background-color: rgba(200, 90, 80, 0.9) !important;
+    background-color: rgb(135, 10, 24) !important;
     transform: scale(1.05);
     border: white;
     outline: white;
@@ -76,7 +77,7 @@
 .ant-input {
     color: black !important;
     background-color: white !important;
-    border: 1px solid rgba(244, 112, 100, 0.5);
+    border: 1px solid rgba(185, 0, 23, 1);
     border-radius: 5px;
     padding: 10px;
     transition: all 0.3s ease-in-out;
@@ -84,21 +85,13 @@
 
 .ant-input:hover, .ant-input:focus {
     background-color: white !important;
-    border: 1px solid rgba(244, 112, 100, 0.9) !important;
+    border: 1px solid rgba(185, 0, 23, 1) !important;
 }
-
-/* DISABLED INPUT , in  case we opt for the auto-fill of the admin ID*/
-.ant-input[disabled] {
-    background-color: #f5f5f5 !important;
-    color: #999 !important;
-    border: 1px solid rgba(200, 200, 200, 0.5);
-}
-
 
 
 
 .groupCreation-upload {
-    background-color: rgba(244, 112, 100, 0.8) !important;
+    background-color: rgba(185, 0, 23, 1) !important;
     color: white !important;
     border: none !important;
     padding: 10px;
@@ -108,7 +101,7 @@
 
 
 .groupCreation-upload:hover {
-    background-color: rgba(200, 90, 80, 0.9) !important;
+    background-color: rgb(135, 10, 24) !important;
     color: white !important;
     transform: scale(1.05);
 }
@@ -116,14 +109,14 @@
 .ant-upload-list-item {
     color: black !important;
     background-color: white !important;
-    border: 1px solid rgba(244, 112, 100, 0.5);
+    border: 1px solid rgba(185, 0, 23, 1);
     padding: 5px;
     border-radius: 5px;
 }
 
 
 .ant-form-item-label > label {
-    color: rgba(244, 112, 100, 0.9) !important;
+    color: rgba(185, 0, 23, 1) !important;
     font-weight: bold;
 }
 
