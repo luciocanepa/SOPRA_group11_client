@@ -58,6 +58,22 @@ reason).
 |                    | 06.04.2025   | <https://github.com/luciocanepa/SOPRA_group11_server/commit/e369fdd8d1a7bd9ba2f63af6ee909bd2327a77cc> | I added tests (unit, integration, and controller) for fetching groups based on a user Id, adding tests for success, failure and an edge case. | The tests make sure that the endpoint /users/{id}/groups works as intended. |
 | **@luciocanepa** | 05.04.2025   | [#43 Manage groups invitations](https://github.com/luciocanepa/SOPRA_group11_server/commit/e7c2b00117199c055fd1848100b7d020de944a36) | Manage groups invitation:<br>- users that are part of a group can invite an user<br>- invited users are able to visualize all invitations and either accept it or reject it<br>- groups can see all active members and retrieve all pending invitations<br>I've managed to keep one single extra table to do so, and specifically implemented the endpoints:<br>- POST /groups/{gid}/invitations to invite an user to a group (user ID is a body parameter)<br>- GET /groups/{gid}/invitations to get all invitations of a group (no body)<br>- GET /users/{user_id}/invitations to get all invitations of a user (no body)<br>- PUT /invitations/{iid}/accept to accept a specific invitation based on id<br>- PUT /invitations/{iid}/reject to reject a specific invitation based on id<br>All 5 mappsing requires a token to be passed in the header (Authorization: <token>) of the user making the API call this serves to identify it, retrieve information about it and decide if it can do that call | Now users that are part of groups can send invitations to other users to join. Who gets invited can decide to either accept (gets added to the group) or reject. The users-groups relation is stored in a table on the server that keeps track of the relations status|
 | **@luciocanepa** | 05.04.2025   | [#41 Tests for groups invitations](https://github.com/luciocanepa/SOPRA_group11_server/commit/aabcbd845e1ad376b7d2e3557d7b6ffd149ec551) | Added tests for groups invitations and newly introduced endpoints:<br>- InvitationService tests (and integration)<br>- added tests for DTO Mapper<br>- updated group related tests such that they are now compatible with the new joined table | For each endpoint and implemented function, a test is written and enusre the correct behaviour for the succes case and all different kinds of error the function can return.|
+| **@sharonisler** | 06.04.2025   | [Commit 1, Issue28 server](https://github.com/luciocanepa/SOPRA_group11_server/commit/49a7259bc280b24a6688325a7019a90ebeae3611) | I added the endpoint that returns one user especially for the edit page (ManageProfileDTO) and an endpoint to store the new user values (including username, name, password, birthday, timezone and profilePicture) of the user (UserPutDTO). | This contribution is needed in order to process the user profile management, new user values can now be changed and stored. |
+| **@sharonisler** | 06.04.2025   | [Commit 2, Issue8 client](https://github.com/luciocanepa/SOPRA_group11_client/commit/db26f965e5e0ebdc6073209ca148d1b9d9aaeec0) | I made a UI for Profile Management. The user can oversee their profile and edit the values they would like to change. All users have the same initial profile picture if they have not uploaded one themselves. The user information should be prefilled in the Form and are only editable by clicking on the edit button (pen). To enter your birthday you are able to choose the Date in a calendar, instead of having to type in a correct format, as well as the timezones, they are selectable from a certain selection of timezones. | This contribution is needed so logged in users can oversee their profile data, as well as editing their profile. |
+| **@sharonisler** | 06.04.2025   | [Commit 3, Issue3 client](https://github.com/luciocanepa/SOPRA_group11_client/commit/d55ae9ee7f862f57b471349543dc9feb978f9600) [Commit 4, Issue6 client](https://github.com/luciocanepa/SOPRA_group11_client/commit/58369597f47b5445b89de9da6963b79a0d6f48f8) | I had to change some things regarding the admin Id, and the general styling of this group creation form. I had to change the handleLogout() so the status can be set to offline on the server part. The size of the box does not jump anymore when hovering over a group card. I also changed how the users’ groups get fetched and displayed, however this can and possibly should be improved again with the newly added endpoints from the server side.  | Both of these commits are fixes/improvements to my commit from last week. |
+| **[@githubUser4]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@githubUser5]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+
+---
+
+## Contributions Week 3 - 07.04.2025 to 13.04.2025
+
+| **[@githubUser1]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@githubUser2]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **[@githubUser4]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
@@ -67,19 +83,13 @@ reason).
 
 ---
 
-## Contributions Week 3 - [Begin Date] to [End Date]
+## Contributions Week 4 - 14.04.2025 to 20.04.2025
 
 _Continue with the same table format as above._
 
 ---
 
-## Contributions Week 4 - [Begin Date] to [End Date]
-
-_Continue with the same table format as above._
-
----
-
-## Contributions Week 5 - [Begin Date] to [End Date]
+## Contributions Week 5 - 21.04.2025 to 27.04.2025
 
 _Continue with the same table format as above._
 
