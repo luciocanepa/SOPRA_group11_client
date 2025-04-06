@@ -30,7 +30,7 @@
   
   .dashboardMainPage-card {
     width: 100%;
-    max-width: 400px;
+    max-width: 500px;
     padding: 1.5rem; 
     border-radius: 10px;
     background-color: white !important;
@@ -39,7 +39,7 @@
     color: white !important;
   }
   .dashboardMainPage-card h3 {
-    color: rgb(159, 154, 154);
+    color: rgba(185, 0, 23, 1);
   }
 
   .dashboardMainPage-button-container {
@@ -89,7 +89,16 @@
 
 .group-card-wrapper {
     flex: 0 0 auto;
-}
+    width: 150px;
+    height: 150px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    overflow: visible;
+    position: relative;
+  }
 
 .group-card {
     width: 150px;

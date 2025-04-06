@@ -4,4 +4,5 @@ export interface User {
   username: string | null;
   token: string | null;
   status: string | null;
+  groupIds: string[] | null;
 }

@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Group } from "@/types/group";
-import { Button, Card, Table } from "antd";
+import { User } from "@/types/user";
+import { Button, Card } from "antd";
 import React, { useEffect, useState } from "react";
 import { PlusCircleOutlined } from "@ant-design/icons";
 
@@ -17,49 +18,59 @@ const Dashboard: React.FC = () => {
         clear: clearToken,
     } = useLocalStorage<string>("token", "");
 
-    const handleLogout = (): void => {
+    const [loggedInUserId, setLoggedInUserId] = useState<string | null>(null);
+    const [loggedInUserGroupIds, setLoggedInUserGroupIds] = useState<string[] | null>(null);
+
+    useEffect(() => {
+        const fetchLoggedInUser = async () => {
+            const token = localStorage.getItem("token");
+            if (!token) return;
+      
+            try {
+                const users = await apiService.get<User[]>("/users"); // fetching all users
+                const matchedUser = users.find((user) => user.token === token);
+        
+                if (matchedUser) {
+                setLoggedInUserId(matchedUser.id)
+                setLoggedInUserGroupIds(matchedUser.groupIds); // store the group IDs in order to be able to display the listed ones
+                } else {
+                console.warn("No matching user found for stored token");
+                }
+            } catch (error) {
+                console.error("Error fetching users:", error);
+            }
+        };
+      
+        fetchLoggedInUser();
+      }, []);
+
+
+      const handleLogout = async() => {
+        try {
+            await apiService.put<void>(`/users/logout`, {id: loggedInUserId});
+            } catch (error) {
+            if (error instanceof Error) {
+                alert(`Something went wrong while logging out:\n${error.message}`);
+            } else {
+                console.error("Logout has failed");
+            }}
+
         clearToken();
         router.push("/login");
     };
 
-
-    const columns = [
-        {
-          title: "Group Name",
-          dataIndex: "groupName",
-          key: "groupName",
-        }
-      ];
-
-
-      // in order to get the current user, to be able to filter the groups the user is member of
-      const [loggedInUser, setLoggedInUser] = useState<string | null>(null);
-      useEffect(() => {
-          const fetchLoggedUserId = localStorage.getItem("locallyStoredID");
-          if (fetchLoggedUserId) {
-              setLoggedInUser(fetchLoggedUserId);
-          } else {
-              console.log("No user ID found in local storage.");
-          }
-      }, []);
-
-
-      // fetches all the groups, and checks for each group if the current user is a member
-    const [groups, setGroups] = useState<Group[] | null>(null);
-    const [userGroups, setUserGroups] = useState<Group[]>([]);
+      // fetching all groups, and check if the group id is in the list of group id's that the user is a member of.
+    const [userGroupMemberships, setUserGroupMemberships] = useState<Group[]>([]);
     useEffect(() => {
         const fetchGroups = async () => {
         try {
             const allGroups: Group[] = await apiService.get<Group[]>("/groups");
-            setGroups(allGroups);
-            console.log("Fetched groups:", groups);
 
-
-            if (loggedInUser) {
+            if (loggedInUserGroupIds) {
                 const filteredGroups = allGroups.filter(group => 
-                    group.members?.some(member => member.id === loggedInUser)
+                    group.id !== null && loggedInUserGroupIds.includes(group.id)
                 );
-                setUserGroups(filteredGroups);
+                setUserGroupMemberships(filteredGroups);
             }
 
         
@@ -73,7 +84,7 @@ const Dashboard: React.FC = () => {
         };
 
     fetchGroups();
-  }, [apiService, loggedInUser]);
+  }, [apiService, loggedInUserGroupIds]);
 
 
 
@@ -97,9 +108,9 @@ return (
             <Card className="dashboardMainPage-card">
                 <h3>Your Groups:</h3>
                 <div className="groups-grid">
-                    {userGroups && userGroups.length > 0 ? (
+                    {userGroupMemberships && userGroupMemberships.length > 0 ? (
                         <>
-                            {userGroups.map((group) => (
+                            {userGroupMemberships.map((group) => (
                                 <div key={group.id} className="group-card-wrapper">
                                     <Card className="group-card" onClick={() => router.push(`/groups/${group.id}`)}>
                                         {group.name}
@@ -135,7 +146,7 @@ return (
 
 
         <div className="dashboardMPL-button-container">
-            <Button className="dashboardMainPage-button" onClick = {() => router.push("/edit")}>
+            <Button className="dashboardMainPage-button" onClick = {() => router.push(`/edit/${loggedInUserId}`)}>
                 Manage Profile
             </Button>
             <Button className="dashboardMainPage-button" onClick={handleLogout}>
