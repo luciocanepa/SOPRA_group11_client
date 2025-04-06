@@ -53,8 +53,9 @@ reason).
 
 | **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
 | ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
-| **[@githubUser1]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **annapangUZH** | 03.04.2025   | [[Link to Commit 1]](https://github.com/luciocanepa/SOPRA_group11_client/commit/31f717b63d50b8cdd819ad08ac353d59d01be189) | I changed the realTimeStatus branch and the WebSocket. Now instead of only updating statuses of users, it handles updates to all group-related stuff, like updates to the group name, description, or if a member changes the username or the status changes. | This ensures that users will see real time updates of changes, including status changes, without having to constantly refresh the page. |
+|                    | 05.04.2025   | https://github.com/luciocanepa/SOPRA_group11_server/commit/e9718c9b67a104aeee80f8093620a0f45be23402 | I added an endpoint (/users/{id}/groups) that handles the fetching of groups if given a user Id (based on the user Id, it returns all groups the user is a part of) | This ensures that the call to get all groups of a specific user is isolated and handled directly by one single endpoint, which makes getting the groups for a user much easier, especially for the dashboard. |
+|                    | 06.04.2025   | https://github.com/luciocanepa/SOPRA_group11_server/commit/e369fdd8d1a7bd9ba2f63af6ee909bd2327a77cc | I added tests (unit, integration, and controller) for fetching groups based on a user Id, adding tests for success, failure and an edge case. | The tests make sure that the endpoint /users/{id}/groups works as intended. |
 | **[@githubUser2]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
