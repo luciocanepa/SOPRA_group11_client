@@ -62,7 +62,7 @@ li {
   padding: 2rem;
 }
 
-/* Home page gradient background */
+
 .home {
   background: linear-gradient(to bottom right, var(--bg-primary), var(--bg-secondary));
   min-height: 100vh;
