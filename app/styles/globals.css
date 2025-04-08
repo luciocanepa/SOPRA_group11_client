@@ -7,6 +7,9 @@
   --accent-light: #93c5fd;
   --text-primary: #f3f4f6;
   --text-secondary: #d1d5db;
+  /* Registration page colors */
+  --reg-light: #f87171;   /* Light red */
+  --reg-dark: #b91c1c;    /* Darker red (base) */
 }
 
 * {
@@ -59,8 +62,51 @@ li {
   padding: 2rem;
 }
 
+
 .home {
   background: linear-gradient(to bottom right, var(--bg-primary), var(--bg-secondary));
   min-height: 100vh;
   padding: 2rem;
 }
+
+/* Registration Page Styles */
+.register-container {
+  background-color: #fcd1d1; /* Soft pastel red */
+  padding: 2rem;
+  border-radius: 0.5rem;
+  margin: 2rem auto;
+  max-width: 500px;
+  color: black;  /* Text color for container set to black */
+}
+
+.register-container h2 {
+  color: black;  /* Change header color to black */
+}
+
+/* Set the label text to black */
+.register-container .ant-form-item-label {
+  color: black; /* Set text color for labels (e.g., Username, Password) to black */
+}
+
+/* Set text color for the input fields */
+.register-container .ant-input,
+.register-container .ant-input-password {
+  color: white;
+  background-color: white;/* Set text color inside inputs to black */
+}
+
+.register-button {
+  background-color: #b91c1c;  /* Darker red */
+  color: white;  /* Text color for button set to white */
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 1rem;
+}
+
+.register-button:hover {
+  background-color: #991b1b;  /* Darker red on hover */
+}
+
