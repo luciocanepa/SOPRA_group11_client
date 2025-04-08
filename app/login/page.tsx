@@ -98,6 +98,7 @@ const Login: () => JSX.Element = () => {
           <p className="signup-prompt">No account yet?</p>
         </div>
       </div>
+
   );
 };
 
