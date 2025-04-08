@@ -77,7 +77,7 @@ reason).
 | ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
 | **[@githubUser1]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
-| **[@githubUser2]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+| **luciocanepa** | 08.04.2025   | [#59 PUT and DELETE groups endpoints](https://github.com/luciocanepa/SOPRA_group11_server/pull/62/commits/fcf09f35353ee21542b020bf599a4fb32e013b53) |  Added the following groups endpoints and associated tests:<br>- DELETE /groups/{gid}<br>- PUT /groups/{gid}<br>At the moment no authorization check is going on (this will be addressed by another issue)<br> | Now a user is able to update groups information and delete a group (together with all associated relations).<br>Tests for the 2 endpoints are now written. |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
