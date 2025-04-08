@@ -59,7 +59,6 @@ li {
   padding: 2rem;
 }
 
-/* Add subtle gradient to backgrounds */
 .home {
   background: linear-gradient(to bottom right, var(--bg-primary), var(--bg-secondary));
   min-height: 100vh;
