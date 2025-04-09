@@ -9,3 +9,4 @@ export interface Group {
     adminId: string | null;
     members: User[] | null;
   }
+

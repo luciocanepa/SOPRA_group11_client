@@ -1,44 +1,51 @@
-"use client"; // For components that need React hooks and browser APIs, SSR (server side rendering) has to be disabled. Read more here: https://nextjs.org/docs/pages/building-your-application/rendering/server-side-rendering
-
-import { useRouter } from "next/navigation"; // use NextJS router for navigation
+"use client";
+import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
-import { Button, Form, Input } from "antd";
-// Optionally, you can import a CSS module or file for additional styling:
-// import styles from "@/styles/page.module.css";
+
+import { JSX, useState } from "react";
+import "../styles/pages/login.css";
+
 
 interface FormFieldProps {
-  label: string;
-  value: string;
+  username: string;
+  password: string;
 }
 
-const Login: React.FC = () => {
+const Login: () => JSX.Element = () => {
   const router = useRouter();
   const apiService = useApi();
-  const [form] = Form.useForm();
-  // useLocalStorage hook example use
-  // The hook returns an object with the value and two functions
-  // Simply choose what you need from the hook:
-  const {
-    // value: token, // is commented out because we do not need the token value
-    set: setToken, // we need this method to set the value of the token to the one we receive from the POST request to the backend server API
-    // clear: clearToken, // is commented out because we do not need to clear the token when logging in
-  } = useLocalStorage<string>("token", ""); // note that the key we are selecting is "token" and the default value we are setting is an empty string
-  // if you want to pick a different token, i.e "usertoken", the line above would look as follows: } = useLocalStorage<string>("usertoken", "");
+  const { set: setToken } = useLocalStorage<string>("token", "");
+  const [errors, setErrors] = useState({ username: '', password: '' }); // Add error state
 
-  const handleLogin = async (values: FormFieldProps) => {
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
+    const values = {
+      username: formData.get("username") as string,
+      password: formData.get("password") as string,
+    };
+
+    // Validate inputs
+    const newErrors = {
+      username: !values.username ? 'Please put in your username!' : '',
+      password: !values.password ? 'Please put in your password!' : ''
+    };
+
+    setErrors(newErrors);
+
+    // Don't proceed if there are errors
+    if (newErrors.username || newErrors.password) {
+      return;
+    }
+
     try {
-      // Call the API service and let it handle JSON serialization and error handling
-      const response = await apiService.post<User>("/users", values);
-
-      // Use the useLocalStorage hook that returned a setter function (setToken in line 41) to store the token if available
+      const response = await apiService.post<User>("/users/login", values);
       if (response.token) {
         setToken(response.token);
       }
-
-      // Navigate to the user overview
-      router.push("/users");
+      router.push("/dashboard");
     } catch (error) {
       if (error instanceof Error) {
         alert(`Something went wrong during the login:\n${error.message}`);
@@ -48,37 +55,52 @@ const Login: React.FC = () => {
     }
   };
 
+  const handleSignUpRedirect = () => {
+    router.push("/register");
+  };
+
   return (
-    <div className="login-container">
-      <Form
-        form={form}
-        name="login"
-        size="large"
-        variant="outlined"
-        onFinish={handleLogin}
-        layout="vertical"
-      >
-        <Form.Item
-          name="username"
-          label="Username"
-          rules={[{ required: true, message: "Please input your username!" }]}
-        >
-          <Input placeholder="Enter username" />
-        </Form.Item>
-        <Form.Item
-          name="name"
-          label="Name"
-          rules={[{ required: true, message: "Please input your name!" }]}
-        >
-          <Input placeholder="Enter name" />
-        </Form.Item>
-        <Form.Item>
-          <Button type="primary" htmlType="submit" className="login-button">
-            Login
-          </Button>
-        </Form.Item>
-      </Form>
-    </div>
+      <div className="login-page">
+        <div className="login-container">
+          <h1 className="login-title">Pomodoro Study Room</h1>
+          <form onSubmit={handleLogin} className="login-form" noValidate>
+            <div className="form-group">
+              <label htmlFor="username">Username</label>
+              <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  placeholder="Please enter your username"
+                  className="login-input"
+                  required
+              />
+              {errors.username && <span className="error-message">{errors.username}</span>}
+            </div>
+            <div className="form-group">
+              <label htmlFor="password">Password</label>
+              <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  placeholder="Please enter your password"
+                  className="login-input"
+                  required
+              />
+              {errors.password && <span className="error-message">{errors.password}</span>}
+            </div>
+            <div className="button-group">
+              <button type="submit" className="login-button">
+                Login
+              </button>
+              <button type="button" onClick={handleSignUpRedirect} className="signup-button">
+                Go to Sign Up
+              </button>
+            </div>
+          </form>
+          <p className="signup-prompt">No account yet?</p>
+        </div>
+      </div>
+
   );
 };
 
