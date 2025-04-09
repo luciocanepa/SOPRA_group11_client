@@ -8,10 +8,10 @@ import { JSX, useState } from "react";
 import "../styles/pages/login.css";
 
 
-interface FormFieldProps {
+/*interface FormFieldProps {
   username: string;
   password: string;
-}
+}*/
 
 const Login: () => JSX.Element = () => {
   const router = useRouter();

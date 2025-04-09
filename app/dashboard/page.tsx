@@ -42,7 +42,7 @@ const Dashboard: React.FC = () => {
         };
       
         fetchLoggedInUser();
-      }, []);
+      }, [apiService]);
 
 
       const handleLogout = async() => {

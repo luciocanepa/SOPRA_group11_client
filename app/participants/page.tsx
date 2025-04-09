@@ -5,6 +5,15 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Table, Tag } from "antd";
 
+interface ApiUser {
+    id: number;
+    username: string;
+    status: 'Available' | 'Working' | 'Offline';
+}
+
+interface GroupResponse {
+    users: ApiUser[];
+}
 
 interface Participant {
     id: number;
@@ -23,9 +32,9 @@ export default function GroupParticipantsPage() {
         const fetchParticipants = async () => {
             try {
                 setLoading(true);
-                const response = await apiService.get(`/groups/${gId}`);
+                const response = await apiService.get<GroupResponse>(`/groups/${gId}`);
 
-                const members = response.users.map((user: any) => ({
+                const members = response.users.map((user: ApiUser) => ({
                     id: user.id,
                     username: user.username,
                     status: user.status
@@ -40,7 +49,7 @@ export default function GroupParticipantsPage() {
         };
 
         fetchParticipants();
-    }, [gId]);
+    }, [gId, apiService]);
 
     const columns = [
         {

@@ -2,11 +2,12 @@
 import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
-import useLocalStorage from "@/hooks/useLocalStorage";
+//import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
 import { Button, Form, Input, message, Select, Upload , DatePicker} from "antd";
 import { EditOutlined, UploadOutlined } from "@ant-design/icons";
 import "@/styles/pages/edit.css";
+import Image from 'next/image';
 
 const timezones = [
     { value: "UTC", label: "UTC" },
@@ -78,7 +79,7 @@ const timezones = [
 
         fetchingUser();
 
-    },[id, apiService]);
+    },[id, apiService, form]);
 
 
 
@@ -171,15 +172,18 @@ const timezones = [
             <h2>Profile Management</h2>
 
         <div className="profile-image-container">
-          <img
+        <Image
             src={
-              uploadedImage
-                ? `data:image/png;base64,${uploadedImage}`
-                : "/tomato.JPG" // default profile picture
+                uploadedImage
+                    ? `data:image/png;base64,${uploadedImage}`
+                    : "/tomato.JPG"
             }
             alt="Profile"
             className="profile-image"
-          />  
+            width={150}  // Add appropriate width
+            height={150} // Add appropriate height
+            unoptimized={!!uploadedImage} // Needed for base64 images
+        />
         </div>
             
 

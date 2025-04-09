@@ -3,6 +3,10 @@
 
 body {
     background-color: #ff844e;
+    background-image: url('/images/clock_top_right.jpeg');
+    background-size: cover; /* full coverage without stretching */
+    background-position: center; /* centers image */
+    background-repeat: no-repeat;
     color: white;
     font-family: Arial, sans-serif;
     display: flex;

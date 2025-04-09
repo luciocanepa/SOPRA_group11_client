@@ -82,7 +82,7 @@ export function PomodoroTimer({ initialSession = 25, initialBreak = 5 }: {
         }, 1500); // 1.5 seconds delay
 
         return () => clearTimeout(timeout);
-    }, [state.timeLeft, state.isRunning, state.activeSettings]);
+    }, [state.timeLeft, state.isRunning, state.activeSettings, state.isSession]);
 
     const formatTime = (seconds: number) => {
         const mins = Math.floor(seconds / 60);
