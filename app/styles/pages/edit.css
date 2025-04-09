@@ -1,0 +1,234 @@
+.background-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    padding: 2rem;
+    gap: 2.5rem;
+    width: 100%;
+    overflow: auto;
+    position:relative
+
+  }
+.background-container::before {
+    content: "";
+    
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('/dashboard_bg.jpg');
+    background-size: cover;
+    background-position: top right;
+    background-repeat: no-repeat;
+    opacity: 0.8;
+    z-index: -1;
+}
+
+.groupCreation-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem;
+    gap: 2.5rem;
+    width: 100%;
+    overflow: auto;
+    
+    max-width: 600px; 
+    padding: 1.5rem; 
+    border-radius: 10px;
+    background-color: white !important;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    color: white !important;
+
+  }
+.groupCreation-container h2 {
+    color: rgba(185, 0, 23, 1) !important;
+    text-align: center;
+    font-weight: bold;
+}
+.groupCreation-container p {
+    color: rgba(185, 0, 23, 1) !important;
+    text-align: center;
+}
+
+
+.profile-image-container {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  
+.profile-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ccc;
+    margin-bottom: 12px;
+  }
+
+
+
+.edit-icon {
+    cursor: pointer;
+    color: rgba(185, 0, 23, 1);
+    margin-left: 8px;
+    transition: color 0.3s ease;
+  }
+  
+.edit-icon:hover {
+    color: rgba(185, 0, 23, 1);
+  }
+
+
+
+.groupCreation-button {
+    width: 100%;
+    min-width: 120px;
+    background-color: rgba(185, 0, 23, 1) !important;
+    color :white !important;
+    border: none;
+  }
+.groupCreation-button:hover {
+    background-color: rgb(135, 10, 24) !important;
+    transform: scale(1.05);
+    border: white;
+    outline: white;
+  }
+
+
+
+.ant-input {
+    color: black !important;
+    background-color: white !important;
+    border: 1px solid rgba(185, 0, 23, 1);
+    border-radius: 5px;
+    padding: 10px;
+    transition: all 0.3s ease-in-out;
+}
+
+.ant-input:hover, .ant-input:focus {
+    background-color: white !important;
+    border: 1px solid rgba(185, 0, 23, 1) !important;
+}
+
+
+
+.groupCreation-upload {
+    background-color: rgba(185, 0, 23, 1) !important;
+    color: white !important;
+    border: none !important;
+    padding: 10px;
+    border-radius: 5px;
+    transition: all 0.3s ease-in-out;
+}
+
+
+.groupCreation-upload:hover {
+    background-color: rgb(135, 10, 24) !important;
+    color: white !important;
+    transform: scale(1.05);
+}
+
+.groupCreation-upload .anticon {
+    color: white !important;
+  }
+
+.ant-upload-list-item {
+    color: black !important;
+    background-color: white !important;
+    border: 1px solid rgba(185, 0, 23, 1);
+    padding: 5px;
+    border-radius: 5px;
+}
+
+
+.ant-form-item-label > label {
+    color: rgba(185, 0, 23, 1) !important;
+    font-weight: bold;
+}
+
+.ant-form-item-explain {
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    max-width: 100%;
+    font-size: 0.85rem;
+}
+
+
+.ant-input-affix-wrapper {
+    background-color: white !important;
+    border-color: #aba9a9 !important;
+    box-shadow: none !important;
+    height: 40px;
+    line-height: 40px;
+    transition: none !important;
+    padding: 0 11px !important;
+    box-sizing: border-box;
+      
+  }
+  
+
+  .ant-input-affix-wrapper-focused {
+    border-color: rgba(185, 0, 23, 1) !important;
+
+  }
+
+  .ant-input {
+    background-color: white !important;
+    color: black !important;
+  }
+
+
+/*ant-input-affix-wrapper-lg*/
+/* Reset input styles */
+.ant-input,
+.ant-select-selector,
+.ant-picker,
+.ant-input-password,
+.ant-select-dropdown {
+  background-color: white !important;
+  color: black !important;
+  border-color: #d9d9d9 !important; /* default AntD border */
+}
+
+/* Ensure calendar icon and dropdown icons are visible */
+.ant-picker-suffix,
+.ant-select-arrow,
+.anticon {
+  color: black !important;
+}
+
+/* Dropdown menu styles */
+.ant-select-dropdown,
+.ant-picker-dropdown {
+  background-color: white !important;
+  color: black !important;
+}
+
+/* Calendar cell hover/focus */
+.ant-picker-cell-inner {
+  color: black !important;
+}
+
+/* Option styles */
+.ant-select-item-option-content {
+  color: black !important;
+}
+.ant-picker-header-view {
+    color: black !important;
+  }
+  .ant-picker-panel {
+    background-color: white !important;
+    color: black !important;
+  }
+  
+  /* Calendar cell hover / selected */
+  .ant-picker-cell-in-view {
+    color: black !important;
+  }
+

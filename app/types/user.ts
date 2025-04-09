@@ -4,5 +4,12 @@ export interface User {
   username: string | null;
   token: string | null;
   status: string | null;
+
+  birthday: string | null;
+  profilePicture: string | null;
+  timezone: string | null;
+  password: string | null;
+
   groupIds: string[] | null;
+
 }
