@@ -4,11 +4,15 @@ import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import { Form, Input } from "antd";
 import Link from "next/link";
+import useLocalStorage from "@/hooks/useLocalStorage";
+import { User } from "@/types/user";
 
 const Register: React.FC = () => {
     const router = useRouter();
     const apiService = useApi();
     const [form] = Form.useForm();
+    const { set: setToken } = useLocalStorage<string>("token", "");
+    const { set: setUserId } = useLocalStorage<string>("id", "");
 
     const hashPassword = async (password: string) => {
         const encoder = new TextEncoder();
@@ -23,11 +27,13 @@ const Register: React.FC = () => {
         try {
             // Hash the password before sending it to the backend
             const hashedPassword = await hashPassword(values.password);
-            const response = await apiService.post("/users/register", {
+            const response = await apiService.post<User>("/users/register", {
                 username: values.username,
                 password: hashedPassword,
             });
-            if (response) {
+            if (response&& response.token && response.id) {
+                setToken(response.token);
+                setUserId(response.id);
                 alert("Registration successful! Redirecting to dashboard.");
                 router.push("/dashboard");
             }

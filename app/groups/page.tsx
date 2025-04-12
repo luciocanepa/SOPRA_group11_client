@@ -15,7 +15,6 @@ interface FormFieldProps {
     image: string;
     adminId: string;
     members: string[];
-    token: string;
   }
 
 
@@ -29,23 +28,37 @@ interface FormFieldProps {
 
 
     useEffect(() => {
-      const fetchLoggedInUser = async () => {
-        const token = localStorage.getItem("token");
-        if (!token) return;
+        const fetchLoggedInUser = async () => {
+            const token = localStorage.getItem("token");
+            const uid = localStorage.getItem("id");
+            const id = uid ? String(uid) : null;
+
+
+            if (!token || !id) return;
+      
+            try {
+                const user = await apiService.get<User>(`/users/${id}`);
     
-        try {
-          const users = await apiService.get<User[]>("/users"); // fetching all users
-          const matchedUser = users.find((user) => user.token === token);
-    
-          if (matchedUser) {
-            setLoggedInUserId(matchedUser.id); // store the ID in order to use it as adminId for group creation
-          } else {
-            console.warn("No matching user found for stored token");
-          }
-        } catch (error) {
-          console.error("Error fetching users:", error);
-        }
-      };
+                const storedToken = String(token).replace(/\s+/g, '').trim();
+                const fetchedToken = user.token? String(user.token).replace(/\s+/g, '').trim() : "";
+                const wrappedFetchedToken = `"${fetchedToken}"`;
+                console.log("Fetched User:", user);
+                console.log("Fetched Token from User:", fetchedToken);
+                console.log("Stored Token in localStorage:", storedToken);
+                console.log("Stored User ID in localStorage:", id);
+                console.log("Wrapped Fetched Token:", wrappedFetchedToken);
+
+        
+                if (storedToken == wrappedFetchedToken) {
+                  setLoggedInUserId(user.id);
+                }
+                else {
+                    console.warn("No matching user found for stored token");
+                }
+            } catch (error) {
+                console.error("Error fetching users:", error);
+            }
+        };
     
       fetchLoggedInUser();
     }, [apiService]);
@@ -61,11 +74,8 @@ interface FormFieldProps {
             image: uploadedImage || null,  // Use uploadedImage or set null if not uploaded
             adminId: loggedInUserId
         };
-        const response = await apiService.post<Group>("/groups", requestBody);
+        await apiService.post<Group>("/groups", requestBody);
   
-        if (response.token) {
-          setToken(response.token);
-        }
 
         router.push("/dashboard"); // --> going back to the dashboard, since there is no UI for group display yet
 
