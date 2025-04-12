@@ -17,6 +17,7 @@ const Login: () => JSX.Element = () => {
   const router = useRouter();
   const apiService = useApi();
   const { set: setToken } = useLocalStorage<string>("token", "");
+  const { set: setUserId } = useLocalStorage<string>("id", "");
   const [errors, setErrors] = useState({ username: '', password: '' }); // Add error state
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -42,8 +43,9 @@ const Login: () => JSX.Element = () => {
 
     try {
       const response = await apiService.post<User>("/users/login", values);
-      if (response.token) {
+      if (response&& response.token && response.id) {
         setToken(response.token);
+        setUserId(response.id);
       }
       router.push("/dashboard");
     } catch (error) {

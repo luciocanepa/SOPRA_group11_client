@@ -24,15 +24,28 @@ const Dashboard: React.FC = () => {
     useEffect(() => {
         const fetchLoggedInUser = async () => {
             const token = localStorage.getItem("token");
-            if (!token) return;
+            const uid = localStorage.getItem("id");
+            const id = uid ? String(uid) : null;
+
+
+            if (!token || !id) return;
       
             try {
-                const users = await apiService.get<User[]>("/users"); // fetching all users
-                const matchedUser = users.find((user) => user.token === token);
+                const user = await apiService.get<User>(`/users/${id}`);
+    
+                const storedToken = String(token).replace(/\s+/g, '').trim();
+                const fetchedToken = user.token? String(user.token).replace(/\s+/g, '').trim() : "";
+                const wrappedFetchedToken = `"${fetchedToken}"`;
+                console.log("Fetched User:", user);
+                console.log("Fetched Token from User:", fetchedToken);
+                console.log("Stored Token in localStorage:", storedToken);
+                console.log("Stored User ID in localStorage:", id);
+                console.log("Wrapped Fetched Token:", wrappedFetchedToken);
+
         
-                if (matchedUser) {
-                setLoggedInUserId(matchedUser.id)
-                setLoggedInUserGroupIds(matchedUser.groupIds); // store the group IDs in order to be able to display the listed ones
+                if (storedToken == wrappedFetchedToken) {
+                    setLoggedInUserId(user.id)
+                    setLoggedInUserGroupIds(user.groupIds); // store the group IDs in order to be able to display the listed ones
                 } else {
                 console.warn("No matching user found for stored token");
                 }
