@@ -8,8 +8,8 @@
   --text-primary: #f3f4f6;
   --text-secondary: #d1d5db;
   /* Registration page colors */
-  --reg-light: #f87171;   /* Light red */
-  --reg-dark: #b91c1c;    /* Darker red (base) */
+  --reg-light: #f87171; /* Light red */
+  --reg-dark: #b91c1c; /* Darker red (base) */
 }
 
 * {
@@ -21,7 +21,13 @@
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
   line-height: 1.5;
 }
 
@@ -62,9 +68,12 @@ li {
   padding: 2rem;
 }
 
-
 .home {
-  background: linear-gradient(to bottom right, var(--bg-primary), var(--bg-secondary));
+  background: linear-gradient(
+    to bottom right,
+    var(--bg-primary),
+    var(--bg-secondary)
+  );
   min-height: 100vh;
   padding: 2rem;
 }
@@ -76,11 +85,11 @@ li {
   border-radius: 0.5rem;
   margin: 2rem auto;
   max-width: 500px;
-  color: black;  /* Text color for container set to black */
+  color: black; /* Text color for container set to black */
 }
 
 .register-container h2 {
-  color: black;  /* Change header color to black */
+  color: black; /* Change header color to black */
 }
 
 /* Set the label text to black */
@@ -92,12 +101,12 @@ li {
 .register-container .ant-input,
 .register-container .ant-input-password {
   color: white;
-  background-color: white;/* Set text color inside inputs to black */
+  background-color: white; /* Set text color inside inputs to black */
 }
 
 .register-button {
-  background-color: #b91c1c;  /* Darker red */
-  color: white;  /* Text color for button set to white */
+  background-color: #b91c1c; /* Darker red */
+  color: white; /* Text color for button set to white */
   border: none;
   padding: 0.75rem 1.5rem;
   border-radius: 0.375rem;
@@ -107,7 +116,7 @@ li {
 }
 
 .register-button:hover {
-  background-color: #991b1b;  /* Darker red on hover */
+  background-color: #991b1b; /* Darker red on hover */
 }
 
 .invite-user-placeholder-container {
