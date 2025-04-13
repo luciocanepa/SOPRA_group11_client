@@ -8,24 +8,26 @@ import { Button, Form, Input, message, Select, Upload , DatePicker} from "antd";
 import { EditOutlined, UploadOutlined } from "@ant-design/icons";
 import "@/styles/pages/edit.css";
 import Image from 'next/image';
+import moment from 'moment-timezone';
 
-const timezones = [
+const timezones = moment.tz.names()
+/*[
     { value: "UTC", label: "UTC" },
     { value: "GMT", label: "GMT" },
     { value: "PST", label: "Pacific Standard Time (UTC-8)" },
     { value: "MST", label: "Mountain Standard Time (UTC-7)" },
     { value: "CST", label: "Central Standard Time (UTC-6)" },
     { value: "EST", label: "Eastern Standard Time (UTC-5)" },
-];
+];*/
 
   const ManageProfile: React.FC = () => {
+    console.log("Component Rendered");
     const router = useRouter();
     const apiService = useApi();
     const [form] = Form.useForm();
-    //const {set: setToken, } = useLocalStorage<string>("token", "");
     const [user, setUser] = useState<User | null>(null);
     const {id} = useParams();
-    const [isAuthorizedToEdit, setIsAuthorizedToEdit] = useState<boolean>(false);
+
 
 
     const [isEdit, setIsEdit] = useState({
@@ -49,20 +51,41 @@ const timezones = [
     };
 
 
+
+    const [uploadedImage, setUploadedImage] = useState<string | null>(null);   
+    const uploadingImage = (file: File) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+    
+        reader.onload = () => {
+            const base64String = (reader.result as string).split(",")[1];
+            setUploadedImage(base64String);
+        };
+    
+        reader.onerror = (error) => {
+            message.error(`${file.name} upload failed.`);
+            console.error("Upload error:", error);
+        };
+    };
+
+
+
+
       useEffect(() => {
+        console.log("Fetching user data");
         const fetchingUser = async () => {
           try {
             const user = await apiService.get<User>(`/users/${id}`);
+            console.log("User fetched:", user);
+            //console.log("Profile picture correctly fetched?:", user.profilePicture);
             setUser(user);
+            if (user.profilePicture) {
+              setUploadedImage(user.profilePicture);
+            }
             const token = localStorage.getItem("token");
                 if (!token) return;
-                if (token === user.token) {
-                    setIsAuthorizedToEdit(true);
-                } else {
-                    message.error("You are not authorized to edit this profile.");
-                }
-
-            form.setFieldsValue({
+                console.log("Token:", token);
+                form.setFieldsValue({
                 username: user.username,
                 name: user.name ?? undefined,
                 birthday: user.birthday ?? undefined,
@@ -84,13 +107,11 @@ const timezones = [
 
 
     const handleUserEdit = async () => {
-        if (!isAuthorizedToEdit) {
-            message.error("You are not authorized to edit this profile.");
-            return;
-        }
+      console.log("handleUserEdit triggered");
+
         try {
             const values = form.getFieldsValue();
-
+            console.log("values:", values);
             const edits: Partial<User> = {};
         
             // Check for changes and only include them in the updates object
@@ -114,11 +135,16 @@ const timezones = [
                 edits.profilePicture = uploadedImage;
             }
 
+            console.log("edited profile:", edits);
 
 
-      
-            await apiService.put(`/users/${user?.id}`, edits);
-      
+
+            console.log("Sending PUT to: ", `/users/${user?.id}`);
+            console.log("Auth. token", JSON.parse(localStorage.getItem("token") || "null"))
+            await apiService.put(`/users/${user?.id}`, edits, {
+              Authorization: JSON.parse(localStorage.getItem("token") || "null")
+            });
+            console.log("Save button clicked");
             message.success("Profile updated successfully");
             setIsEdit({ 
                 username: false,
@@ -127,6 +153,8 @@ const timezones = [
                 birthday: false,
                 timezone: false,
             }); // reset editable state
+            alert("Edit successful!");
+            router.push(`/edit/${user?.id}`);
         } catch (error) {
           message.error("Failed to update profile");
           console.error(error);
@@ -135,26 +163,7 @@ const timezones = [
 
 
 
-
-    const [uploadedImage, setUploadedImage] = useState<string | null>(null);   
-    const uploadingImage = (file: File) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-    
-        reader.onload = () => {
-            const base64String = (reader.result as string).split(",")[1];
-            setUploadedImage(base64String);
-        };
-    
-        reader.onerror = (error) => {
-            message.error(`${file.name} upload failed.`);
-            console.error("Upload error:", error);
-        };
-    };
-
-
-    
-
+     
 
 
     return (
@@ -291,8 +300,8 @@ const timezones = [
                 suffixIcon={<EditOutlined className="edit-icon" onClick={() => setIsEdit((prev) => ({ ...prev, timezone: true }))} />}
             >
                 {timezones.map((tz) => (
-                    <Select.Option key={tz.value} value={tz.value}>
-                        {tz.label}
+                    <Select.Option key={tz} value={tz}>
+                        {tz}
                     </Select.Option>
                 ))}
             </Select>
