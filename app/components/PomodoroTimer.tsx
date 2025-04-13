@@ -17,10 +17,17 @@ interface TimerState {
     activeSettings: TimerSettings;
 }
 
-export function PomodoroTimer({ initialSession = 25, initialBreak = 5 }: {
+interface PomodoroTimerProps {
     initialSession?: number;
     initialBreak?: number;
-}) {
+    onTimerStatusChange: (isRunning: boolean) => void; // New prop to notify the parent about the timer status
+}
+
+export function PomodoroTimer({
+                                  initialSession = 25,
+                                  initialBreak = 5,
+                                  onTimerStatusChange
+                              }: PomodoroTimerProps) {
     const [state, setState] = useState<TimerState>({
         timeLeft: initialSession * 60,
         isRunning: false,
@@ -35,6 +42,10 @@ export function PomodoroTimer({ initialSession = 25, initialBreak = 5 }: {
             break: initialBreak
         }
     });
+
+    useEffect(() => {
+        onTimerStatusChange(state.isRunning); // Notify parent about timer state
+    }, [state.isRunning, onTimerStatusChange]);
 
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
