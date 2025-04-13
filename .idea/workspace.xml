@@ -4,8 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cdb550d5-0a9f-4bbf-bbd0-ab1180d08c91" name="Changes" comment="I added the page for the group dashboard including components I used in it (except the Timer, which was already a component). Things missing are the invite user form, plan session form, manage group and the websocket features. You should be able to test it locally after creating an account and a group.">
-      <change beforePath="$PROJECT_DIR$/app/api/apiService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/apiService.ts" afterDir="false" />
+    <list default="true" id="cdb550d5-0a9f-4bbf-bbd0-ab1180d08c91" name="Changes" comment="I updated the websocket stuff so that it not only updates user status, but everything user / group related.">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/components/PomodoroTimer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/components/PomodoroTimer.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/styles/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/styles/globals.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,7 +47,8 @@
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "authorization-calls",
+    "git-widget-placeholder": "group-dashboard",
+
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "//wsl$/Ubuntu/home/helincapan/SOPRA_group11_client/public/sounds",
     "node.js.detected.package.eslint": "true",
@@ -83,7 +86,7 @@
       <option name="presentableId" value="Default" />
       <updated>1743342606038</updated>
       <workItem from="1743342607919" duration="14555000" />
-      <workItem from="1744548096425" duration="1914000" />
+      <workItem from="1744493439678" duration="11947000" />
     </task>
     <servers />
   </component>
