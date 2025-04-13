@@ -6,7 +6,11 @@
   min-height: 100vh;
   padding: 2rem;
   gap: 2rem;
-  background: linear-gradient(to bottom right, var(--bg-primary), var(--bg-secondary));
+  background: linear-gradient(
+    to bottom right,
+    var(--bg-primary),
+    var(--bg-secondary)
+  );
 }
 
 .main {

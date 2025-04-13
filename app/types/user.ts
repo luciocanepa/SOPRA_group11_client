@@ -11,5 +11,4 @@ export interface User {
   password: string | null;
 
   groupIds: string[] | null;
-
 }

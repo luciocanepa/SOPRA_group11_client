@@ -51,7 +51,7 @@ export class ApiService {
       throw error;
     }
     return res.headers.get("Content-Type")?.includes("application/json")
-      ? res.json() as Promise<T>
+      ? (res.json() as Promise<T>)
       : Promise.resolve(res as T);
   }
 
