@@ -14,6 +14,21 @@ export class ApiService {
   }
 
   /**
+   * Helper function to get the headers with the authorization token.
+   */
+  private getHeaders(): HeadersInit {
+    const token = localStorage.getItem("token");
+    const headers = new Headers(this.defaultHeaders);
+
+    if (token) {
+      headers.append("Authorization", `Bearer ${token}`);
+    }
+
+    return headers;
+  }
+
+
+  /**
    * Helper function to check the response, parse JSON,
    * and throw an error if the response is not OK.
    *
@@ -64,7 +79,7 @@ export class ApiService {
     const url = `${this.baseURL}${endpoint}`;
     const res = await fetch(url, {
       method: "GET",
-      headers: this.defaultHeaders,
+      headers: this.getHeaders(),
     });
     return this.processResponse<T>(
       res,
@@ -82,7 +97,7 @@ export class ApiService {
     const url = `${this.baseURL}${endpoint}`;
     const res = await fetch(url, {
       method: "POST",
-      headers: this.defaultHeaders,
+      headers: this.getHeaders(),
       body: JSON.stringify(data),
     });
     return this.processResponse<T>(
@@ -101,7 +116,7 @@ export class ApiService {
     const url = `${this.baseURL}${endpoint}`;
     const res = await fetch(url, {
       method: "PUT",
-      headers: this.defaultHeaders,
+      headers: this.getHeaders(),
       body: JSON.stringify(data),
     });
     return this.processResponse<T>(
@@ -119,7 +134,7 @@ export class ApiService {
     const url = `${this.baseURL}${endpoint}`;
     const res = await fetch(url, {
       method: "DELETE",
-      headers: this.defaultHeaders,
+      headers: this.getHeaders(),
     });
     return this.processResponse<T>(
       res,
