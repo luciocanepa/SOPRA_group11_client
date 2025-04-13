@@ -19,6 +19,10 @@
 }
 
 body {
+  background-image: url("/images/clock_top_right.jpeg");
+  background-size: cover; /* full coverage without stretching */
+  background-position: center; /* centers image */
+  background-repeat: no-repeat;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   font-family:

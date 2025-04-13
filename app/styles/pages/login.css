@@ -1,7 +1,7 @@
 .login-page {
   background-image: url("/images/clock_top_right.jpeg");
-  background-size: cover; /* full coverage without stretching */
-  background-position: center; /* centers image */
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
   display: flex;
   justify-content: center;
@@ -13,14 +13,14 @@
 }
 
 .login-container {
-  background-color: rgba(249, 225, 227, 0.87);
+  background-color: rgba(249, 225, 227, 0.77);
   border-radius: 20px;
   padding: 40px;
   width: 100%;
   max-width: 480px;
   box-shadow:
-    inset 0 2px 5px rgba(0, 0, 0, 0.2),
-    0 6px 12px rgba(0, 0, 0, 0.42);
+            inset 0 2px 5px rgba(0, 0, 0, 0.2),
+            0 6px 12px rgba(0, 0, 0, 0.42);
   backdrop-filter: blur(8px) !important;
 }
 
@@ -36,7 +36,7 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 25px;
+  gap: 5px;
 }
 
 .form-group {
@@ -51,73 +51,126 @@
   font-size: 18px;
 }
 
+.ant-form-item-label > label {
+  color: #000000 !important;
+  font-size: 18px;
+  font-weight: bold;
+}
+
 .login-input {
   width: 100%;
-  padding: 16px;
-  border-radius: 18px;
+  padding: 13px 16px !important;
+  border-radius: 18px !important;
   border: none;
-  background-color: #ffffff;
+  background-color: #ffffff !important;
   box-shadow: 2px 3px 3px rgba(0, 0, 0, 0.15);
-  font-size: 16px;
+  font-size: 18px !important;
+  height: auto !important;
+  min-height: 40px !important;
+  color: black !important;
 }
-
 .login-input::placeholder {
-  color: #989898;
-  font-size: 17.5px;
-  font-style: italic !important;
+  color: rgb(135, 135, 135) !important;
+  font-size: 18px;
 }
 
-.login-input:focus {
-  outline: 3px solid #730000; /* thicker outline */
+
+
+
+.login-input:focus,
+.ant-input-password .login-input:focus,
+.ant-input-password:focus-within .login-input {
+  outline: 3px solid #730000 !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
 }
+.ant-input-password:focus-within {
+  outline: 3px solid #730000 !important;
+  border-radius: 18px;
+}
+.ant-input-affix-wrapper-focused {
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+
+
 
 .button-group {
   display: flex;
   gap: 20px;
   margin-top: 20px;
+  width: 100%;
 }
 
+.button-group .ant-form-item-control {
+  width: 100%;
+}
+
+.button-group .ant-form-item-control-input-content {
+  display: flex;
+  gap: 20px;
+}
+
+
+
+/* Unified Button Styles */
 .login-button,
 .signup-button {
   flex: 1;
-  padding: 16px;
-  border-radius: 18px;
-  border: none;
-  color: white;
-  font-weight: bold;
-  font-size: 18px;
+  padding: 14px 0;
+  border-radius: 18px !important;
+  border: none !important;
+  color: white !important;
+  font-weight: bold !important;
+  font-size: 18px !important;
+  font-family: inherit !important;
   cursor: pointer;
-  box-shadow: 2px 4px 4px rgba(0, 0, 0, 0.25); /*  shadow */
-  transition: all 0.2s;
-  margin-top: -10px;
+  box-shadow: 2px 4px 4px rgba(0, 0, 0, 0.25) !important;
+  transition: all 0.2s !important;
+  text-align: center;
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  box-sizing: border-box;
+  text-decoration: none !important;
+  white-space: nowrap;
 }
+
+
+
 
 .login-button {
-  background-color: #730000;
-}
-
-.login-button:hover {
-  background-color: #3e0000;
-  transform: translateY(2px);
+  background-color: #730000 !important;
 }
 
 .signup-button {
-  background-color: #f43d3e;
+  background-color: #f43d3e !important;
+}
+
+
+.login-button:hover {
+  background-color: #3e0000 !important;
+  transform: translateY(2px);
 }
 
 .signup-button:hover {
-  background-color: #c63233;
-  transform: translateY(2px); /*  hover effect */
+  background-color: #c63233 !important;
+  transform: translateY(2px);
 }
+
+
 
 .signup-prompt {
   color: #730000;
-  margin-top: 8px;
+  margin-top: -20px;
   margin-right: 65px;
   font-size: 16px;
-  text-align: right;
+  text-align: end;
   font-weight: 500;
 }
+
+
 
 .error-message {
   color: #ff2e2e;
@@ -126,6 +179,8 @@
   display: block;
   font-weight: 500;
 }
+
+
 
 .login-input:invalid {
   border-color: #ff4444;
