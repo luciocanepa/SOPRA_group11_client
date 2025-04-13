@@ -27,7 +27,6 @@ export class ApiService {
     return headers;
   }
 
-
   /**
    * Helper function to check the response, parse JSON,
    * and throw an error if the response is not OK.

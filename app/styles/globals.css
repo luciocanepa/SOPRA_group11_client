@@ -172,7 +172,11 @@ li {
 }
 
 .groupPage-container {
-  background: linear-gradient(to bottom right, var(--bg-primary), var(--bg-secondary));
+  background: linear-gradient(
+    to bottom right,
+    var(--bg-primary),
+    var(--bg-secondary)
+  );
   min-height: 100vh;
   padding: 2rem;
   color: var(--text-primary); /* Ensure text is white in this section */
