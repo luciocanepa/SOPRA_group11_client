@@ -16,6 +16,8 @@ export default function GroupPage() {
     const groupId = params.gid as string;
     const apiService = useApi();
     const router = useRouter();
+    const token = localStorage.getItem("token");
+    const localUserId = localStorage.getItem("id"); // Get the user ID from localStorage
 
     const [calendarModalOpen, setCalendarModalOpen] = useState(false);
     const [isRunning, setIsRunning] = useState(false); // Timer state
@@ -27,11 +29,11 @@ export default function GroupPage() {
 
     useEffect(() => {
         const checkIfAdmin = async () => {
+            if (!token || !localUserId) return;
             try {
                 // Using apiService to get the group data by its ID
                 const groupData: Group = await apiService.get<Group>(`/groups/${groupId}`);
 
-                const localUserId = localStorage.getItem("id"); // Get the user ID from localStorage
                 console.log("Local user ID:", localUserId, "Group admin ID:", groupData.adminId);
                 console.log(localUserId == groupData.adminId);
 
