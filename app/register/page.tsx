@@ -22,10 +22,14 @@ const Register: React.FC = () => {
 
   const handleRegister = async (values: RegisterForm) => {
     try {
-      const response = await apiService.post<User>("/users/register", {
-        username: values.username,
-        password: values.password,
-      });
+      const response = await apiService.post<User>(
+        "/users/register",
+        {
+          username: values.username,
+          password: values.password,
+        },
+        null,
+      );
       if (response && response.token && response.id) {
         setToken(response.token);
         setUserId(response.id);

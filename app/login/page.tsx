@@ -22,10 +22,14 @@ const Login: React.FC = () => {
 
   const handleLogin = async (values: LoginForm) => {
     try {
-      const response = await apiService.post<User>("/users/login", {
-        username: values.username,
-        password: values.password,
-      });
+      const response = await apiService.post<User>(
+        "/users/login",
+        {
+          username: values.username,
+          password: values.password,
+        },
+        null,
+      );
       if (response && response.token && response.id) {
         setToken(response.token);
         setUserId(response.id);

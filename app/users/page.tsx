@@ -39,7 +39,7 @@ const Dashboard: React.FC = () => {
   // The hook returns an object with the value and two functions
   // Simply choose what you need from the hook:
   const {
-    // value: token, // is commented out because we dont need to know the token value for logout
+    value: token, // is commented out because we dont need to know the token value for logout
     // set: setToken, // is commented out because we dont need to set or update the token value
     clear: clearToken, // all we need in this scenario is a method to clear the token
   } = useLocalStorage<string>("token", ""); // if you wanted to select a different token, i.e "lobby", useLocalStorage<string>("lobby", "");
@@ -51,11 +51,12 @@ const Dashboard: React.FC = () => {
   };
 
   useEffect(() => {
+    if (!token) return;
     const fetchUsers = async () => {
       try {
         // apiService.get<User[]> returns the parsed JSON object directly,
         // thus we can simply assign it to our users variable.
-        const users: User[] = await apiService.get<User[]>("/users");
+        const users: User[] = await apiService.get<User[]>("/users", token);
         setUsers(users);
         console.log("Fetched users:", users);
       } catch (error) {

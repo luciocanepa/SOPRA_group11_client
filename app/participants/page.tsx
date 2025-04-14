@@ -4,7 +4,7 @@ import { useApi } from "@/hooks/useApi";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Table, Tag } from "antd";
-
+import useLocalStorage from "@/hooks/useLocalStorage";
 interface ApiUser {
   id: number;
   username: string;
@@ -27,12 +27,17 @@ export default function GroupParticipantsPage() {
   const apiService = useApi();
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [loading, setLoading] = useState(true);
+  const { value: token } = useLocalStorage<string>("token", "");
 
   useEffect(() => {
+    if (!token) return;
     const fetchParticipants = async () => {
       try {
         setLoading(true);
-        const response = await apiService.get<GroupResponse>(`/groups/${gId}`);
+        const response = await apiService.get<GroupResponse>(
+          `/groups/${gId}`,
+          token,
+        );
 
         const members = response.users.map((user: ApiUser) => ({
           id: user.id,
@@ -49,7 +54,7 @@ export default function GroupParticipantsPage() {
     };
 
     fetchParticipants();
-  }, [gId, apiService]);
+  }, [gId, apiService, token]);
 
   const columns = [
     {

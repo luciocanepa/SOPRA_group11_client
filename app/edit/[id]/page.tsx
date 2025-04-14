@@ -2,13 +2,12 @@
 import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
-//import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
 import { Button, Form, Input, message, Select, Upload, DatePicker } from "antd";
 import { EditOutlined, UploadOutlined } from "@ant-design/icons";
 import "@/styles/pages/edit.css";
 import Image from "next/image";
-
+import useLocalStorage from "@/hooks/useLocalStorage";
 const timezones = [
   { value: "UTC", label: "UTC" },
   { value: "GMT", label: "GMT" },
@@ -22,7 +21,7 @@ const ManageProfile: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
   const [form] = Form.useForm();
-  //const {set: setToken, } = useLocalStorage<string>("token", "");
+  const { value: token } = useLocalStorage<string>("token", "");
   const [user, setUser] = useState<User | null>(null);
   const { id } = useParams();
   const [isAuthorizedToEdit, setIsAuthorizedToEdit] = useState<boolean>(false);
@@ -45,12 +44,11 @@ const ManageProfile: React.FC = () => {
   };
 
   useEffect(() => {
+    if (!token) return;
     const fetchingUser = async () => {
       try {
-        const user = await apiService.get<User>(`/users/${id}`);
+        const user = await apiService.get<User>(`/users/${id}`, token);
         setUser(user);
-        const token = localStorage.getItem("token");
-        if (!token) return;
         if (token === user.token) {
           setIsAuthorizedToEdit(true);
         } else {
@@ -78,6 +76,7 @@ const ManageProfile: React.FC = () => {
   }, [id, apiService, form]);
 
   const handleUserEdit = async () => {
+    if (!token) return;
     if (!isAuthorizedToEdit) {
       message.error("You are not authorized to edit this profile.");
       return;
@@ -109,7 +108,7 @@ const ManageProfile: React.FC = () => {
         edits.profilePicture = uploadedImage;
       }
 
-      await apiService.put(`/users/${user?.id}`, edits);
+      await apiService.put(`/users/${user?.id}`, edits, token);
 
       message.success("Profile updated successfully");
       setIsEdit({
