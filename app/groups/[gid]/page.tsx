@@ -22,6 +22,7 @@ export default function GroupPage() {
   const [isRunning, setIsRunning] = useState(false); // Timer state
   const [isGroupOwner, setIsGroupOwner] = useState(false);
   const [inviteModalOpen, setInviteModalOpen] = useState(false); // New state to control the invite user modal
+  const [inviteFormKey, setInviteFormKey] = useState(0);
 
   const handleTimerStatusChange = (isRunning: boolean) => {
     setIsRunning(isRunning); // Update isRunning state when the timer starts/stops
@@ -37,19 +38,10 @@ export default function GroupPage() {
             token,
         );
 
-        console.log(
-            "Local user ID:",
-            localUserId,
-            "Group admin ID:",
-            groupData.adminId,
-        );
-        console.log(localUserId == groupData.adminId);
-
         if (groupData.adminId === localUserId) {
           setIsGroupOwner(true); // Set this if the current user is the admin
         } else {
           setIsGroupOwner(false); // Set to false if not
-          console.log("User is NOT the group owner");
         }
       } catch (error) {
         console.error("Failed to fetch group admin data", error);
@@ -128,13 +120,16 @@ export default function GroupPage() {
 
         {/* Invite User Modal */}
         <Modal
-            open={inviteModalOpen} // Modal open state controlled by inviteModalOpen
+            open={inviteModalOpen}
             title="Invite User"
-            onCancel={() => setInviteModalOpen(false)} // Close modal on cancel
-            footer={null} // Remove the default modal footer (can add custom footer if needed)
+            onCancel={() => {
+              setInviteModalOpen(false);
+              setInviteFormKey(prev => prev + 1); // trigger reset
+            }}
+            footer={null}
             className="groupPage-modal"
         >
-          <InviteUser groupId={groupId} />
+          <InviteUser key={inviteFormKey} groupId={groupId} isVisible={inviteModalOpen} />
         </Modal>
       </div>
   );

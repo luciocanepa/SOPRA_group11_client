@@ -62,6 +62,10 @@ li {
   margin: 0.5rem 0;
 }
 
+.ant-form-item {
+  margin-bottom: 1rem;
+}
+
 .container {
   margin: 0 auto;
   max-width: 1200px;
@@ -133,7 +137,7 @@ li {
   cursor: pointer;
   transition: background-color 0.2s ease;
   font-size: 1rem;
-  margin-top: 10px;
+  margin-top: 0px;
 }
 
 .invite-user-button.ant-btn:hover {
@@ -172,8 +176,9 @@ li {
 .invite-container {
   background-color: #ffffff; /* White background */
   padding: 1rem;
-  border-radius: 0.5rem;
   color: black; /* Black text */
+  margin: 0 auto;
+  border: 0;
 }
 
 /* Style the AutoComplete input */
@@ -187,6 +192,40 @@ li {
 .autocomplete-popup .ant-select-item {
   color: black !important;
   background-color: white !important;
+}
+
+.invite-results table {
+  width: 100%; /* Make sure the table takes the full width of the container */
+  margin-top: 16px; /* Adjust the margin to make sure it's not too far from the form */
+  border: 1px solid #d9d9d9; /* Add border to the table */
+}
+
+/* Table Headers */
+.invite-results th {
+  color: black; /* Make sure the header text is black */
+  background-color: #f5f5f5; /* Light background for headers */
+  font-weight: bold;
+}
+
+/* Table Data */
+.invite-results td {
+  color: black; /* Make sure the table text is black */
+  border: 1px solid #d9d9d9; /* Add border to cells */
+  padding: 8px; /* Padding for table cells */
+}
+
+/* Table Row Styling for Success/Failure */
+.invite-results tr.bg-green-50 {
+  background-color: #e6f7e6; /* Light green background for success */
+}
+
+.invite-results tr.bg-red-50 {
+  background-color: #f8d7da; /* Light red background for failure */
+}
+
+/* Remove extra margin on invite-results div */
+.invite-results {
+  margin-top: 16px; /* Adjust if necessary */
 }
 
 .groupPage-button {

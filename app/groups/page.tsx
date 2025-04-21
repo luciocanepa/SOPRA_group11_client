@@ -7,6 +7,8 @@ import { Group } from "@/types/group";
 import { UploadOutlined } from "@ant-design/icons";
 import "@/styles/pages/groups.css";
 import useLocalStorage from "@/hooks/useLocalStorage";
+import {User} from "@/types/user";
+import {InviteUser} from "@/components/InviteUser";
 
 interface FormFieldProps {
   name: string;
@@ -21,6 +23,7 @@ const GroupCreation: React.FC = () => {
   const apiService = useApi();
   const [form] = Form.useForm();
   const { value: token } = useLocalStorage<string>("token", "");
+  const [invitedUsers, setInvitedUsers] = useState<User[]>([]);
   // const { value: id } = useLocalStorage<string>("id", "");
 
   // const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
@@ -65,16 +68,26 @@ const GroupCreation: React.FC = () => {
 
   const handleGroupCreation = async (values: FormFieldProps) => {
     try {
+      // Create the group first
       const requestBody = {
         ...values,
+        members: invitedUsers.map(user => user.id), // or usernames depending on backend
         image: uploadedImage || null,
       };
-      const newGroup = await apiService.post<Group>(
-        "/groups",
-        requestBody,
-        token,
-      );
 
+      // Create the new group
+      const newGroup = await apiService.post<Group>("/groups", requestBody, token);
+
+      // Automatically send invitations for the users that were locally added
+      for (const user of invitedUsers) {
+        await apiService.post(
+            `/groups/${newGroup.id}/invitations`, // API endpoint to send invitations
+            { inviteeId: user.id },
+            token
+        );
+      }
+
+      message.success("Group created and users invited successfully!");
       router.push(`/groups/${newGroup.id}`);
     } catch (error) {
       if (error instanceof Error) {
@@ -161,6 +174,18 @@ const GroupCreation: React.FC = () => {
               placeholder="Enter a description for your group"
             />
           </Form.Item>
+          <Form.Item>
+            <InviteUser
+                isVisible={true}
+                onInviteLocally={(user) => {
+                  setInvitedUsers(prev => {
+                    if (prev.find(u => u.id === user.id)) return prev;
+                    return [...prev, user];
+                  });
+                }}
+            />
+          </Form.Item>
+
 
           {/* <Form.Item
             name="members"

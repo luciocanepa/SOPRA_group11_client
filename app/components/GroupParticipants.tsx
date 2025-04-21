@@ -56,7 +56,7 @@ export function GroupParticipants({ groupId }: GroupParticipantsProps) {
     };
 
     fetchParticipants();
-  }, [groupId, apiService]);
+  }, [groupId, apiService, token]);
 
   // TODO: integrate WebSocket live status updates when ready
 
