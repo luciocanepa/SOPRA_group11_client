@@ -2,9 +2,9 @@
 
 import { useApi } from "@/hooks/useApi";
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
 import { Table, Tag } from "antd";
 import useLocalStorage from "@/hooks/useLocalStorage";
+
 interface ApiUser {
   id: number;
   username: string;
@@ -21,9 +21,11 @@ interface Participant {
   status: "Available" | "Working" | "Offline";
 }
 
-export default function GroupParticipantsPage() {
-  const params = useParams();
-  const gId = params.gId as string;
+interface GroupParticipantsProps {
+  groupId: string;
+}
+
+export function GroupParticipants({ groupId }: GroupParticipantsProps) {
   const apiService = useApi();
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,7 +37,7 @@ export default function GroupParticipantsPage() {
       try {
         setLoading(true);
         const response = await apiService.get<GroupResponse>(
-          `/groups/${gId}`,
+          `/groups/${groupId}`,
           token,
         );
 
@@ -54,7 +56,9 @@ export default function GroupParticipantsPage() {
     };
 
     fetchParticipants();
-  }, [gId, apiService, token]);
+  }, [groupId, apiService]);
+
+  // TODO: integrate WebSocket live status updates when ready
 
   const columns = [
     {
@@ -66,9 +70,22 @@ export default function GroupParticipantsPage() {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status: "Available" | "Working" | "Offline") => (
-        <Tag color={status === "Available" ? "green" : "red"}>{status}</Tag>
-      ),
+      render: (status: "ONLINE" | "WORK" | "BREAK" | "OFFLINE") => {
+        let color = "white"; // Default color
+
+        // Assign different colors based on the status
+        if (status === "ONLINE") {
+          color = "green";
+        } else if (status === "WORK") {
+          color = "red";
+        } else if (status === "BREAK") {
+          color = "orange";
+        } else if (status === "OFFLINE") {
+          color = "grey";
+        }
+
+        return <Tag color={color}>{status}</Tag>;
+      },
     },
   ];
 

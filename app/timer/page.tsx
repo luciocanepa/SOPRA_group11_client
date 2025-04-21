@@ -3,11 +3,18 @@ import { PomodoroTimer } from "@/components/PomodoroTimer";
 import "../styles/pages/timer.css";
 
 export default function Dashboard() {
-    return (
-        <div className="timer-grid">
-            <PomodoroTimer initialSession={25} initialBreak={5} />
-        </div>
-    );
+  return (
+    <div className="timer-grid">
+      <PomodoroTimer
+        initialSession={25}
+        initialBreak={5}
+        onTimerStatusChange={(isRunning) => {
+          // You can add logic here to handle timer status changes
+          console.log(`Timer is ${isRunning ? "running" : "paused"}`);
+        }}
+      />
+    </div>
+  );
 }
 
 //Older code:

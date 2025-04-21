@@ -1,108 +1,84 @@
 "use client";
+
 import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
+import { Form, Input } from "antd";
+import Link from "next/link";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
 
-import { JSX, useState } from "react";
-import "../styles/pages/login.css";
-
-
-/*interface FormFieldProps {
+interface LoginForm {
   username: string;
   password: string;
-}*/
+}
 
-const Login: () => JSX.Element = () => {
+const Login: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
+  const [form] = Form.useForm<LoginForm>();
+
   const { set: setToken } = useLocalStorage<string>("token", "");
   const { set: setUserId } = useLocalStorage<string>("id", "");
-  const [errors, setErrors] = useState({ username: '', password: '' }); // Add error state
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget as HTMLFormElement);
-    const values = {
-      username: formData.get("username") as string,
-      password: formData.get("password") as string,
-    };
-
-    // Validate inputs
-    const newErrors = {
-      username: !values.username ? 'Please put in your username!' : '',
-      password: !values.password ? 'Please put in your password!' : ''
-    };
-
-    setErrors(newErrors);
-
-    // Don't proceed if there are errors
-    if (newErrors.username || newErrors.password) {
-      return;
-    }
-
+  const handleLogin = async (values: LoginForm) => {
     try {
-      const response = await apiService.post<User>("/users/login", values);
-      if (response&& response.token && response.id) {
+      const response = await apiService.post<User>(
+        "/users/login",
+        {
+          username: values.username,
+          password: values.password,
+        },
+        null,
+      );
+      if (response && response.token && response.id) {
         setToken(response.token);
         setUserId(response.id);
+        console.log("Login successful! Redirecting to dashboard.");
+        router.push("/dashboard");
       }
-      router.push("/dashboard");
     } catch (error) {
       if (error instanceof Error) {
-        alert(`Something went wrong during the login:\n${error.message}`);
+        console.error("Login failed:", error.message);
       } else {
         console.error("An unknown error occurred during login.");
       }
     }
   };
 
-  const handleSignUpRedirect = () => {
-    router.push("/register");
-  };
-
   return (
-      <div className="login-page">
-        <div className="login-container">
-          <h1 className="login-title">Pomodoro Study Room</h1>
-          <form onSubmit={handleLogin} className="login-form" noValidate>
-            <div className="form-group">
-              <label htmlFor="username">Username</label>
-              <input
-                  type="text"
-                  id="username"
-                  name="username"
-                  placeholder="Please enter your username"
-                  className="login-input"
-                  required
-              />
-              {errors.username && <span className="error-message">{errors.username}</span>}
-            </div>
-            <div className="form-group">
-              <label htmlFor="password">Password</label>
-              <input
-                  type="password"
-                  id="password"
-                  name="password"
-                  placeholder="Please enter your password"
-                  className="login-input"
-                  required
-              />
-              {errors.password && <span className="error-message">{errors.password}</span>}
-            </div>
-            <div className="button-group">
-              <button type="submit" className="login-button">
-                Login
-              </button>
-              <button type="button" onClick={handleSignUpRedirect} className="signup-button">
-                Go to Sign Up
-              </button>
-            </div>
-          </form>
-          <p className="signup-prompt">No account yet?</p>
-        </div>
-      </div>
-
+    <div className="login-container text-black">
+      <h2>Pomodoro Study Room</h2>
+      <Form<LoginForm>
+        form={form}
+        name="login"
+        size="large"
+        onFinish={handleLogin}
+        layout="vertical"
+      >
+        <Form.Item
+          name="username"
+          label="Username"
+          rules={[{ required: true, message: "Please input your username!" }]}
+        >
+          <Input placeholder="Enter username" />
+        </Form.Item>
+        <Form.Item
+          name="password"
+          label="Password"
+          rules={[{ required: true, message: "Please input your password!" }]}
+        >
+          <Input.Password placeholder="Enter password" />
+        </Form.Item>
+        <Form.Item>
+          <button type="submit" className="login-button">
+            Login
+          </button>
+        </Form.Item>
+      </Form>
+      <p>
+        No account yet? <Link href="/register">Sign up</Link>
+      </p>
+    </div>
   );
 };
 

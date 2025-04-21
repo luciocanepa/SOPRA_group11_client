@@ -1,218 +1,214 @@
 /*@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap');*/
-@import url('https://fonts.googleapis.com/css2?family=Tektur:wght@400..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Tektur:wght@400..900&display=swap");
 
 body {
-    background-color: #ff844e;
-    background-image: url('/images/clock_top_right.jpeg');
-    background-size: cover; /* full coverage without stretching */
-    background-position: center; /* centers image */
-    background-repeat: no-repeat;
-    color: white;
-    font-family: Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
+  background-color: #ff844e;
+  background-image: url("/images/clock_top_right.jpeg");
+  background-size: cover; /* full coverage without stretching */
+  background-position: center; /* centers image */
+  background-repeat: no-repeat;
+  color: white;
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
 }
 
 .white-container {
-    background: white;
-    padding: 30px; /* Creates space around pink container */
-    border-radius: 20px; /* Optional rounded corners */
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* Optional subtle shadow */
-    margin: 20px; /* Prevents touching screen edges */
-    display: flex;
-    flex-direction: column;
-    gap: 30px; /* Space between timer and buttons */
-
-
+  background: white;
+  padding: 30px; /* Creates space around pink container */
+  border-radius: 20px; /* Optional rounded corners */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* Optional subtle shadow */
+  margin: 20px; /* Prevents touching screen edges */
+  display: flex;
+  flex-direction: column;
+  gap: 30px; /* Space between timer and buttons */
 }
 .timer-grid {
-    display: flex;
-    justify-content: center;
-    padding: 1rem;
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
 }
-
 
 .pink-container {
-    background: #fbe3e4;
-    color: black;
-    padding: 20px;
-    border-radius: 20px;
-    text-align: center;
-    box-shadow: 0 4px 3px rgba(0, 0, 0, 0.2);
-    width: 450px;
+  background: #fbe3e4;
+  color: black;
+  padding: 20px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 4px 3px rgba(0, 0, 0, 0.2);
+  width: 450px;
 }
 
-
 .title {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: #730000;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #730000;
 }
 
 .timer-display {
-    font-size: 80px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    font-family: 'Tektur', sans-serif;
-    letter-spacing: 5px;
-    color: #040000;
+  font-size: 80px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  font-family: "Tektur", sans-serif;
+  letter-spacing: 5px;
+  color: #040000;
 }
 
 .button-group {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
 button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 11px;
-    cursor: pointer;
-    font-size: 18px;
-    min-width: 80px;
-    box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3);
+  padding: 10px 20px;
+  border: none;
+  border-radius: 11px;
+  cursor: pointer;
+  font-size: 18px;
+  min-width: 80px;
+  box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3);
 }
 
 .start {
-    background: #005f13;
-    color: white;
+  background: #005f13;
+  color: white;
 }
 
 .start:hover {
-    background-color: #004912;
-    transform: translateY(2px);
+  background-color: #004912;
+  transform: translateY(2px);
 }
 
 .stop {
-    background: #720000;
-    color: white;
+  background: #720000;
+  color: white;
 }
 
 .stop:hover {
-    background-color: #470000;
-    transform: translateY(2px);
+  background-color: #470000;
+  transform: translateY(2px);
 }
 
 .reset {
-    background: #000000;
-    color: white;
+  background: #000000;
+  color: white;
 }
 
 .reset:hover {
-    background-color: #272727;
-    transform: translateY(2px);
+  background-color: #272727;
+  transform: translateY(2px);
 }
 
 .close {
-    background: darkred;
-    color: white;
+  background: darkred;
+  color: white;
 }
 
 .close:hover {
-    background-color: #610101;
-    transform: translateY(2px);
+  background-color: #610101;
+  transform: translateY(2px);
 }
 
 .settings-btn {
-    background: #f93c3a;
-    color: white;
-    width: 100%;
-    padding: 10px 20px;
-    margin-top: -30px;
+  background: #f93c3a;
+  color: white;
+  width: 100%;
+  padding: 10px 20px;
+  margin-top: -30px;
 }
 
 .settings-btn:hover {
-    background-color: #cc302e;
-    transform: translateY(2px);
+  background-color: #cc302e;
+  transform: translateY(2px);
 }
 
 .settings-popup {
-    position: fixed;
-    background: white;
-    color: black;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    width: 300px;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 10;
+  position: fixed;
+  background: white;
+  color: black;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 300px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
 }
 
 .popup-title {
-    font-size: 20px;
-    margin-bottom: 15px;
-    color: #8a0000;
+  font-size: 20px;
+  margin-bottom: 15px;
+  color: #8a0000;
 }
 
 .input-box-green {
-    display: block;
-    width: 100%;
-    padding: 8px;
-    margin: 8px 0 15px;
-    border: 2px solid #005f13;
-    border-radius: 8px;
-    box-sizing: border-box;
+  display: block;
+  width: 100%;
+  padding: 8px;
+  margin: 8px 0 15px;
+  border: 2px solid #005f13;
+  border-radius: 8px;
+  box-sizing: border-box;
 }
 
 .input-box-red {
-    display: block;
-    width: 100%;
-    padding: 8px;
-    margin: 8px 0 15px;
-    border: 2px solid #730000;
-    border-radius: 8px;
-    box-sizing: border-box;
+  display: block;
+  width: 100%;
+  padding: 8px;
+  margin: 8px 0 15px;
+  border: 2px solid #730000;
+  border-radius: 8px;
+  box-sizing: border-box;
 }
 
 .popup-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
 }
 
 .popup-buttons-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 .default-btn {
-    background: #fd709b;
-    color: black;
-    padding: 10px;
-    border: none;
-    border-radius: 11px;
-    cursor: pointer;
-    font-size: 16px;
-    width: 100%;
+  background: #fd709b;
+  color: black;
+  padding: 10px;
+  border: none;
+  border-radius: 11px;
+  cursor: pointer;
+  font-size: 16px;
+  width: 100%;
 }
 
 .default-btn:hover {
-    background-color: #da5a7e;
-    transform: translateY(2px);
+  background-color: #da5a7e;
+  transform: translateY(2px);
 }
 
 .apply-btn {
-    background: #005f13;
-    color: white;
+  background: #005f13;
+  color: white;
 }
 
 .apply-btn:hover {
-    background-color: #00450d;
-    transform: translateY(2px);
+  background-color: #00450d;
+  transform: translateY(2px);
 }
 
 .close-btn {
-    background: gray;
-    color: white;
+  background: gray;
+  color: white;
 }
