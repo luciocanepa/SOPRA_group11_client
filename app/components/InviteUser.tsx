@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { AutoComplete, Form, Button, message } from "antd";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
-
+import "@/styles/pages/inviteUser.css";
 interface InviteUserProps {
     groupId?: string; // optional for local
     isVisible: boolean;
@@ -17,14 +17,15 @@ interface User {
 }
 
 export function InviteUser({ groupId, isVisible, onInviteLocally }: InviteUserProps) {
+    const apiService = useApi();
+    const { value: token } = useLocalStorage<string>("token", "");
+    const { value: localUserId } = useLocalStorage<string>("id", "");
+    
     const [username, setUsername] = useState("");
     const [filteredOptions, setFilteredOptions] = useState<{ value: string }[]>([]);
     const [allUsers, setAllUsers] = useState<{ id: string; username: string }[]>([]);
     const [loading, setLoading] = useState(false);
     const [form] = Form.useForm();
-    const apiService = useApi();
-    const { value: token } = useLocalStorage<string>("token", "");
-    const { value: localUserId } = useLocalStorage<string>("id", "");
     const [inviteResults, setInviteResults] = useState<{ username: string; status: "success" | "error" | "not_found"; message: string }[]>([]);
 
     // Fetch all users on component mount
@@ -33,7 +34,7 @@ export function InviteUser({ groupId, isVisible, onInviteLocally }: InviteUserPr
         const fetchUsers = async () => {
             try {
                 const users = await apiService.get<User[]>("/users", token);
-                const filteredUsers = users.filter(user => user.id !== parseInt(localUserId || ""));
+                const filteredUsers = users.filter(user => user.id !== (localUserId || ""));
                 setAllUsers(filteredUsers);
             } catch (error) {
                 console.error("Failed to fetch users:", error);
@@ -156,24 +157,17 @@ export function InviteUser({ groupId, isVisible, onInviteLocally }: InviteUserPr
                 </Button>
 
                 {inviteResults.length > 0 && (
-                    <div className="invite-results mt-4">
+                    <div className="invite-results">
                         <h4>Invitations Sent:</h4>
-                        <table className="w-full mt-2 border border-gray-300 text-sm">
-                            <thead>
-                            <tr className="bg-gray-100">
-                                <th className="border px-2 py-1 text-left">Username</th>
-                                <th className="border px-2 py-1 text-left">Message</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {inviteResults.map((res, idx) => (
-                                <tr key={idx} className={res.status === "success" ? "bg-green-50" : res.status === "not_found" || res.status === "error" ? "bg-red-50" : ""}>
-                                    <td className="border px-2 py-1">{res.username}</td>
-                                    <td className="border px-2 py-1">{res.message}</td>
-                                </tr>
+
+                        <div className="invite-results-table">
+                        {inviteResults.map((res, idx) => (
+                            <div key={idx} className="invite-result-row" id={res.status == "success" ? "success": "error"}>
+                                <p>{res.username}</p>
+                                <p>{res.message}</p>
+                            </div>
                             ))}
-                            </tbody>
-                        </table>
+                        </div>
                     </div>
                 )}
             </Form>
