@@ -245,54 +245,51 @@ const ManageProfile: React.FC = () => {
           </Form.Item>
 
           <Form.Item label="Birthday">
-  {isEdit.birthday ? (
-    <Form.Item name="birthday" noStyle>
-      <DatePicker
-        style={{ width: "100%" }}
-        format="YYYY-MM-DD"
-        allowClear
-        picker="date"
-      />
-    </Form.Item>
-  ) : (
-    <div style={{ position: "relative" }}>
-      <Input
-        value={form.getFieldValue("birthday")?.format("YYYY-MM-DD") || ""}
-        readOnly
-        style={{
-          backgroundColor: "#f5f5f5",
-        }}
-      />
-      {/* Overlay to block interaction and force cursor */}
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          cursor: "not-allowed",
-          zIndex: 2,
-        }}
-      />
-      <EditOutlined
-        className="edit-icon"
-        style={{
-          position: "absolute",
-          right: 10,
-          top: "50%",
-          transform: "translateY(-50%)",
-          cursor: "pointer",
-          zIndex: 3, // make sure it's above the overlay
-        }}
-        onClick={() => setIsEdit((prev) => ({ ...prev, birthday: true }))}
-      />
-    </div>
-  )}
-</Form.Item>
-
-
-
+            {isEdit.birthday ? (
+              <Form.Item name="birthday" noStyle>
+                <DatePicker
+                  style={{ width: "100%" }}
+                  format="YYYY-MM-DD"
+                  allowClear
+                  picker="date"
+                />
+              </Form.Item>
+            ) : (
+              <div style={{ position: "relative" }}>
+                <Input
+                  value={form.getFieldValue("birthday")?.format("YYYY-MM-DD") || ""}
+                  readOnly
+                  style={{
+                    backgroundColor: "#f5f5f5",
+                  }}
+                />
+                {/* Overlay to block interaction and force cursor */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    cursor: "not-allowed",
+                    zIndex: 2,
+                  }}
+                />
+                <EditOutlined
+                  className="edit-icon"
+                  style={{
+                    position: "absolute",
+                    right: 10,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    cursor: "pointer",
+                    zIndex: 3, // make sure it's above the overlay
+                  }}
+                  onClick={() => setIsEdit((prev) => ({ ...prev, birthday: true }))}
+                />
+              </div>
+            )}
+          </Form.Item>
 
 
 

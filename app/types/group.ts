@@ -6,5 +6,5 @@ export interface Group {
   description: string | null;
   image: string | null;
   adminId: string | null;
-  members: User[] | null;
+  users: User[] | null;
 }
