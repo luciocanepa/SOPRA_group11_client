@@ -112,6 +112,7 @@ export class ApiService {
    * PUT request.
    * @param endpoint - The API endpoint (e.g. "/users/123").
    * @param data - The payload to update.
+   * @param customHeaders - Optional custom headers.
    * @returns JSON data of type T.
    */
   public async put<T>(
