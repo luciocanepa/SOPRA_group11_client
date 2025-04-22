@@ -1,4 +1,3 @@
-
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
@@ -9,6 +8,7 @@ import { EditOutlined, UploadOutlined} from "@ant-design/icons";
 import "@/styles/pages/edit.css";
 import Image from "next/image";
 import useLocalStorage from "@/hooks/useLocalStorage";
+import { User } from "@/types/user";
 
 
 const ManageGroup: React.FC = () => {
@@ -20,7 +20,8 @@ const ManageGroup: React.FC = () => {
   const [group, setGroup] = useState<Group | null>(null);
   const { gid } = useParams();
   const [isAuthorizedToEdit, setIsAuthorizedToEdit] = useState<boolean>(false);
-  const [selectedUserId, setSelectedUserId] = useState<string>("");
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [removedUsers, setRemovedUsers] = useState<User[]>([]);
 
 
   const [isEdit, setIsEdit] = useState({
@@ -138,25 +139,21 @@ const ManageGroup: React.FC = () => {
 
   const handleUserRemoval = async (userId: string) => {
     if (!token || !group || !group.id || !group.users) return;
-    console.log("group.users", group.users);
-    console.log("to delete", userId);
-    const userToRemove = group.users.find((user) => String(user.id) === String(userId));
-    console.log("userToRemove:" , userToRemove);
+    
+    const userToRemove = group.users.find(u => u.id === userId);
     if (!userToRemove) return;
-  
+
     const confirmRemoval = window.confirm(`Are you sure you want to remove ${userToRemove.username} from the group?`);
     if (!confirmRemoval) return;
   
     try {
-      await apiService.delete(`/groups/${group.id}/${userId}`, token);
-  
-      const updatedUsers = group.users.filter((user) => user.id !== userId);
-      const updatedGroup = { ...group, users: updatedUsers };
+      await apiService.delete(`/groups/${group.id}/users/${userId}`, token);
+      setRemovedUsers([...removedUsers, userToRemove]);
+
+      const updatedGroup = await apiService.get<Group>(`/groups/${group.id}`, token);
       setGroup(updatedGroup);
   
       message.success(`User ${userToRemove.username} has been removed from the group.`);
-      alert(`The removal of ${userToRemove.username} was successful!`);
-      router.push(`/edit/group/${gid}`);
     } catch (error) {
       message.error("Failed to remove member.");
       console.error(error);
@@ -260,15 +257,26 @@ const ManageGroup: React.FC = () => {
             <Select
               placeholder="Select a member to remove"
               className="removal-dropdown"
-              onChange={(userId) => handleUserRemoval(userId)}
+              value={selectedUserId}
+              onChange={(value) => {
+                handleUserRemoval(value);
+                setSelectedUserId(null);
+              }}
               allowClear
             >
-              {group?.users?.map((user) => (
+              {group?.users?.filter(user => user.id !== group.adminId).map((user) => (
               <Select.Option key={user.id} value={user.id}>
                 {user.username}
               </Select.Option>
               ))}
             </Select>
+            <div className="removed-users-container">
+              {removedUsers.map((user) => (
+                <p key={user.id}>
+                  {user.username} successfully removed
+                </p>
+              ))}
+            </div>
           </Form.Item>
 
 
