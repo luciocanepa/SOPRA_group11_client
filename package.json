@@ -12,6 +12,8 @@
   "dependencies": {
     "@ant-design/nextjs-registry": "^1.0.2",
     "@ant-design/v5-patch-for-react-19": "^1.0.3",
+    "dayjs": "^1.11.13",
+    "dayjs-plugin-utc": "^0.1.2",
     "moment-timezone": "^0.5.48",
     "next": "^15.2.0",
     "node-localstorage": "^3.0.5",
