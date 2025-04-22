@@ -94,7 +94,7 @@ export default function GroupPage() {
           {isGroupOwner && (
             <Button
               className="groupPage-button"
-              onClick={() => console.log("Open manage group modal")}
+              onClick={() => router.push(`/edit/group/${groupId}`)}
             >
               ⚙️ Manage Group
             </Button>
