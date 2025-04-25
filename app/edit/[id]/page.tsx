@@ -6,6 +6,7 @@ import { User } from "@/types/user";
 import { Button, Form, Input, message, Select, Upload, DatePicker } from "antd";
 import { EditOutlined, UploadOutlined } from "@ant-design/icons";
 import "@/styles/pages/edit.css";
+import "@/styles/pages/login.css";
 import Image from "next/image";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import dayjs from "dayjs";
@@ -296,7 +297,7 @@ const ManageProfile: React.FC = () => {
           <Form.Item name="timezone" label="Timezone">
             <Select
               disabled={!isEdit.timezone}
-              placeholder="Select from the dropdown menu"
+              placeholder="Select from dropdown menu"
               onChange={(value) => form.setFieldsValue({ timezone: value })}
               suffixIcon={
                 <EditOutlined
@@ -333,7 +334,7 @@ const ManageProfile: React.FC = () => {
           </Form.Item>
 
           <Form.Item>
-            <Button htmlType="submit" className="groupCreation-button">
+            <Button htmlType="submit" className="groupCreation-button-save">
               Save Profile Changes
             </Button>
           </Form.Item>

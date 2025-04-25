@@ -178,7 +178,7 @@ const Dashboard: React.FC = () => {
           className="dashboardMainPage-button"
           onClick={() => router.push(`/edit/${loggedInUser?.id}`)}
         >
-          Manage Profile
+          Profile
         </Button>
         <Button className="dashboardMainPage-button" onClick={handleLogout}>
           Logout
