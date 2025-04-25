@@ -62,6 +62,10 @@ li {
   margin: 0.5rem 0;
 }
 
+.ant-form-item {
+  margin-bottom: 1rem;
+}
+
 .container {
   margin: 0 auto;
   max-width: 1200px;
@@ -123,20 +127,23 @@ li {
   margin-bottom: 1rem;
 }
 
-.invite-user-button {
-  background-color: var(--reg-dark); /* Darker red for the button */
-  color: white;
-  border: none;
+/* Ensure styles are applied correctly */
+.invite-user-button.ant-btn {
+  background-color: var(--reg-dark) !important;
+  color: white !important;
+  border: none !important;
   padding: 0.75rem 1.5rem;
   border-radius: 0.375rem;
   cursor: pointer;
   transition: background-color 0.2s ease;
   font-size: 1rem;
+  margin-top: 0px;
 }
 
-.invite-user-button:hover {
-  background-color: var(--reg-light); /* Lighter red on hover */
+.invite-user-button.ant-btn:hover {
+  background-color: var(--reg-light) !important;
 }
+
 
 /* Modal Styling */
 .invite-user-modal .ant-modal-header {
@@ -155,6 +162,70 @@ li {
 
 .invite-user-modal .ant-modal-footer {
   background-color: var(--bg-secondary);
+}
+
+.autocomplete-popup .ant-select-item {
+  background-color: white !important;
+  color: black !important;
+}
+
+.autocomplete-popup .ant-select-item-option-selected {
+  background-color: #f0f0f0 !important;
+}
+
+.invite-container {
+  background-color: #ffffff; /* White background */
+  padding: 1rem;
+  color: black; /* Black text */
+  margin: 0 auto;
+  border: 0;
+}
+
+/* Style the AutoComplete input */
+.invite-container .ant-select-selector {
+  background-color: white !important;
+  color: black !important;
+  border-color: #d9d9d9;
+}
+
+/* Dropdown items */
+.autocomplete-popup .ant-select-item {
+  color: black !important;
+  background-color: white !important;
+}
+
+.invite-results table {
+  width: 100%; /* Make sure the table takes the full width of the container */
+  margin-top: 16px; /* Adjust the margin to make sure it's not too far from the form */
+  border: 1px solid #d9d9d9; /* Add border to the table */
+}
+
+/* Table Headers */
+.invite-results th {
+  color: black; /* Make sure the header text is black */
+  background-color: #f5f5f5; /* Light background for headers */
+  font-weight: bold;
+}
+
+/* Table Data */
+.invite-results td {
+  color: black; /* Make sure the table text is black */
+  border: 1px solid #d9d9d9; /* Add border to cells */
+  padding: 8px; /* Padding for table cells */
+}
+
+/* Table Row Styling for Success/Failure */
+.invite-results tr.bg-green-50 {
+  background-color: #e6f7e6; /* Light green background for success */
+}
+
+.invite-results tr.bg-red-50 {
+  background-color: #f8d7da; /* Light red background for failure */
+}
+
+/* Remove extra margin on invite-results div */
+.invite-results {
+  margin-top: 16px; /* Adjust if necessary */
 }
 
 .groupPage-button {

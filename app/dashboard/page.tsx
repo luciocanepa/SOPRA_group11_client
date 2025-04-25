@@ -9,6 +9,16 @@ import { Button, Card } from "antd";
 import React, { useEffect, useState } from "react";
 import { PlusCircleOutlined } from "@ant-design/icons";
 
+interface Invitation {
+  id: number;
+  groupId: number;
+  groupName: string;
+  inviterId: number;
+  inviteeId: number;
+  status: "PENDING" | "ACCEPTED" | "DECLINED";
+  invitedAt: string;
+}
+
 const Dashboard: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
@@ -20,7 +30,7 @@ const Dashboard: React.FC = () => {
 
   const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
   const [loggedInUserGroups, setLoggedInUserGroups] = useState<Group[]>([]);
-
+  const [invitations, setInvitations] = useState<Invitation[]>([]);
   const handleLogout = async () => {
     if (!loggedInUser) return;
     try {
@@ -41,6 +51,36 @@ const Dashboard: React.FC = () => {
     clearId();
     router.push("/login");
   };
+
+  const handleAcceptInvitation = async (invitationId: number) => {
+    if (!token || !id) return;
+
+    try {
+      await apiService.put<void>(
+        `/invitations/${invitationId}/accept`,
+        {},
+        token,
+      );
+      setInvitations(invitations.filter((invitation) => invitation.id !== invitationId));
+    } catch (error) {
+      console.error("An unknown error occurred while accepting invitation.");
+    }
+  }
+
+  const handleDeclineInvitation = async (invitationId: number) => {
+    if (!token || !id) return;
+
+    try {
+      await apiService.put<void>(
+        `/invitations/${invitationId}/reject`,
+        {},
+        token,
+      );
+      setInvitations(invitations.filter((invitation) => invitation.id !== invitationId));
+    } catch (error) {
+      console.error("An unknown error occurred while declining invitation."); 
+    }
+  }
 
   useEffect(() => {
     const fetchLoggedInUser = async () => {
@@ -106,6 +146,25 @@ const Dashboard: React.FC = () => {
     fetchGroups();
   }, [apiService, loggedInUserGroups, token, id]);
 
+  useEffect(() => {
+    const fetchInvitations = async () => {
+      if (!token || !id) return;
+
+      try {
+        const invitations: Invitation[] = await apiService.get<Invitation[]>(
+          `/users/${id}/invitations`,
+          token,
+        );
+        setInvitations(invitations);
+        console.log("Invitations:", invitations);
+      } catch (error) {
+        console.error("An unknown error occurred while fetching invitations.");
+      }
+    };
+
+    fetchInvitations();
+  }, [apiService, token, id]);
+
   return (
     <>
       <div className="dashboardMainPage-container">
@@ -130,6 +189,24 @@ const Dashboard: React.FC = () => {
         </Card>
 
         <Card className="dashboardMainPage-card">
+          {invitations.length > 0 && (
+            <>
+            <h3>Your invitations:</h3>
+            <div className="invitations-grid">
+              {invitations.map((invitation) => (
+                <div key={invitation.id} className="invitation-card-wrapper">
+                  <a
+                    className="invitation-card"
+                  >
+                    {invitation.groupName}
+                  </a>
+                  <button id="accept" onClick={() => handleAcceptInvitation(invitation.id)}>Accept</button>
+                  <button id="reject" onClick={() => handleDeclineInvitation(invitation.id)}>Decline</button>
+                </div>
+              ))}
+              </div>
+            </>
+          )}
           <h3>Your Groups:</h3>
           <div className="groups-grid">
             {loggedInUserGroups && loggedInUserGroups.length > 0 ? (
@@ -187,5 +264,6 @@ const Dashboard: React.FC = () => {
     </>
   );
 };
+
 
 export default Dashboard;
