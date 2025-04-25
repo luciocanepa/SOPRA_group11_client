@@ -247,7 +247,7 @@ const ManageGroup: React.FC = () => {
 
 
           <Form.Item>
-            <Button htmlType="submit" className="groupCreation-button">
+            <Button htmlType="submit" className="groupCreation-button-save">
               Save Group Changes
             </Button>
           </Form.Item>
@@ -282,7 +282,7 @@ const ManageGroup: React.FC = () => {
 
           <Form.Item>
             <Button
-              className="groupCreation-button"
+              className="groupCreation-button-delete"
               onClick={handleGroupDeletion}
             >
               Delete your Group

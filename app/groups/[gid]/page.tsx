@@ -51,60 +51,57 @@ export default function GroupPage() {
   }, [groupId, apiService, localUserId, token]);
 
   return (
-      <div className="groupPage-container">
+      <div className="main-container">
+        {/* Back button aligned with timer top */}
+        <Button
+            className="groupPage-button back-button"
+            onClick={() => router.push("/dashboard")}
+        >
+          ← Back
+        </Button>
+
+        {/* Title */}
+        <h1 className="group-title">Study Session</h1>
+
+        {/* Main content */}
         <div className="main-content">
-          {/* Timer Section */}
-          <div className="timer-section">
-            <Card title="Pomodoro Timer" className="groupPage-card h-fit">
-              <PomodoroTimer onTimerStatusChange={handleTimerStatusChange} />
-            </Card>
+          {/* Left column - Participants and buttons */}
+          <div className="left-column">
+            <GroupParticipants groupId={groupId} />
 
-            {/* Conditionally render the chat based on the timer status */}
-            {!isRunning && (
-                <Card title="Group Chat (Break)" className="groupPage-card mt-6">
-                  <p>
-                    💬 Chat feature coming soon! (WebSocket integration in progress)
-                  </p>
-                </Card>
-            )}
-          </div>
-
-          {/* Sidebar: Invite, Plan, Participants */}
-          <div className="side-section">
-            <div className="flex flex-col gap-4">
-              {/* Button to open Invite User Modal */}
-              <Button
-                  className="groupPage-button"
-                  onClick={() => setInviteModalOpen(true)} // Open the invite modal
-              >
-                + Invite Users
-              </Button>
+            {/* Buttons below participants but above chat */}
+            <div className="button-container">
+              <InviteUser groupId={groupId} isVisible={inviteModalOpen} />
               <Button
                   className="groupPage-button"
                   onClick={() => setCalendarModalOpen(true)}
               >
                 + Plan Session
               </Button>
+              {isGroupOwner && (
+                  <Button
+                      className="groupPage-button"
+                      onClick={() => router.push(`/edit/group/${groupId}`)}
+                  >
+                    ⚙️ Manage Group
+                  </Button>
+              )}
             </div>
-
-            <Card title="Participants" className="groupPage-card h-fit mt-4">
-              <GroupParticipants groupId={groupId} />
-            </Card>
-            {isGroupOwner && (
-                <Button
-                    className="groupPage-button"
-                    onClick={() => console.log("Open manage group modal")}
-                >
-                  ⚙️ Manage Group
-                </Button>
-            )}
-            <Button
-                className="groupPage-button"
-                onClick={() => router.push("/dashboard")}
-            >
-              Back to Dashboard
-            </Button>
           </div>
+
+          {/* Right column - Timer */}
+          <div className="timer-column">
+            <PomodoroTimer onTimerStatusChange={handleTimerStatusChange} />
+          </div>
+
+          {/* Chat section below everything */}
+          {!isRunning && (
+              <div className="chat-section">
+                <Card title="Group Chat (Break)" className="groupPage-card">
+                  <p>💬 Chat feature coming soon! (WebSocket integration in progress)</p>
+                </Card>
+              </div>
+          )}
         </div>
 
         {/* Calendar modal */}

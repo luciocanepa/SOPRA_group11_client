@@ -4,6 +4,7 @@ import { useApi } from "@/hooks/useApi";
 import { useEffect, useState } from "react";
 import { Table, Tag } from "antd";
 import useLocalStorage from "@/hooks/useLocalStorage";
+import "@/styles/pages/participants.css";
 
 interface ApiUser {
   id: number;
@@ -90,16 +91,15 @@ export function GroupParticipants({ groupId }: GroupParticipantsProps) {
   ];
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-semibold mb-4">Group Members</h2>
-      <Table
-        columns={columns}
-        dataSource={participants}
-        loading={loading}
-        rowKey="id"
-        pagination={false}
-        size="small"
-      />
-    </div>
+      <div className="">
+        <h2 className="group-members-title">Group Members</h2>
+        <Table
+            className="group-members-table"
+            columns={columns}
+            dataSource={participants}
+            loading={loading}
+            pagination={false}
+        />
+      </div>
   );
 }

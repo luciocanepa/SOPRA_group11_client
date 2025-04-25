@@ -17,7 +17,8 @@ body {
 }
 
 .white-container {
-  background: white;
+  background-color: rgba(251, 227, 228, 0.91);
+  backdrop-filter: blur(8px) !important;
   padding: 30px; /* Creates space around pink container */
   border-radius: 20px; /* Optional rounded corners */
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* Optional subtle shadow */
@@ -33,7 +34,7 @@ body {
 }
 
 .pink-container {
-  background: #fbe3e4;
+  background: #ffffff;
   color: black;
   padding: 20px;
   border-radius: 20px;

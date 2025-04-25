@@ -127,7 +127,7 @@ const GroupCreation: React.FC = () => {
           onFinish={handleGroupCreation}
           layout="vertical"
         >
-          <h2>Create your own study group</h2>
+          <h2>Create Study Group</h2>
           <Form.Item
             name="name"
             label="Group name"
@@ -205,14 +205,14 @@ const GroupCreation: React.FC = () => {
               Create Group
             </Button>
           </Form.Item>
-          <p>You changed your mind on creating a group?</p>
           <Form.Item>
             <Button
-              className="groupCreation-button"
+              className="groupCreation-button-back"
               onClick={() => router.push("/dashboard")}
             >
               Back to Dashboard
             </Button>
+          <p>Have you changed your mind on creating a group?</p>
           </Form.Item>
         </Form>
       </div>
