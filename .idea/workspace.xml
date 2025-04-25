@@ -4,15 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3ebf501b-ebd8-45c8-b006-2168cd837a51" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="6a0154fb-0921-4f9d-87ba-7366d0446b40" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/dashboard/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/dashboard/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/register/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/register/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/styles/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/styles/globals.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/styles/pages/dashboard.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/styles/pages/dashboard.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/styles/pages/login.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/styles/pages/login.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/styles/pages/timer.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/styles/pages/timer.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/components/PomodoroTimer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/components/PomodoroTimer.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,22 +18,22 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "HelinCapan"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;HelinCapan&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "git@github.com:luciocanepa/SOPRA_group11_client.git",
-    "accountId": "3a49da74-3a56-49d3-8ae6-292c0a012dd5"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;git@github.com:luciocanepa/SOPRA_group11_client.git&quot;,
+    &quot;accountId&quot;: &quot;3a49da74-3a56-49d3-8ae6-292c0a012dd5&quot;
   }
-}]]></component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 8
-}]]></component>
-  <component name="ProjectId" id="2vgUPYK9iR6N88MtwmhT6HGjUTa" />
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="2w8Z7YMJaxhRjL8mJNLrXrCtZqf" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -46,7 +42,7 @@
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "stylingsTest",
+    "git-widget-placeholder": "stylings",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "//wsl$/Ubuntu/home/helincapan/SOPRA_group11_client",
     "node.js.detected.package.eslint": "true",
@@ -68,12 +64,13 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="3ebf501b-ebd8-45c8-b006-2168cd837a51" name="Changes" comment="" />
-      <created>1744566186450</created>
+      <changelist id="6a0154fb-0921-4f9d-87ba-7366d0446b40" name="Changes" comment="" />
+      <created>1745424994677</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1744566186450</updated>
-      <workItem from="1744566187622" duration="26662000" />
+      <updated>1745424994677</updated>
+      <workItem from="1745424995893" duration="10719000" />
+      <workItem from="1745521642545" duration="1145000" />
     </task>
     <servers />
   </component>
