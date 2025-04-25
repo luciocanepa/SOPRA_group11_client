@@ -1,8 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import { Button, Form, Input, message, Upload } from "antd";
+import { User } from "@/types/user";
 import { Group } from "@/types/group";
 import { UploadOutlined } from "@ant-design/icons";
 import "@/styles/pages/groups.css";
@@ -14,8 +15,6 @@ interface FormFieldProps {
   name: string;
   description: string;
   image: string;
-  adminId: string;
-  members: string[];
 }
 
 const GroupCreation: React.FC = () => {
@@ -23,48 +22,31 @@ const GroupCreation: React.FC = () => {
   const apiService = useApi();
   const [form] = Form.useForm();
   const { value: token } = useLocalStorage<string>("token", "");
-  const [invitedUsers, setInvitedUsers] = useState<User[]>([]);
-  // const { value: id } = useLocalStorage<string>("id", "");
+  const { value: id } = useLocalStorage<string>("id", "");
 
-  // const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
+  const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
 
-  // useEffect(() => {
-  //   const fetchLoggedInUser = async () => {
-  //     if (!token || !id) return;
+  //useEffect is needed in order to not get a 409 error which is caused by not providing the admin id
+  useEffect(() => {
+    const fetchLoggedInUser = async () => {
+      if (!token || !id) return;
 
-  //     try {
-  //       const user = await apiService.get<User>(`/users/${id}`, token);
-  //       setLoggedInUser(user);
+      try {
+        const user = await apiService.get<User>(`/users/${id}`, token);
+        setLoggedInUser(user);
+      } catch (error) {
+        if (error instanceof Error) {
+          alert(
+            `Something went wrong while fetching groups:\n${error.message}`,
+          );
+        } else {
+          console.error("An unknown error occurred while fetching groups.");
+        }
+      }
+    };
 
-  //       // const storedToken = String(token).replace(/\s+/g, "").trim();
-  //       // const fetchedToken = user.token
-  //       //   ? String(user.token).replace(/\s+/g, "").trim()
-  //       //   : "";
-  //       // const wrappedFetchedToken = `"${fetchedToken}"`;
-  //       // console.log("Fetched User:", user);
-  //       // console.log("Fetched Token from User:", fetchedToken);
-  //       // console.log("Stored Token in localStorage:", storedToken);
-  //       // console.log("Stored User ID in localStorage:", id);
-  //       // console.log("Wrapped Fetched Token:", wrappedFetchedToken);
-
-  //       // if (storedToken == wrappedFetchedToken) {
-  //       //   setLoggedInUserId(user.id);
-  //       // } else {
-  //       //   console.warn("No matching user found for stored token");
-  //       // }
-  //     } catch (error) {
-  //       if (error instanceof Error) {
-  //         alert(
-  //           `Something went wrong while fetching groups:\n${error.message}`,
-  //         );
-  //       } else {
-  //         console.error("An unknown error occurred while fetching groups.");
-  //       }
-  //     }
-  //   };
-
-  //   fetchLoggedInUser();
-  // }, [apiService, token, id]);
+    fetchLoggedInUser();
+  }, [apiService, token, id]);
 
   const handleGroupCreation = async (values: FormFieldProps) => {
     try {
@@ -73,6 +55,7 @@ const GroupCreation: React.FC = () => {
         ...values,
         members: invitedUsers.map(user => user.id), // or usernames depending on backend
         image: uploadedImage || null,
+        adminId: loggedInUser?.id
       };
 
       // Create the new group
