@@ -95,28 +95,10 @@ export function GroupParticipants({ groupId }: GroupParticipantsProps) {
         <h2 className="group-members-title">Group Members</h2>
         <Table
             className="group-members-table"
-            columns={[
-              {
-                title: "Username",
-                dataIndex: "username",
-                key: "username",
-              },
-              {
-                title: "Status",
-                dataIndex: "status",
-                key: "status",
-                render: (status: string) => (
-                    <Tag className={`status-tag status-${status.toLowerCase()}`}>
-                      {status}
-                    </Tag>
-                ),
-              },
-            ]}
+            columns={columns}
             dataSource={participants}
             loading={loading}
-            rowKey="id"
             pagination={false}
-            size="small"
         />
       </div>
   );

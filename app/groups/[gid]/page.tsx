@@ -5,11 +5,10 @@ import React, { useEffect, useState } from "react";
 import { PomodoroTimer } from "@/components/PomodoroTimer";
 import { GroupParticipants } from "@/components/GroupParticipants";
 import { Button, Modal, Card } from "antd";
-import { InviteUserPlaceholder } from "@/components/InviteUserPlaceholder";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { useApi } from "@/hooks/useApi";
 import { Group } from "@/types/group";
-import "@/styles/pages/group_dashboard.css";
+import { InviteUser } from "@/components/InviteUser";
 
 export default function GroupPage() {
   const params = useParams();
@@ -22,6 +21,8 @@ export default function GroupPage() {
   const [calendarModalOpen, setCalendarModalOpen] = useState(false);
   const [isRunning, setIsRunning] = useState(false); // Timer state
   const [isGroupOwner, setIsGroupOwner] = useState(false);
+  const [inviteModalOpen, setInviteModalOpen] = useState(false); // New state to control the invite user modal
+  const [inviteFormKey, setInviteFormKey] = useState(0);
 
   const handleTimerStatusChange = (isRunning: boolean) => {
     setIsRunning(isRunning); // Update isRunning state when the timer starts/stops
@@ -33,23 +34,14 @@ export default function GroupPage() {
       try {
         // Using apiService to get the group data by its ID
         const groupData: Group = await apiService.get<Group>(
-          `/groups/${groupId}`,
-          token,
+            `/groups/${groupId}`,
+            token,
         );
-
-        console.log(
-          "Local user ID:",
-          localUserId,
-          "Group admin ID:",
-          groupData.adminId,
-        );
-        console.log(localUserId == groupData.adminId);
 
         if (groupData.adminId === localUserId) {
           setIsGroupOwner(true); // Set this if the current user is the admin
         } else {
           setIsGroupOwner(false); // Set to false if not
-          console.log("User is NOT the group owner");
         }
       } catch (error) {
         console.error("Failed to fetch group admin data", error);
@@ -79,7 +71,7 @@ export default function GroupPage() {
 
             {/* Buttons below participants but above chat */}
             <div className="button-container">
-              <InviteUserPlaceholder />
+              <InviteUser groupId={groupId} isVisible={inviteModalOpen} />
               <Button
                   className="groupPage-button"
                   onClick={() => setCalendarModalOpen(true)}
@@ -121,6 +113,20 @@ export default function GroupPage() {
             className="groupPage-modal"
         >
           <p>📅 Google Calendar integration coming soon!</p>
+        </Modal>
+
+        {/* Invite User Modal */}
+        <Modal
+            open={inviteModalOpen}
+            title="Invite User"
+            onCancel={() => {
+              setInviteModalOpen(false);
+              setInviteFormKey(prev => prev + 1); // trigger reset
+            }}
+            footer={null}
+            className="groupPage-modal"
+        >
+          <InviteUser key={inviteFormKey} groupId={groupId} isVisible={inviteModalOpen} />
         </Modal>
       </div>
   );
