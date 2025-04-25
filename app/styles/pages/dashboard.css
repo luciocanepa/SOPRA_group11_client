@@ -67,9 +67,58 @@
   font-size: 18px !important;
   font-family: inherit !important;
   cursor: pointer;
+  box-shadow:
+          inset 0 2px 5px rgba(0, 0, 0, 0.2),
+          0 6px 12px rgba(0, 0, 0, 0.42) !important;
 }
 .dashboardMainPage-button:hover {
   background-color: #3e0000 !important;
+  transform: translateY(2px);
+  border: white;
+  outline: white;
+}
+
+.dashboardMainPage-button-black {
+  width: 100%;
+  min-width: 120px;
+  background-color: rgb(0, 0, 0) !important;
+  color: white !important;
+  border: none !important;
+  padding: 28px 0 !important;
+  border-radius: 18px !important;
+  font-weight: bold !important;
+  font-size: 18px !important;
+  font-family: inherit !important;
+  cursor: pointer;
+  box-shadow:
+          inset 0 2px 5px rgba(0, 0, 0, 0.2),
+          0 6px 12px rgba(0, 0, 0, 0.42) !important;
+}
+.dashboardMainPage-button-black:hover {
+  background-color: #2e2e2e !important;
+  transform: translateY(2px);
+  border: white;
+  outline: white;
+}
+
+.dashboardMainPage-button-profile {
+  width: 100%;
+  min-width: 120px;
+  background-color: #005f13 !important;
+  color: white !important;
+  border: none !important;
+  padding: 28px 0 !important;
+  border-radius: 18px !important;
+  font-weight: bold !important;
+  font-size: 18px !important;
+  font-family: inherit !important;
+  cursor: pointer;
+  box-shadow:
+          inset 0 2px 5px rgba(0, 0, 0, 0.2),
+          0 6px 12px rgba(0, 0, 0, 0.42) !important;
+}
+.dashboardMainPage-button-profile:hover {
+  background-color: #00400f !important;
   transform: translateY(2px);
   border: white;
   outline: white;
@@ -117,6 +166,9 @@
   font-size: 18px !important;
   font-family: inherit !important;
   cursor: pointer;
+  box-shadow:
+          inset 0 2px 5px rgba(0, 0, 0, 0.2),
+          0 6px 12px rgba(0, 0, 0, 0.42) !important;
 }
 .group-card h3 {
   margin: 0;

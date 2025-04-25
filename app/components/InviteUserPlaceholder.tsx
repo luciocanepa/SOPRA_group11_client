@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import { Button, Modal } from "antd";
+import "@/styles/pages/group_dashboard.css";
 
 export function InviteUserPlaceholder() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="invite-user-placeholder-container">
-      <Button className="invite-user-button" onClick={() => setOpen(true)}>
+    <div className="123">
+      <Button className="groupPage-button" onClick={() => setOpen(true)}>
         + Invite User
       </Button>
       <Modal
@@ -16,7 +17,7 @@ export function InviteUserPlaceholder() {
         open={open}
         onCancel={() => setOpen(false)}
         footer={null}
-        className="invite-user-modal"
+        className="groupPage-button"
       >
         <p>This feature is coming soon!</p>
         {/* In the future: replace with <InviteUserForm groupId={...} /> */}

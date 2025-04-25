@@ -175,12 +175,12 @@ const Dashboard: React.FC = () => {
 
       <div className="dashboardMPL-button-container">
         <Button
-          className="dashboardMainPage-button"
+          className="dashboardMainPage-button-profile"
           onClick={() => router.push(`/edit/${loggedInUser?.id}`)}
         >
           Profile
         </Button>
-        <Button className="dashboardMainPage-button" onClick={handleLogout}>
+        <Button className="dashboardMainPage-button-black" onClick={handleLogout}>
           Logout
         </Button>
       </div>
