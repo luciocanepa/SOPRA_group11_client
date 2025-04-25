@@ -8,7 +8,6 @@ import { Group } from "@/types/group";
 import { UploadOutlined } from "@ant-design/icons";
 import "@/styles/pages/groups.css";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import {User} from "@/types/user";
 import {InviteUser} from "@/components/InviteUser";
 
 interface FormFieldProps {
@@ -25,8 +24,8 @@ const GroupCreation: React.FC = () => {
   const { value: id } = useLocalStorage<string>("id", "");
 
   const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
+  const [invitedUsers, setInvitedUsers] = useState<{ id: string; username: string }[]>([]);
 
-  //useEffect is needed in order to not get a 409 error which is caused by not providing the admin id
   useEffect(() => {
     const fetchLoggedInUser = async () => {
       if (!token || !id) return;

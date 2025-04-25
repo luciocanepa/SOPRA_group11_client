@@ -63,7 +63,11 @@ const Dashboard: React.FC = () => {
       );
       setInvitations(invitations.filter((invitation) => invitation.id !== invitationId));
     } catch (error) {
-      console.error("An unknown error occurred while accepting invitation.");
+      if (error instanceof Error) {
+        console.error("Error accepting invitation:", error.message);
+      } else {
+        console.error("An unknown error occurred while accepting invitation.");
+      }
     }
   }
 
@@ -78,7 +82,11 @@ const Dashboard: React.FC = () => {
       );
       setInvitations(invitations.filter((invitation) => invitation.id !== invitationId));
     } catch (error) {
-      console.error("An unknown error occurred while declining invitation."); 
+      if (error instanceof Error) {
+        console.error("Error declining invitation:", error.message);
+      } else {
+        console.error("An unknown error occurred while declining invitation.");
+      }
     }
   }
 
@@ -158,7 +166,11 @@ const Dashboard: React.FC = () => {
         setInvitations(invitations);
         console.log("Invitations:", invitations);
       } catch (error) {
-        console.error("An unknown error occurred while fetching invitations.");
+        if (error instanceof Error) {
+          console.error("Error fetching invitations:", error.message);
+        } else {
+          console.error("An unknown error occurred while fetching invitations.");
+        }
       }
     };
 
