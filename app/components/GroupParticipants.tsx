@@ -3,6 +3,7 @@
 import { useApi } from "@/hooks/useApi";
 import { useEffect, useState } from "react";
 import { Table, Tag } from "antd";
+import useLocalStorage from "@/hooks/useLocalStorage";
 
 interface ApiUser {
   id: number;
@@ -28,13 +29,16 @@ export function GroupParticipants({ groupId }: GroupParticipantsProps) {
   const apiService = useApi();
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [loading, setLoading] = useState(true);
+  const { value: token } = useLocalStorage<string>("token", "");
 
   useEffect(() => {
+    if (!token) return;
     const fetchParticipants = async () => {
       try {
         setLoading(true);
         const response = await apiService.get<GroupResponse>(
           `/groups/${groupId}`,
+          token,
         );
 
         const members = response.users.map((user: ApiUser) => ({
@@ -52,7 +56,7 @@ export function GroupParticipants({ groupId }: GroupParticipantsProps) {
     };
 
     fetchParticipants();
-  }, [groupId, apiService]);
+  }, [groupId, apiService, token]);
 
   // TODO: integrate WebSocket live status updates when ready
 

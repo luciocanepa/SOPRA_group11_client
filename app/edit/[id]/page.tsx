@@ -2,28 +2,24 @@
 import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
-//import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
 import { Button, Form, Input, message, Select, Upload, DatePicker } from "antd";
 import { EditOutlined, UploadOutlined } from "@ant-design/icons";
 import "@/styles/pages/edit.css";
 import "@/styles/pages/login.css";
 import Image from "next/image";
+import useLocalStorage from "@/hooks/useLocalStorage";
+import dayjs from "dayjs";
+import moment from "moment-timezone";
 
-const timezones = [
-  { value: "UTC", label: "UTC" },
-  { value: "GMT", label: "GMT" },
-  { value: "PST", label: "Pacific Standard Time (UTC-8)" },
-  { value: "MST", label: "Mountain Standard Time (UTC-7)" },
-  { value: "CST", label: "Central Standard Time (UTC-6)" },
-  { value: "EST", label: "Eastern Standard Time (UTC-5)" },
-];
+const timezones = moment.tz.names();
+
 
 const ManageProfile: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
   const [form] = Form.useForm();
-  //const {set: setToken, } = useLocalStorage<string>("token", "");
+  const { value: token } = useLocalStorage<string>("token", "");
   const [user, setUser] = useState<User | null>(null);
   const { id } = useParams();
   const [isAuthorizedToEdit, setIsAuthorizedToEdit] = useState<boolean>(false);
@@ -45,23 +41,40 @@ const ManageProfile: React.FC = () => {
       .join("");
   };
 
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const uploadingImage = (file: File) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+
+    reader.onload = () => {
+      const base64String = (reader.result as string).split(",")[1];
+      setUploadedImage(base64String);
+    };
+
+    reader.onerror = (error) => {
+      message.error(`${file.name} upload failed.`);
+      console.error("Upload error:", error);
+    };
+  };
+
   useEffect(() => {
+    if (!token) return;
     const fetchingUser = async () => {
       try {
-        const user = await apiService.get<User>(`/users/${id}`);
+        const user = await apiService.get<User>(`/users/${id}`, token);
         setUser(user);
-        const token = localStorage.getItem("token");
-        if (!token) return;
         if (token === user.token) {
           setIsAuthorizedToEdit(true);
         } else {
           message.error("You are not authorized to edit this profile.");
         }
-
+        if (user.profilePicture) {
+          setUploadedImage(user.profilePicture);
+        }
         form.setFieldsValue({
           username: user.username,
           name: user.name ?? undefined,
-          birthday: user.birthday ?? undefined,
+          birthday: user.birthday ? dayjs(user.birthday, "YYYY-MM-DD").startOf('day') : null,
           timezone: user.timezone ?? undefined,
         });
       } catch (error) {
@@ -76,9 +89,10 @@ const ManageProfile: React.FC = () => {
     };
 
     fetchingUser();
-  }, [id, apiService, form]);
+  }, [id, token, apiService, form]);
 
   const handleUserEdit = async () => {
+    if (!token) return;
     if (!isAuthorizedToEdit) {
       message.error("You are not authorized to edit this profile.");
       return;
@@ -101,7 +115,7 @@ const ManageProfile: React.FC = () => {
         edits.password = hashedPassword; // You may want to hash it before sending
       }
       if (values.birthday !== user?.birthday) {
-        edits.birthday = values.birthday;
+        edits.birthday = dayjs(values.birthday).format("YYYY-MM-DD");
       }
       if (values.timezone !== user?.timezone) {
         edits.timezone = values.timezone;
@@ -110,7 +124,7 @@ const ManageProfile: React.FC = () => {
         edits.profilePicture = uploadedImage;
       }
 
-      await apiService.put(`/users/${user?.id}`, edits);
+      await apiService.put(`/users/${user?.id}`, edits, token);
 
       message.success("Profile updated successfully");
       setIsEdit({
@@ -120,27 +134,14 @@ const ManageProfile: React.FC = () => {
         birthday: false,
         timezone: false,
       }); // reset editable state
+      alert("Edit successful!");
+      router.push(`/edit/${user?.id}`);
     } catch (error) {
       message.error("Failed to update profile");
       console.error(error);
     }
   };
 
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-  const uploadingImage = (file: File) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-
-    reader.onload = () => {
-      const base64String = (reader.result as string).split(",")[1];
-      setUploadedImage(base64String);
-    };
-
-    reader.onerror = (error) => {
-      message.error(`${file.name} upload failed.`);
-      console.error("Upload error:", error);
-    };
-  };
 
   return (
     <div className="background-container">
@@ -244,29 +245,54 @@ const ManageProfile: React.FC = () => {
             />
           </Form.Item>
 
-          <Form.Item name="birthday" label="Birthday">
+          <Form.Item label="Birthday">
             {isEdit.birthday ? (
-              <DatePicker
-                style={{ width: "100%" }}
-                placeholder="Select date"
-                format="YYYY-MM-DD"
-                inputReadOnly
-              />
+              <Form.Item name="birthday" noStyle>
+                <DatePicker
+                  style={{ width: "100%" }}
+                  format="YYYY-MM-DD"
+                  allowClear
+                  picker="date"
+                />
+              </Form.Item>
             ) : (
-              <Input
-                value={form.getFieldValue("birthday")}
-                readOnly
-                suffix={
-                  <EditOutlined
-                    className="edit-icon"
-                    onClick={() =>
-                      setIsEdit((prev) => ({ ...prev, birthday: true }))
-                    }
-                  />
-                }
-              />
+              <div style={{ position: "relative" }}>
+                <Input
+                  value={form.getFieldValue("birthday")?.format("YYYY-MM-DD") || ""}
+                  readOnly
+                  style={{
+                    backgroundColor: "#f5f5f5",
+                  }}
+                />
+                {/* Overlay to block interaction and force cursor */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    cursor: "not-allowed",
+                    zIndex: 2,
+                  }}
+                />
+                <EditOutlined
+                  className="edit-icon"
+                  style={{
+                    position: "absolute",
+                    right: 10,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    cursor: "pointer",
+                    zIndex: 3, // make sure it's above the overlay
+                  }}
+                  onClick={() => setIsEdit((prev) => ({ ...prev, birthday: true }))}
+                />
+              </div>
             )}
           </Form.Item>
+
+
 
           <Form.Item name="timezone" label="Timezone">
             <Select
@@ -282,11 +308,11 @@ const ManageProfile: React.FC = () => {
                 />
               }
             >
-              {timezones.map((tz) => (
-                <Select.Option key={tz.value} value={tz.value}>
-                  {tz.label}
-                </Select.Option>
-              ))}
+                {timezones.map((tz) => (
+                    <Select.Option key={tz} value={tz}>
+                        {tz}
+                    </Select.Option>
+                ))}
             </Select>
           </Form.Item>
 

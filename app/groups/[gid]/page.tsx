@@ -6,7 +6,7 @@ import { PomodoroTimer } from "@/components/PomodoroTimer";
 import { GroupParticipants } from "@/components/GroupParticipants";
 import { Button, Modal, Card } from "antd";
 import { InviteUserPlaceholder } from "@/components/InviteUserPlaceholder";
-// import useLocalStorage from "@/hooks/useLocalStorage";
+import useLocalStorage from "@/hooks/useLocalStorage";
 import { useApi } from "@/hooks/useApi";
 import { Group } from "@/types/group";
 
@@ -15,8 +15,8 @@ export default function GroupPage() {
   const groupId = params.gid as string;
   const apiService = useApi();
   const router = useRouter();
-  const token = localStorage.getItem("token");
-  const localUserId = localStorage.getItem("id"); // Get the user ID from localStorage
+  const { value: token } = useLocalStorage<string>("token", "");
+  const { value: localUserId } = useLocalStorage<string>("id", "");
 
   const [calendarModalOpen, setCalendarModalOpen] = useState(false);
   const [isRunning, setIsRunning] = useState(false); // Timer state
@@ -33,6 +33,7 @@ export default function GroupPage() {
         // Using apiService to get the group data by its ID
         const groupData: Group = await apiService.get<Group>(
           `/groups/${groupId}`,
+          token,
         );
 
         console.log(
@@ -93,7 +94,7 @@ export default function GroupPage() {
           {isGroupOwner && (
             <Button
               className="groupPage-button"
-              onClick={() => console.log("Open manage group modal")}
+              onClick={() => router.push(`/edit/group/${groupId}`)}
             >
               ⚙️ Manage Group
             </Button>

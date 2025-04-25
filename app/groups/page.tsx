@@ -2,74 +2,64 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
-// import useLocalStorage from "@/hooks/useLocalStorage";
-import { User } from "@/types/user";
 import { Button, Form, Input, message, Upload } from "antd";
+import { User } from "@/types/user";
 import { Group } from "@/types/group";
 import { UploadOutlined } from "@ant-design/icons";
 import "@/styles/pages/groups.css";
+import useLocalStorage from "@/hooks/useLocalStorage";
 
 interface FormFieldProps {
   name: string;
   description: string;
   image: string;
-  adminId: string;
-  members: string[];
 }
 
 const GroupCreation: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
   const [form] = Form.useForm();
-  // const {set: setToken, } = useLocalStorage<string>("token", "");
+  const { value: token } = useLocalStorage<string>("token", "");
+  const { value: id } = useLocalStorage<string>("id", "");
 
-  const [loggedInUserId, setLoggedInUserId] = useState<string | null>(null);
+  const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
 
+  //useEffect is needed in order to not get a 409 error which is caused by not providing the admin id
   useEffect(() => {
     const fetchLoggedInUser = async () => {
-      const token = localStorage.getItem("token");
-      const uid = localStorage.getItem("id");
-      const id = uid ? String(uid) : null;
-
       if (!token || !id) return;
 
       try {
-        const user = await apiService.get<User>(`/users/${id}`);
-
-        const storedToken = String(token).replace(/\s+/g, "").trim();
-        const fetchedToken = user.token
-          ? String(user.token).replace(/\s+/g, "").trim()
-          : "";
-        const wrappedFetchedToken = `"${fetchedToken}"`;
-        console.log("Fetched User:", user);
-        console.log("Fetched Token from User:", fetchedToken);
-        console.log("Stored Token in localStorage:", storedToken);
-        console.log("Stored User ID in localStorage:", id);
-        console.log("Wrapped Fetched Token:", wrappedFetchedToken);
-
-        if (storedToken == wrappedFetchedToken) {
-          setLoggedInUserId(user.id);
-        } else {
-          console.warn("No matching user found for stored token");
-        }
+        const user = await apiService.get<User>(`/users/${id}`, token);
+        setLoggedInUser(user);
       } catch (error) {
-        console.error("Error fetching users:", error);
+        if (error instanceof Error) {
+          alert(
+            `Something went wrong while fetching groups:\n${error.message}`,
+          );
+        } else {
+          console.error("An unknown error occurred while fetching groups.");
+        }
       }
     };
 
     fetchLoggedInUser();
-  }, [apiService]);
+  }, [apiService, token, id]);
 
   const handleGroupCreation = async (values: FormFieldProps) => {
     try {
       const requestBody = {
         ...values,
-        image: uploadedImage || null, // Use uploadedImage or set null if not uploaded
-        adminId: loggedInUserId,
+        image: uploadedImage || null,
+        adminId: loggedInUser?.id
       };
-      await apiService.post<Group>("/groups", requestBody);
+      const newGroup = await apiService.post<Group>(
+        "/groups",
+        requestBody,
+        token,
+      );
 
-      router.push("/dashboard"); // --> going back to the dashboard, since there is no UI for group display yet
+      router.push(`/groups/${newGroup.id}`);
     } catch (error) {
       if (error instanceof Error) {
         alert(`Something went wrong during group creation:\n${error.message}`);
@@ -145,7 +135,7 @@ const GroupCreation: React.FC = () => {
             label="Description"
             rules={[
               {
-                required: true,
+                required: false,
                 message: "Please input a description for your group",
               },
             ]}
@@ -156,7 +146,7 @@ const GroupCreation: React.FC = () => {
             />
           </Form.Item>
 
-          <Form.Item
+          {/* <Form.Item
             name="members"
             label="Members"
             rules={[
@@ -168,7 +158,7 @@ const GroupCreation: React.FC = () => {
             ]}
           >
             <Input placeholder="Enter usernames, comma-separated" />
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item name="image" label="Group Picture">
             <Upload

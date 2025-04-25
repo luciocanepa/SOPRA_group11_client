@@ -39,7 +39,7 @@ const Dashboard: React.FC = () => {
   // The hook returns an object with the value and two functions
   // Simply choose what you need from the hook:
   const {
-    // value: token, // is commented out because we dont need to know the token value for logout
+    value: token, // is commented out because we dont need to know the token value for logout
     // set: setToken, // is commented out because we dont need to set or update the token value
     clear: clearToken, // all we need in this scenario is a method to clear the token
   } = useLocalStorage<string>("token", ""); // if you wanted to select a different token, i.e "lobby", useLocalStorage<string>("lobby", "");
@@ -51,11 +51,12 @@ const Dashboard: React.FC = () => {
   };
 
   useEffect(() => {
+    if (!token) return;
     const fetchUsers = async () => {
       try {
         // apiService.get<User[]> returns the parsed JSON object directly,
         // thus we can simply assign it to our users variable.
-        const users: User[] = await apiService.get<User[]>("/users");
+        const users: User[] = await apiService.get<User[]>("/users", token);
         setUsers(users);
         console.log("Fetched users:", users);
       } catch (error) {
@@ -68,7 +69,7 @@ const Dashboard: React.FC = () => {
     };
 
     fetchUsers();
-  }, [apiService]); // dependency apiService does not re-trigger the useEffect on every render because the hook uses memoization (check useApi.tsx in the hooks).
+  }, [apiService, token]); // dependency apiService does not re-trigger the useEffect on every render because the hook uses memoization (check useApi.tsx in the hooks).
   // if the dependency array is left empty, the useEffect will trigger exactly once
   // if the dependency array is left away, the useEffect will run on every state change. Since we do a state change to users in the useEffect, this results in an infinite loop.
   // read more here: https://react.dev/reference/react/useEffect#specifying-reactive-dependencies
