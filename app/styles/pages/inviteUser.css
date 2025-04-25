@@ -1,69 +1,119 @@
-.ant-modal-close {
-    max-width: 30px !important;
-    min-width: 30px !important;
-    max-height: 30px !important;
-    min-height: 30px !important;
-    background-color: rgb(178, 178, 178) !important;
-    color: black !important;
-    border-radius: 50% !important;
+.invite-container {
+    padding: 16px;
+    border-radius: 20px;
+    margin: 10px 0;
+    background-color: rgb(248, 217, 214) !important;
 }
 
-.ant-form-item-label {
-    display: none !important;
-    /* min-height: 0px !important;
-    height: 0px !important; */
+
+.invite-title {
+    color: #000 !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    margin-bottom: 12px;
+    text-align: center;
 }
 
-.ant-modal-close:hover {
-    background-color: rgb(222, 40, 40) !important;
-    color: white !important;
+
+.invite-input .ant-select-selector {
+    width: 100%;
+    padding: 13px 16px !important;
+    border-radius: 18px !important;
+    border: 1px solid #720000 !important;
+    background: #fff !important;
+    box-shadow: 2px 3px 3px rgba(0,0,0,0.15);
+    font-size: 18px !important;
+    height: 53px !important;
+    color: #000 !important;
+    transition: all 0.2s !important;
 }
 
-.ant-select-selection-search-input {
-    height: fit-content !important;
-    font-size: 1rem !important;
+.invite-input .ant-select-selector:hover {
+    border-color: #720000 !important;
+}
+
+
+.invite-input .ant-select-focused .ant-select-selector {
+    border: 2px solid #720000 !important;
+    box-shadow: 0 0 0 3px rgba(115,0,0,0.2) !important;
+}
+
+
+.invite-button {
+    width: auto !important;
+    padding: 8px 24px !important;
+    height: 53px !important;
+    border-radius: 20px !important;
+    background: #730000 !important;
+    color: #fff !important;
+    border: none !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    margin-top: 12px !important;
+    transition: transform  !important;
+}
+
+
+.invite-button:hover,
+.invite-button:focus {
+    background: #5a0000 !important;
+    transform: translateY(2px) !important;
+    outline: none !important;
+}
+
+.ant-select-dropdown .ant-select-item-option-content {
+    color: #000 !important;
 }
 
 .invite-results {
-    width: 100%;
-    color: black;
+    margin-top: 16px;
 }
 
 .invite-results h4 {
-    color: black;
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #333;
 }
 
-.invite-result-table {
-    width: 100%;
+.result-row {
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 6px;
 }
 
-.invite-result-row {
-    width: 100%;
-    padding: 1rem;
-    margin-bottom: 1rem;
-
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-start;
+.result-row .username {
+    font-weight: 500;
+    min-width: 80px;
 }
 
-.invite-result-row p:first-child {
-    width: 20%;
-    font-weight: bold;
+.result-row.success {
+    background: rgba(76,175,80,0.1);
+    color: #2e7d32;
 }
 
-.invite-result-row p:last-child {
-    width: 70%;
+.result-row.error {
+    background: rgba(244,67,54,0.1);
+    color: #c62828;
 }
 
-#success {
-    background-color: rgb(163, 246, 163);
+
+/* Error message styling */
+.result-row .message {
+    color: #f5222d !important; /* Bright red for error messages */
+    font-weight: 500;
 }
 
-#error {
-    background-color: rgb(246, 163, 163);
+/* Username styling (black) */
+.result-row .username {
+    color: #000 !important; /* Force black color */
+    font-weight: 500;
+    min-width: 80px;
+}
+
+/* Success message styling */
+.result-row.success .message {
+    color: #52c41a !important; /* Green for success messages */
 }

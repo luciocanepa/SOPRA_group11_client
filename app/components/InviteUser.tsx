@@ -20,7 +20,7 @@ export function InviteUser({ groupId, isVisible, onInviteLocally }: InviteUserPr
     const apiService = useApi();
     const { value: token } = useLocalStorage<string>("token", "");
     const { value: localUserId } = useLocalStorage<string>("id", "");
-    
+
     const [username, setUsername] = useState("");
     const [filteredOptions, setFilteredOptions] = useState<{ value: string }[]>([]);
     const [allUsers, setAllUsers] = useState<{ id: string; username: string }[]>([]);
@@ -127,18 +127,20 @@ export function InviteUser({ groupId, isVisible, onInviteLocally }: InviteUserPr
             <Form
                 form={form}
                 name="invite-user-form"
-                size="large"
+                size="middle"
                 layout="vertical"
                 onFinish={handleInvite}
             >
+
+                <h3 className="invite-title">Invite Users</h3>
+
                 <Form.Item
                     name="username"
-                    label="Invite a User"
-                    rules={[{ required: false, message: "Please enter a username!" }]}>
+                    rules={[{ required: false }]}
+                >
                     <AutoComplete
-                        className="w-full"
+                        className="invite-input"
                         options={filteredOptions}
-                        popupClassName="autocomplete-popup"
                         onSearch={handleSearch}
                         onSelect={setUsername}
                         onChange={setUsername}
@@ -148,7 +150,7 @@ export function InviteUser({ groupId, isVisible, onInviteLocally }: InviteUserPr
                 </Form.Item>
 
                 <Button
-                    className="invite-user-button"
+                    className="invite-button"
                     onClick={handleInvite}
                     loading={loading}
                     disabled={!username}
@@ -159,13 +161,12 @@ export function InviteUser({ groupId, isVisible, onInviteLocally }: InviteUserPr
                 {inviteResults.length > 0 && (
                     <div className="invite-results">
                         <h4>Invitations Sent:</h4>
-
                         <div className="invite-results-table">
-                        {inviteResults.map((res, idx) => (
-                            <div key={idx} className="invite-result-row" id={res.status == "success" ? "success": "error"}>
-                                <p>{res.username}</p>
-                                <p>{res.message}</p>
-                            </div>
+                            {inviteResults.map((res, idx) => (
+                                <div key={idx} className={`result-row ${res.status}`}>
+                                    <span className="username">{res.username}</span>
+                                    <span className="message">{res.message}</span>
+                                </div>
                             ))}
                         </div>
                     </div>

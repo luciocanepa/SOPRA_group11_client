@@ -9,6 +9,8 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 import { useApi } from "@/hooks/useApi";
 import { Group } from "@/types/group";
 import { InviteUser } from "@/components/InviteUser";
+// import "@/styles/pages/group_dashboard.css";
+import "@/styles/pages/login.css";
 
 export default function GroupPage() {
   const params = useParams();
@@ -52,12 +54,12 @@ export default function GroupPage() {
 
   return (
       <div className="main-container">
-        {/* Back button aligned with timer top */}
+        {/* Back button */}
         <Button
-            className="groupPage-button back-button"
+            className="groupPage-button login-button"
             onClick={() => router.push("/dashboard")}
         >
-          ← Back
+          Back
         </Button>
 
         {/* Title */}
@@ -65,22 +67,22 @@ export default function GroupPage() {
 
         {/* Main content */}
         <div className="main-content">
-          {/* Left column - Participants and buttons */}
+          {/* Participants */}
           <div className="left-column">
             <GroupParticipants groupId={groupId} />
 
-            {/* Buttons below participants but above chat */}
+            {/* Buttons */}
             <div className="button-container">
               <InviteUser groupId={groupId} isVisible={inviteModalOpen} />
               <Button
-                  className="groupPage-button"
+                  className="plan-session-button"
                   onClick={() => setCalendarModalOpen(true)}
               >
                 + Plan Session
               </Button>
               {isGroupOwner && (
                   <Button
-                      className="groupPage-button"
+                      className="manage-group-button"
                       onClick={() => router.push(`/edit/group/${groupId}`)}
                   >
                     ⚙️ Manage Group
@@ -89,12 +91,12 @@ export default function GroupPage() {
             </div>
           </div>
 
-          {/* Right column - Timer */}
+          {/* Timer */}
           <div className="timer-column">
             <PomodoroTimer onTimerStatusChange={handleTimerStatusChange} />
           </div>
 
-          {/* Chat section below everything */}
+          {/* Chat */}
           {!isRunning && (
               <div className="chat-section">
                 <Card title="Group Chat (Break)" className="groupPage-card">
@@ -104,7 +106,7 @@ export default function GroupPage() {
           )}
         </div>
 
-        {/* Calendar modal */}
+        {/* Calendar */}
         <Modal
             open={calendarModalOpen}
             title="Plan Study Session"
@@ -115,13 +117,13 @@ export default function GroupPage() {
           <p>📅 Google Calendar integration coming soon!</p>
         </Modal>
 
-        {/* Invite User Modal */}
+        {/* Invite User */}
         <Modal
             open={inviteModalOpen}
             title="Invite User"
             onCancel={() => {
               setInviteModalOpen(false);
-              setInviteFormKey(prev => prev + 1); // trigger reset
+              setInviteFormKey(prev => prev + 1);
             }}
             footer={null}
             className="groupPage-modal"
