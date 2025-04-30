@@ -91,16 +91,16 @@ export function GroupParticipants({ groupId }: GroupParticipantsProps) {
   ];
 
   return (
-      <div className="group-members-container">
-        <h2 className="group-members-title">Group Members</h2>
-        <Table
-            className="group-members-table"
-            columns={columns}
-            dataSource={participants}
-            loading={loading}
-            rowKey="id"
-            pagination={false}
-        />
-      </div>
+    <div className="group-members-container">
+      <h2 className="group-members-title">Group Members</h2>
+      <Table
+        className="group-members-table"
+        columns={columns}
+        dataSource={participants}
+        loading={loading}
+        rowKey="id"
+        pagination={false}
+      />
+    </div>
   );
 }

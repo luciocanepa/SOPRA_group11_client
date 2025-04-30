@@ -14,7 +14,6 @@ import moment from "moment-timezone";
 
 const timezones = moment.tz.names();
 
-
 const ManageProfile: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
@@ -74,7 +73,9 @@ const ManageProfile: React.FC = () => {
         form.setFieldsValue({
           username: user.username,
           name: user.name ?? undefined,
-          birthday: user.birthday ? dayjs(user.birthday, "YYYY-MM-DD").startOf('day') : null,
+          birthday: user.birthday
+            ? dayjs(user.birthday, "YYYY-MM-DD").startOf("day")
+            : null,
           timezone: user.timezone ?? undefined,
         });
       } catch (error) {
@@ -141,7 +142,6 @@ const ManageProfile: React.FC = () => {
       console.error(error);
     }
   };
-
 
   return (
     <div className="background-container">
@@ -258,7 +258,9 @@ const ManageProfile: React.FC = () => {
             ) : (
               <div style={{ position: "relative" }}>
                 <Input
-                  value={form.getFieldValue("birthday")?.format("YYYY-MM-DD") || ""}
+                  value={
+                    form.getFieldValue("birthday")?.format("YYYY-MM-DD") || ""
+                  }
                   readOnly
                   style={{
                     backgroundColor: "#f5f5f5",
@@ -286,13 +288,13 @@ const ManageProfile: React.FC = () => {
                     cursor: "pointer",
                     zIndex: 3, // make sure it's above the overlay
                   }}
-                  onClick={() => setIsEdit((prev) => ({ ...prev, birthday: true }))}
+                  onClick={() =>
+                    setIsEdit((prev) => ({ ...prev, birthday: true }))
+                  }
                 />
               </div>
             )}
           </Form.Item>
-
-
 
           <Form.Item name="timezone" label="Timezone">
             <Select
@@ -308,11 +310,11 @@ const ManageProfile: React.FC = () => {
                 />
               }
             >
-                {timezones.map((tz) => (
-                    <Select.Option key={tz} value={tz}>
-                        {tz}
-                    </Select.Option>
-                ))}
+              {timezones.map((tz) => (
+                <Select.Option key={tz} value={tz}>
+                  {tz}
+                </Select.Option>
+              ))}
             </Select>
           </Form.Item>
 

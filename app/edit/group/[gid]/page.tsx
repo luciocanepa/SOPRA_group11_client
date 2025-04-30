@@ -3,13 +3,12 @@ import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import { Group } from "@/types/group";
-import { Button, Form, Input, message, Upload, Select} from "antd";
-import { EditOutlined, UploadOutlined} from "@ant-design/icons";
+import { Button, Form, Input, message, Upload, Select } from "antd";
+import { EditOutlined, UploadOutlined } from "@ant-design/icons";
 import "@/styles/pages/edit.css";
 import Image from "next/image";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
-
 
 const ManageGroup: React.FC = () => {
   const router = useRouter();
@@ -23,9 +22,7 @@ const ManageGroup: React.FC = () => {
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [removedUsers, setRemovedUsers] = useState<User[]>([]);
 
-
   const [isEdit, setIsEdit] = useState({
-
     name: false,
     description: false,
   });
@@ -49,13 +46,13 @@ const ManageGroup: React.FC = () => {
   useEffect(() => {
     if (!gid || !token || !id) return;
 
-    console.log("checkpoint1")
+    console.log("checkpoint1");
     const fetchingGroup = async () => {
       try {
         const group = await apiService.get<Group>(`/groups/${gid}`, token);
         setGroup(group);
-        console.log("id:" , id)
-        console.log("admin id:" , group?.adminId)
+        console.log("id:", id);
+        console.log("admin id:", group?.adminId);
         if (id === group.adminId) {
           setIsAuthorizedToEdit(true);
         } else {
@@ -68,7 +65,6 @@ const ManageGroup: React.FC = () => {
         form.setFieldsValue({
           description: group.description,
           name: group.name ?? undefined,
-
         });
       } catch (error) {
         if (error instanceof Error) {
@@ -83,7 +79,6 @@ const ManageGroup: React.FC = () => {
 
     fetchingGroup();
   }, [gid, token, id, apiService, form]);
-
 
   const handleGroupEdit = async () => {
     if (!token) return;
@@ -123,11 +118,13 @@ const ManageGroup: React.FC = () => {
   };
 
   const handleGroupDeletion = async () => {
-    const confirmDelete = window.confirm("Do you really want to delete your group?");
+    const confirmDelete = window.confirm(
+      "Do you really want to delete your group?",
+    );
     if (!confirmDelete) return;
 
     try {
-      await apiService.delete(`/groups/${gid}`, token)
+      await apiService.delete(`/groups/${gid}`, token);
 
       alert("Successful Deletion of your group!");
       router.push(`/dashboard`);
@@ -135,33 +132,37 @@ const ManageGroup: React.FC = () => {
       message.error("Failed to delete the group.");
       console.error(error);
     }
-  }
+  };
 
   const handleUserRemoval = async (userId: string) => {
     if (!token || !group || !group.id || !group.users) return;
-    
-    const userToRemove = group.users.find(u => u.id === userId);
+
+    const userToRemove = group.users.find((u) => u.id === userId);
     if (!userToRemove) return;
 
-    const confirmRemoval = window.confirm(`Are you sure you want to remove ${userToRemove.username} from the group?`);
+    const confirmRemoval = window.confirm(
+      `Are you sure you want to remove ${userToRemove.username} from the group?`,
+    );
     if (!confirmRemoval) return;
-  
+
     try {
       await apiService.delete(`/groups/${group.id}/users/${userId}`, token);
       setRemovedUsers([...removedUsers, userToRemove]);
 
-      const updatedGroup = await apiService.get<Group>(`/groups/${group.id}`, token);
+      const updatedGroup = await apiService.get<Group>(
+        `/groups/${group.id}`,
+        token,
+      );
       setGroup(updatedGroup);
-  
-      message.success(`User ${userToRemove.username} has been removed from the group.`);
+
+      message.success(
+        `User ${userToRemove.username} has been removed from the group.`,
+      );
     } catch (error) {
       message.error("Failed to remove member.");
       console.error(error);
     }
   };
-  
-
-
 
   return (
     <div className="background-container">
@@ -191,11 +192,12 @@ const ManageGroup: React.FC = () => {
             />
           </div>
 
-
           <Form.Item
             name="name"
             label="Name"
-            rules={[{ required: false, message: "Please input your new group name" }]}
+            rules={[
+              { required: false, message: "Please input your new group name" },
+            ]}
           >
             <Input
               disabled={!isEdit.name}
@@ -220,13 +222,13 @@ const ManageGroup: React.FC = () => {
               suffix={
                 <EditOutlined
                   className="edit-icon"
-                  onClick={() => setIsEdit((prev) => ({ ...prev, description: true }))}
+                  onClick={() =>
+                    setIsEdit((prev) => ({ ...prev, description: true }))
+                  }
                 />
               }
             />
           </Form.Item>
-
-
 
           <Form.Item name="profilePicture" label="Group Picture">
             <Upload
@@ -245,13 +247,11 @@ const ManageGroup: React.FC = () => {
             </Upload>
           </Form.Item>
 
-
           <Form.Item>
             <Button htmlType="submit" className="groupCreation-button-save">
               Save Group Changes
             </Button>
           </Form.Item>
-
 
           <Form.Item label="Remove Member From Group">
             <Select
@@ -264,21 +264,20 @@ const ManageGroup: React.FC = () => {
               }}
               allowClear
             >
-              {group?.users?.filter(user => user.id !== group.adminId).map((user) => (
-              <Select.Option key={user.id} value={user.id}>
-                {user.username}
-              </Select.Option>
-              ))}
+              {group?.users
+                ?.filter((user) => user.id !== group.adminId)
+                .map((user) => (
+                  <Select.Option key={user.id} value={user.id}>
+                    {user.username}
+                  </Select.Option>
+                ))}
             </Select>
             <div className="removed-users-container">
               {removedUsers.map((user) => (
-                <p key={user.id}>
-                  {user.username} successfully removed
-                </p>
+                <p key={user.id}>{user.username} successfully removed</p>
               ))}
             </div>
           </Form.Item>
-
 
           <Form.Item>
             <Button
@@ -288,7 +287,6 @@ const ManageGroup: React.FC = () => {
               Delete your Group
             </Button>
           </Form.Item>
-          
 
           <Form.Item>
             <Button
@@ -305,4 +303,3 @@ const ManageGroup: React.FC = () => {
 };
 
 export default ManageGroup;
-

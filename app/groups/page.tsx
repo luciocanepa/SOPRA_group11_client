@@ -8,7 +8,7 @@ import { Group } from "@/types/group";
 import { UploadOutlined } from "@ant-design/icons";
 import "@/styles/pages/groups.css";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import {InviteUser} from "@/components/InviteUser";
+import { InviteUser } from "@/components/InviteUser";
 
 interface FormFieldProps {
   name: string;
@@ -24,7 +24,9 @@ const GroupCreation: React.FC = () => {
   const { value: id } = useLocalStorage<string>("id", "");
 
   const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
-  const [invitedUsers, setInvitedUsers] = useState<{ id: string; username: string }[]>([]);
+  const [invitedUsers, setInvitedUsers] = useState<
+    { id: string; username: string }[]
+  >([]);
 
   useEffect(() => {
     const fetchLoggedInUser = async () => {
@@ -52,20 +54,24 @@ const GroupCreation: React.FC = () => {
       // Create the group first
       const requestBody = {
         ...values,
-        members: invitedUsers.map(user => user.id), // or usernames depending on backend
+        members: invitedUsers.map((user) => user.id), // or usernames depending on backend
         image: uploadedImage || null,
-        adminId: loggedInUser?.id
+        adminId: loggedInUser?.id,
       };
 
       // Create the new group
-      const newGroup = await apiService.post<Group>("/groups", requestBody, token);
+      const newGroup = await apiService.post<Group>(
+        "/groups",
+        requestBody,
+        token,
+      );
 
       // Automatically send invitations for the users that were locally added
       for (const user of invitedUsers) {
         await apiService.post(
-            `/groups/${newGroup.id}/invitations`, // API endpoint to send invitations
-            { inviteeId: user.id },
-            token
+          `/groups/${newGroup.id}/invitations`, // API endpoint to send invitations
+          { inviteeId: user.id },
+          token,
         );
       }
 
@@ -158,16 +164,15 @@ const GroupCreation: React.FC = () => {
           </Form.Item>
           <Form.Item>
             <InviteUser
-                isVisible={true}
-                onInviteLocally={(user) => {
-                  setInvitedUsers(prev => {
-                    if (prev.find(u => u.id === user.id)) return prev;
-                    return [...prev, user];
-                  });
-                }}
+              isVisible={true}
+              onInviteLocally={(user) => {
+                setInvitedUsers((prev) => {
+                  if (prev.find((u) => u.id === user.id)) return prev;
+                  return [...prev, user];
+                });
+              }}
             />
           </Form.Item>
-
 
           {/* <Form.Item
             name="members"
@@ -212,7 +217,7 @@ const GroupCreation: React.FC = () => {
             >
               Back to Dashboard
             </Button>
-          <p>Have you changed your mind on creating a group?</p>
+            <p>Have you changed your mind on creating a group?</p>
           </Form.Item>
         </Form>
       </div>

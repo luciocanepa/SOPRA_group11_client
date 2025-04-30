@@ -148,7 +148,6 @@ li {
   background-color: var(--reg-light) !important;
 }
 
-
 /* Modal Styling */
 .invite-user-modal .ant-modal-header {
   background-color: var(--bg-secondary);
@@ -271,7 +270,6 @@ li {
   font-size: 32px;
   font-weight: bold;
   text-align: center;
-
 }
 
 .group-title {

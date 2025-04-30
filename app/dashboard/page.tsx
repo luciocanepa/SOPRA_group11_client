@@ -61,7 +61,9 @@ const Dashboard: React.FC = () => {
         {},
         token,
       );
-      setInvitations(invitations.filter((invitation) => invitation.id !== invitationId));
+      setInvitations(
+        invitations.filter((invitation) => invitation.id !== invitationId),
+      );
     } catch (error) {
       if (error instanceof Error) {
         console.error("Error accepting invitation:", error.message);
@@ -69,7 +71,7 @@ const Dashboard: React.FC = () => {
         console.error("An unknown error occurred while accepting invitation.");
       }
     }
-  }
+  };
 
   const handleDeclineInvitation = async (invitationId: number) => {
     if (!token || !id) return;
@@ -80,7 +82,9 @@ const Dashboard: React.FC = () => {
         {},
         token,
       );
-      setInvitations(invitations.filter((invitation) => invitation.id !== invitationId));
+      setInvitations(
+        invitations.filter((invitation) => invitation.id !== invitationId),
+      );
     } catch (error) {
       if (error instanceof Error) {
         console.error("Error declining invitation:", error.message);
@@ -88,7 +92,7 @@ const Dashboard: React.FC = () => {
         console.error("An unknown error occurred while declining invitation.");
       }
     }
-  }
+  };
 
   useEffect(() => {
     const fetchLoggedInUser = async () => {
@@ -169,7 +173,9 @@ const Dashboard: React.FC = () => {
         if (error instanceof Error) {
           console.error("Error fetching invitations:", error.message);
         } else {
-          console.error("An unknown error occurred while fetching invitations.");
+          console.error(
+            "An unknown error occurred while fetching invitations.",
+          );
         }
       }
     };
@@ -203,19 +209,25 @@ const Dashboard: React.FC = () => {
         <Card className="dashboardMainPage-card">
           {invitations.length > 0 && (
             <>
-            <h3>Your invitations:</h3>
-            <div className="invitations-grid">
-              {invitations.map((invitation) => (
-                <div key={invitation.id} className="invitation-card-wrapper">
-                  <a
-                    className="invitation-card"
-                  >
-                    {invitation.groupName}
-                  </a>
-                  <button id="accept" onClick={() => handleAcceptInvitation(invitation.id)}>Accept</button>
-                  <button id="reject" onClick={() => handleDeclineInvitation(invitation.id)}>Decline</button>
-                </div>
-              ))}
+              <h3>Your invitations:</h3>
+              <div className="invitations-grid">
+                {invitations.map((invitation) => (
+                  <div key={invitation.id} className="invitation-card-wrapper">
+                    <a className="invitation-card">{invitation.groupName}</a>
+                    <button
+                      id="accept"
+                      onClick={() => handleAcceptInvitation(invitation.id)}
+                    >
+                      Accept
+                    </button>
+                    <button
+                      id="reject"
+                      onClick={() => handleDeclineInvitation(invitation.id)}
+                    >
+                      Decline
+                    </button>
+                  </div>
+                ))}
               </div>
             </>
           )}
@@ -269,13 +281,15 @@ const Dashboard: React.FC = () => {
         >
           Profile
         </Button>
-        <Button className="dashboardMainPage-button-black" onClick={handleLogout}>
+        <Button
+          className="dashboardMainPage-button-black"
+          onClick={handleLogout}
+        >
           Logout
         </Button>
       </div>
     </>
   );
 };
-
 
 export default Dashboard;
