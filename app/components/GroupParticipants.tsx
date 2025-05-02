@@ -24,9 +24,13 @@ interface Participant {
 
 interface GroupParticipantsProps {
   groupId: string;
+  adminId: string | number | null | undefined;
 }
 
-export function GroupParticipants({ groupId }: GroupParticipantsProps) {
+export function GroupParticipants({
+  groupId,
+  adminId,
+}: GroupParticipantsProps) {
   const apiService = useApi();
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [loading, setLoading] = useState(true);
@@ -66,6 +70,13 @@ export function GroupParticipants({ groupId }: GroupParticipantsProps) {
       title: "Username",
       dataIndex: "username",
       key: "username",
+      render: (username: string, record: Participant) => {
+        if (record.id === adminId) {
+          // return <strong>{username}</strong>;
+          return username + " (admin)";
+        }
+        return username;
+      },
     },
     {
       title: "Status",

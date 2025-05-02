@@ -8,6 +8,7 @@ import { User } from "@/types/user";
 import { Button, Card } from "antd";
 import React, { useEffect, useState } from "react";
 import { PlusCircleOutlined } from "@ant-design/icons";
+import Navbar from "@/components/Navbar";
 
 interface Invitation {
   id: number;
@@ -186,9 +187,10 @@ const Dashboard: React.FC = () => {
   return (
     <>
       <div className="dashboardMainPage-container">
-        <Card className="dashboardMainPage-card">
+        {/* <Card className="dashboardMainPage-card">
           <h3>Welcome, {loggedInUser?.username}!</h3>
-        </Card>
+        </Card> */}
+        <Navbar user={loggedInUser} group={null} />
         <Card className="dashboardMainPage-card">
           <div className="dashboardMainPage-button-container">
             <Button

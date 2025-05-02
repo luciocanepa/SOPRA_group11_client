@@ -10,6 +10,7 @@ import { useApi } from "@/hooks/useApi";
 import { Group } from "@/types/group";
 import { InviteUser } from "@/components/InviteUser";
 import "@/styles/pages/login.css"; // keep her unified styles
+import Navbar from "@/components/Navbar";
 
 export default function GroupPage() {
   const params = useParams();
@@ -21,7 +22,8 @@ export default function GroupPage() {
 
   const [calendarModalOpen, setCalendarModalOpen] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
-  const [isGroupOwner, setIsGroupOwner] = useState(false);
+
+  const [group, setGroup] = useState<Group | null>(null);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [inviteFormKey, setInviteFormKey] = useState(0);
 
@@ -30,7 +32,7 @@ export default function GroupPage() {
   };
 
   useEffect(() => {
-    const checkIfAdmin = async () => {
+    const fetchGroup = async () => {
       if (!token || !localUserId) return;
       try {
         const groupData: Group = await apiService.get<Group>(
@@ -38,18 +40,20 @@ export default function GroupPage() {
           token,
         );
 
-        setIsGroupOwner(groupData.adminId === localUserId);
+        // setIsGroupOwner(groupData.adminId === localUserId);
+        setGroup(groupData);
       } catch (error) {
         console.error("Failed to fetch group admin data", error);
       }
     };
-    checkIfAdmin();
+    fetchGroup();
   }, [groupId, apiService, localUserId, token]);
 
   return (
     <div className="main-container">
       {/* Header & Timer Section */}
-      <h1 className="group-title">Study Session</h1>
+      {/* <h1 className="group-title">{group?.name}</h1> */}
+      <Navbar user={null} group={group} />
       <div className="main-content" style={{ display: "flex", gap: "2rem" }}>
         {/* Left: Timer */}
         <div className="timer-column" style={{ flex: 2 }}>
@@ -75,7 +79,7 @@ export default function GroupPage() {
             + Plan Session
           </button>
 
-          {isGroupOwner && (
+          {token && localUserId && group?.adminId === parseInt(localUserId) && (
             <button
               className="reset"
               onClick={() => router.push(`/edit/group/${groupId}`)}
@@ -85,7 +89,7 @@ export default function GroupPage() {
           )}
 
           <div className="group-participants-list">
-            <GroupParticipants groupId={groupId} />
+            <GroupParticipants groupId={groupId} adminId={group?.adminId} />
           </div>
 
           <button className="stop" onClick={() => router.push("/dashboard")}>
