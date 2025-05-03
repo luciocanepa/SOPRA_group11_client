@@ -1,117 +1,86 @@
-"use client";
+'use client';
 
-import { useApi } from "@/hooks/useApi";
-import { useEffect, useState } from "react";
-import { Table, Tag } from "antd";
-import useLocalStorage from "@/hooks/useLocalStorage";
-import "@/styles/pages/participants.css";
-
-interface ApiUser {
-  id: number;
-  username: string;
-  status: "Available" | "Working" | "Offline";
-}
-
-interface GroupResponse {
-  users: ApiUser[];
-}
-
-interface Participant {
-  id: number;
-  username: string;
-  status: "Available" | "Working" | "Offline";
-}
+import { useState, useEffect } from 'react';
+import { Table, Tag } from 'antd';
+import useLocalStorage from '@/hooks/useLocalStorage';
+import '@/styles/pages/participants.css';
+import { useGroupParticipants, Participant } from '@/hooks/useGroupParticipants';
 
 interface GroupParticipantsProps {
   groupId: string;
-  adminId: string | number | null | undefined;
+  adminId?: string | number | null;
 }
 
-export function GroupParticipants({
-  groupId,
-  adminId,
-}: GroupParticipantsProps) {
-  const apiService = useApi();
-  const [participants, setParticipants] = useState<Participant[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { value: token } = useLocalStorage<string>("token", "");
+export function GroupParticipants({ groupId, adminId }: GroupParticipantsProps) {
+  const { value: token } = useLocalStorage<string>('token', '');
+  const { participants, timers, loading, error } = useGroupParticipants(groupId, token);
 
+  // countdown tick
+  const [now, setNow] = useState(Date.now());
   useEffect(() => {
-    if (!token) return;
-    const fetchParticipants = async () => {
-      try {
-        setLoading(true);
-        const response = await apiService.get<GroupResponse>(
-          `/groups/${groupId}`,
-          token,
-        );
+    const interval = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(interval);
+  }, []);
 
-        const members = response.users.map((user: ApiUser) => ({
-          id: user.id,
-          username: user.username,
-          status: user.status,
-        }));
+  // format remaining seconds into MM:SS
+  const formatRemaining = (start: Date, duration: number) => {
+    const end = start.getTime() + duration * 1000;
+    const secs = Math.max(0, Math.ceil((end - now) / 1000));
+    const m = String(Math.floor(secs / 60)).padStart(2, '0');
+    const s = String(secs % 60).padStart(2, '0');
+    return `${m}:${s}`;
+  };
 
-        setParticipants(members);
-      } catch (error) {
-        console.error("Failed to fetch participants:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchParticipants();
-  }, [groupId, apiService, token]);
-
-  // TODO: integrate WebSocket live status updates when ready
+  // merge timers into participants for display
+  const data = participants.map((u) => ({
+    ...u,
+    timeRemaining: timers[u.id]
+        ? formatRemaining(timers[u.id].start, timers[u.id].duration)
+        : '—',
+  }));
 
   const columns = [
     {
-      title: "Username",
-      dataIndex: "username",
-      key: "username",
-      render: (username: string, record: Participant) => {
-        if (record.id === adminId) {
-          // return <strong>{username}</strong>;
-          return username + " (admin)";
-        }
-        return username;
+      title: 'Username',
+      dataIndex: 'username',
+      key: 'username',
+      render: (username: string, record: Participant) =>
+          record.id === adminId ? `${username} (admin)` : username,
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status: Participant['status']) => {
+        let color = 'grey';
+        if (status === 'ONLINE') color = 'green';
+        else if (status === 'WORK') color = 'red';
+        else if (status === 'BREAK') color = 'orange';
+        return <Tag color={color}>{status}</Tag>;
       },
     },
     {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (status: "ONLINE" | "WORK" | "BREAK" | "OFFLINE") => {
-        let color = "white"; // Default color
-
-        // Assign different colors based on the status
-        if (status === "ONLINE") {
-          color = "green";
-        } else if (status === "WORK") {
-          color = "red";
-        } else if (status === "BREAK") {
-          color = "orange";
-        } else if (status === "OFFLINE") {
-          color = "grey";
-        }
-
-        return <Tag color={color}>{status}</Tag>;
-      },
+      title: 'Time Remaining',
+      dataIndex: 'timeRemaining',
+      key: 'timeRemaining',
     },
   ];
 
   return (
-    <div className="group-members-container">
-      <h2 className="group-members-title">Group Members</h2>
-      <Table
-        className="group-members-table"
-        columns={columns}
-        dataSource={participants}
-        loading={loading}
-        rowKey="id"
-        pagination={false}
-      />
-    </div>
+      <div className="group-members-container">
+        <h2 className="group-members-title">Group Members</h2>
+        {error ? (
+            <div className="group-members-error">Error: {error}</div>
+        ) : (
+            <Table
+                className="group-members-table"
+                columns={columns}
+                dataSource={data}
+                loading={loading}
+                rowKey="id"
+                pagination={false}
+            />
+        )}
+      </div>
   );
 }
