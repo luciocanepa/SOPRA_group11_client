@@ -12,6 +12,7 @@
   "dependencies": {
     "@ant-design/nextjs-registry": "^1.0.2",
     "@ant-design/v5-patch-for-react-19": "^1.0.3",
+    "@stomp/stompjs": "^7.1.1",
     "@types/moment-timezone": "^0.5.13",
     "dayjs": "^1.11.13",
     "dayjs-plugin-utc": "^0.1.2",
