@@ -139,3 +139,6 @@ yarn-error.log*
 
 # idea
 .idea
+
+# ignore local Nix installer script
+install-nix.sh
