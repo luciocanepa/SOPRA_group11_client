@@ -8,10 +8,9 @@ import "../styles/pages/chat.css";
 interface ChatBoxProps {
     groupId: string;
     userId: string;
-    username: string;
 }
 
-export function ChatBox({ groupId, userId, username }: ChatBoxProps) {
+export function ChatBox({ groupId, userId}: ChatBoxProps) {
     const { value: token } = useLocalStorage<string>('token', '');
     const { messages, sendMessage, clearMessages } = useChatMessages(groupId, token);
     const [input, setInput] = useState('');

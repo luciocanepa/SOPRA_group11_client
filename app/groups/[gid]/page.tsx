@@ -4,7 +4,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { PomodoroTimer } from "@/components/PomodoroTimer";
 import { GroupParticipants } from "@/components/GroupParticipants";
-import { Modal, Card } from "antd";
+import { Modal} from "antd";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { useApi } from "@/hooks/useApi";
 import { Group } from "@/types/group";
@@ -142,7 +142,7 @@ export default function GroupPage() {
                     {isLoadingUser ? (
                         <p>Loading chat...</p>
                     ) : username && localUserId ? (
-                        <ChatBox groupId={groupId} userId={localUserId} username={username} />
+                        <ChatBox groupId={groupId} userId={localUserId} />
                     ) : (
                         <p>Please log in to access the chat</p>
                     )}
