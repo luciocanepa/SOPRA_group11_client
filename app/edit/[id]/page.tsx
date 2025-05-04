@@ -140,6 +140,7 @@ const ManageProfile: React.FC = () => {
     } catch (error) {
       message.error("Failed to update profile");
       console.error(error);
+      alert("Edit was not successful! Most likely because the username is already taken.")
     }
   };
 
