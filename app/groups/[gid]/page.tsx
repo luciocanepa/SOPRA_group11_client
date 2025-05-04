@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { PomodoroTimer } from "@/components/PomodoroTimer";
 import { GroupParticipants } from "@/components/GroupParticipants";
 import { CalendarAPI } from "@/components/CalendarAPI";
-import { Modal, Card, DatePicker, TimePicker, Form, message } from "antd";
+import { Modal, Card } from "antd";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { useApi } from "@/hooks/useApi";
 import { Group } from "@/types/group";
@@ -34,8 +34,8 @@ export default function GroupPage() {
   };
 
   const [groupData, setGroupData] = useState<Group | null>(null);
-  //const [userData, setUserData] = useState<User | null>(null);
-  // --> userData will probably be needed for the timezones
+  const [userData, setUserData] = useState<User | null>(null);
+
 
   useEffect(() => {
     const checkIfAdmin = async () => {
@@ -45,8 +45,10 @@ export default function GroupPage() {
           `/groups/${groupId}`,
           token,
         );
+        const userData: User = await apiService.get<User>(`/users/${localUserId}`, token)
         setGroupData(groupData)
         setIsGroupOwner(groupData.adminId === localUserId);
+        setUserData(userData);
       } catch (error) {
         console.error("Failed to fetch group admin data", error);
       }
@@ -143,6 +145,7 @@ export default function GroupPage() {
           isOpen={calendarModalOpen}
           onClose={() => setCalendarModalOpen(false)}
           groupName={groupData?.name || "Unnamed Group"}
+          userTimezone={userData?.timezone || "Europe/Zurich"}
         />
       )}
     </div>

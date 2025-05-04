@@ -12,9 +12,10 @@ interface CalendarPlannerProps {
   isOpen: boolean;
   onClose: () => void;
   groupName: string;
+  userTimezone: string;
 }
 
-export function CalendarAPI({ isOpen, onClose, groupName }: CalendarPlannerProps) {
+export function CalendarAPI({ isOpen, onClose, groupName, userTimezone }: CalendarPlannerProps) {
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [calendarView, setCalendarView] = useState<"init" | "form">("init");
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
@@ -110,16 +111,17 @@ export function CalendarAPI({ isOpen, onClose, groupName }: CalendarPlannerProps
       .minute(endTime.minute())
       : studySession.add(1, "hour");
   
+      console.log(userTimezone)
     const event = {
       summary: "Study Session with group: " + groupName,
       description: "Planned via the PomodoroTimer WebApplication",
       start: {
-        dateTime: studySession.toISOString(),
-        timeZone: "Europe/Zurich",
+        dateTime: studySession.format("YYYY-MM-DDTHH:mm:ss"),
+        timeZone: userTimezone,
       },
       end: {
-        dateTime: endDateTime.toISOString(),
-        timeZone: "Europe/Zurich",
+        dateTime: endDateTime.format("YYYY-MM-DDTHH:mm:ss"),
+        timeZone: userTimezone,
       },
     };
   
@@ -128,7 +130,7 @@ export function CalendarAPI({ isOpen, onClose, groupName }: CalendarPlannerProps
         calendarId: "primary",
         resource: event,
       });
-      alert("Study session successfully added to your calendar!");
+      alert(`Study session successfully added to your calendar with regards to your timezone: ${userTimezone}`);
       onClose();
     } catch (error) {
       console.error("Calendar event error:", error);
