@@ -11,6 +11,12 @@ import { Group } from "@/types/group";
 import { InviteUser } from "@/components/InviteUser";
 import "@/styles/pages/login.css";
 import Navbar from "@/components/Navbar";
+import { ChatBox } from "@/components/Chat";
+
+interface User {
+    id: string;
+    username: string;
+}
 
 export default function GroupPage() {
     const { gid } = useParams();
@@ -26,12 +32,9 @@ export default function GroupPage() {
     const [calendarOpen, setCalendarOpen] = useState(false);
     const [isRunning, setIsRunning] = useState(false);
 
-    useEffect(() => {
-        if (!token || !localUserId) return;
-        api.get<Group>(`/groups/${groupId}`, token)
-            .then((data) => setGroup(data))
-            .catch(console.error);
-    }, [groupId, token, localUserId, api]);
+    // For chat
+    const [username, setUsername] = useState<string>("");
+    const [isLoadingUser, setIsLoadingUser] = useState(true);
 
     const handleStatus = useCallback((running: boolean) => {
         setIsRunning(running);
@@ -40,7 +43,6 @@ export default function GroupPage() {
     const handleUpdate = useCallback(
         async ({ status, startTime, duration }: { status: string; startTime: string; duration: number }) => {
             if (!token || !localUserId) return;
-            // include seconds in ISO:PTmMsS
             const mins = Math.floor(duration / 60);
             const secs = duration % 60;
             const isoDur = `PT${mins}M${secs}S`;
@@ -56,6 +58,33 @@ export default function GroupPage() {
         },
         [api, token, localUserId]
     );
+
+    useEffect(() => {
+        if (!token || !localUserId) return;
+        api.get<Group>(`/groups/${groupId}`, token)
+            .then((data) => setGroup(data))
+            .catch(console.error);
+    }, [groupId, token, localUserId, api]);
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            if (!token || !localUserId) {
+                setIsLoadingUser(false);
+                return;
+            }
+
+            try {
+                const userData = await api.get<User>(`/users/${localUserId}`, token);
+                setUsername(userData.username);
+            } catch (error) {
+                console.error("Failed to fetch user data:", error);
+            } finally {
+                setIsLoadingUser(false);
+            }
+        };
+
+        fetchUserData();
+    }, [token, localUserId, api]);
 
     return (
         <div className="main-container">
@@ -99,15 +128,24 @@ export default function GroupPage() {
                         <GroupParticipants groupId={groupId} adminId={group?.adminId} />
                     </div>
 
-                    <button className="stop" onClick={() => router.push("/dashboard")}>Back to Dashboard</button>
+                    <button className="stop" onClick={() => router.push("/dashboard")}>
+                        Back to Dashboard
+                    </button>
                 </div>
             </div>
 
             {!isRunning && (
                 <div className="chat-section" style={{ marginTop: "2rem" }}>
-                    <Card title="Group Chat (Break)" className="groupPage-card">
-                        <p>💬 Chat feature coming soon!</p>
-                    </Card>
+                    <div className="chat-header" style={{ fontSize: "1.5rem", fontWeight: "bold" }}>
+                        Group Chat
+                    </div>
+                    {isLoadingUser ? (
+                        <p>Loading chat...</p>
+                    ) : username && localUserId ? (
+                        <ChatBox groupId={groupId} userId={localUserId} username={username} />
+                    ) : (
+                        <p>Please log in to access the chat</p>
+                    )}
                 </div>
             )}
 
