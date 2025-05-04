@@ -1,7 +1,7 @@
 "use client";
 
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
 import { PomodoroTimer } from "@/components/PomodoroTimer";
 import { GroupParticipants } from "@/components/GroupParticipants";
 import { Modal, Card } from "antd";
@@ -9,134 +9,130 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 import { useApi } from "@/hooks/useApi";
 import { Group } from "@/types/group";
 import { InviteUser } from "@/components/InviteUser";
-import "@/styles/pages/login.css"; // keep her unified styles
+import "@/styles/pages/login.css";
 import Navbar from "@/components/Navbar";
 
 export default function GroupPage() {
-  const params = useParams();
-  const groupId = params.gid as string;
-  const apiService = useApi();
-  const router = useRouter();
-  const { value: token } = useLocalStorage<string>("token", "");
-  const { value: localUserId } = useLocalStorage<string>("id", "");
+    const { gid } = useParams();
+    const groupId = gid as string;
+    const api = useApi();
+    const router = useRouter();
+    const { value: token } = useLocalStorage<string>("token", "");
+    const { value: localUserId } = useLocalStorage<string>("id", "");
 
-  const [calendarModalOpen, setCalendarModalOpen] = useState(false);
-  const [isRunning, setIsRunning] = useState(false);
+    const [group, setGroup] = useState<Group | null>(null);
+    const [inviteOpen, setInviteOpen] = useState(false);
+    const [inviteKey, setInviteKey] = useState(0);
+    const [calendarOpen, setCalendarOpen] = useState(false);
+    const [isRunning, setIsRunning] = useState(false);
 
-  const [group, setGroup] = useState<Group | null>(null);
-  const [inviteModalOpen, setInviteModalOpen] = useState(false);
-  const [inviteFormKey, setInviteFormKey] = useState(0);
+    useEffect(() => {
+        if (!token || !localUserId) return;
+        api.get<Group>(`/groups/${groupId}`, token)
+            .then((data) => setGroup(data))
+            .catch(console.error);
+    }, [groupId, token, localUserId, api]);
 
-  const handleTimerStatusChange = (isRunning: boolean) => {
-    setIsRunning(isRunning);
-  };
+    const handleStatus = useCallback((running: boolean) => {
+        setIsRunning(running);
+    }, []);
 
-  useEffect(() => {
-    const fetchGroup = async () => {
-      if (!token || !localUserId) return;
-      try {
-        const groupData: Group = await apiService.get<Group>(
-          `/groups/${groupId}`,
-          token,
-        );
+    const handleUpdate = useCallback(
+        async ({ status, startTime, duration }: { status: string; startTime: string; duration: number }) => {
+            if (!token || !localUserId) return;
+            // include seconds in ISO:PTmMsS
+            const mins = Math.floor(duration / 60);
+            const secs = duration % 60;
+            const isoDur = `PT${mins}M${secs}S`;
+            try {
+                await api.put(
+                    `/users/${localUserId}/timer`,
+                    { status, startTime, duration: isoDur },
+                    token
+                );
+            } catch (e) {
+                console.error("Timer update failed", e);
+            }
+        },
+        [api, token, localUserId]
+    );
 
-        // setIsGroupOwner(groupData.adminId === localUserId);
-        setGroup(groupData);
-      } catch (error) {
-        console.error("Failed to fetch group admin data", error);
-      }
-    };
-    fetchGroup();
-  }, [groupId, apiService, localUserId, token]);
+    return (
+        <div className="main-container">
+            <Navbar user={null} group={group} />
+            <div className="main-content" style={{ display: "flex", gap: "2rem" }}>
+                <div className="timer-column" style={{ flex: 2, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <PomodoroTimer
+                        onTimerStatusChange={handleStatus}
+                        onTimerUpdate={handleUpdate}
+                    />
+                </div>
 
-  return (
-    <div className="main-container">
-      {/* Header & Timer Section */}
-      {/* <h1 className="group-title">{group?.name}</h1> */}
-      <Navbar user={null} group={group} />
-      <div className="main-content" style={{ display: "flex", gap: "2rem" }}>
-        {/* Left: Timer */}
-        <div className="timer-column" style={{ flex: 2 }}>
-          <PomodoroTimer onTimerStatusChange={handleTimerStatusChange} />
-        </div>
+                <div
+                    className="left-column"
+                    style={{
+                        flex: 1,
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "0.75rem",
+                        marginTop: "1rem",
+                    }}
+                >
+                    <button className="stop" onClick={() => setInviteOpen(true)}>
+                        + Invite Users
+                    </button>
 
-        {/* Right: Side Section */}
-        <div
-          className="left-column"
-          style={{
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            gap: "0.75rem",
-            marginTop: "1rem",
-          }}
-        >
-          <button className="stop" onClick={() => setInviteModalOpen(true)}>
-            + Invite Users
-          </button>
+                    <button className="start" onClick={() => setCalendarOpen(true)}>
+                        + Plan Session
+                    </button>
 
-          <button className="start" onClick={() => setCalendarModalOpen(true)}>
-            + Plan Session
-          </button>
+                    {token && localUserId && group?.adminId === parseInt(localUserId) && (
+                        <button
+                            className="reset"
+                            onClick={() => router.push(`/edit/group/${groupId}`)}
+                        >
+                            ⚙️ Manage Group
+                        </button>
+                    )}
 
-          {token && localUserId && group?.adminId === parseInt(localUserId) && (
-            <button
-              className="reset"
-              onClick={() => router.push(`/edit/group/${groupId}`)}
+                    <div className="group-participants-list">
+                        <GroupParticipants groupId={groupId} adminId={group?.adminId} />
+                    </div>
+
+                    <button className="stop" onClick={() => router.push("/dashboard")}>Back to Dashboard</button>
+                </div>
+            </div>
+
+            {!isRunning && (
+                <div className="chat-section" style={{ marginTop: "2rem" }}>
+                    <Card title="Group Chat (Break)" className="groupPage-card">
+                        <p>💬 Chat feature coming soon!</p>
+                    </Card>
+                </div>
+            )}
+
+            <Modal
+                open={inviteOpen}
+                title="Invite User"
+                onCancel={() => {
+                    setInviteOpen(false);
+                    setInviteKey((k) => k + 1);
+                }}
+                footer={null}
+                className="groupPage-modal"
             >
-              ⚙️ Manage Group
-            </button>
-          )}
+                <InviteUser key={inviteKey} groupId={groupId} isVisible={inviteOpen} />
+            </Modal>
 
-          <div className="group-participants-list">
-            <GroupParticipants groupId={groupId} adminId={group?.adminId} />
-          </div>
-
-          <button className="stop" onClick={() => router.push("/dashboard")}>
-            Back to Dashboard
-          </button>
+            <Modal
+                open={calendarOpen}
+                title="Plan Study Session"
+                onCancel={() => setCalendarOpen(false)}
+                footer={null}
+                className="groupPage-modal"
+            >
+                <p>📅 Google Calendar integration coming soon!</p>
+            </Modal>
         </div>
-      </div>
-
-      {/* Chat at the bottom (only on break) */}
-      {!isRunning && (
-        <div className="chat-section" style={{ marginTop: "2rem" }}>
-          <Card title="Group Chat (Break)" className="groupPage-card">
-            <p>
-              💬 Chat feature coming soon! (WebSocket integration in progress)
-            </p>
-          </Card>
-        </div>
-      )}
-
-      {/* Invite Modal */}
-      <Modal
-        open={inviteModalOpen}
-        title="Invite User"
-        onCancel={() => {
-          setInviteModalOpen(false);
-          setInviteFormKey((prev) => prev + 1);
-        }}
-        footer={null}
-        className="groupPage-modal"
-      >
-        <InviteUser
-          key={inviteFormKey}
-          groupId={groupId}
-          isVisible={inviteModalOpen}
-        />
-      </Modal>
-
-      {/* Calendar Modal */}
-      <Modal
-        open={calendarModalOpen}
-        title="Plan Study Session"
-        onCancel={() => setCalendarModalOpen(false)}
-        footer={null}
-        className="groupPage-modal"
-      >
-        <p>📅 Google Calendar integration coming soon!</p>
-      </Modal>
-    </div>
-  );
+    );
 }

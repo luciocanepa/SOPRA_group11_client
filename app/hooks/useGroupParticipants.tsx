@@ -1,3 +1,4 @@
+// hooks/useGroupParticipants.ts
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -15,31 +16,30 @@ interface GroupResponse {
     users: Participant[];
 }
 
-interface TimerInfo {
+// Export TimerInfo so it can be imported by components
+export interface TimerInfo {
     start: Date;
     duration: number; // in seconds
+    running: boolean;
 }
 
-// Discriminated union for incoming WS messages:
 type TimerUpdateMsg = {
     type: 'TIMER_UPDATE';
-    userId: string;       // always present as string
-    username: string;     // only on TIMER_UPDATE
+    userId: string;
     status: Participant['status'];
-    duration: string;     // only on TIMER_UPDATE
-    startTime: string;    // only on TIMER_UPDATE
+    duration: string;   // ISO8601, e.g. "PT25M55S"
+    startTime: string;  // ISO timestamp
 };
+
 type StatusMsg = {
     type: 'STATUS';
     userId: string;
     status: Participant['status'];
 };
+
 type WSMessage = TimerUpdateMsg | StatusMsg;
 
-export function useGroupParticipants(
-    groupId: string,
-    token: string | null
-) {
+export function useGroupParticipants(groupId: string, token: string | null) {
     const api = useApi();
     const clientRef = useRef<Client | null>(null);
 
@@ -64,81 +64,76 @@ export function useGroupParticipants(
             .finally(() => setLoading(false));
     }, [groupId, token, api]);
 
-    // 2) Handle incoming WS messages
+    // 2) WS message handler
     const handleMessage = useCallback((msg: WSMessage) => {
         const userId = Number(msg.userId);
-        if (Number.isNaN(userId)) {
-            console.warn('WS: invalid userId:', msg.userId);
-            return;
-        }
+        if (Number.isNaN(userId)) return;
 
         if (msg.type === 'TIMER_UPDATE') {
-            // update status
-            setParticipants(prev =>
-                prev.map(u =>
-                    u.id === userId ? { ...u, status: msg.status } : u
-                )
-            );
-            // update timer
+            // parse ISO8601 durations PT##M##S or PT##M
+            let durationSec = 0;
+            const fullMatch = msg.duration.match(/^PT(\d+)M(\d+)S$/);
+            if (fullMatch) {
+                durationSec = parseInt(fullMatch[1], 10) * 60 + parseInt(fullMatch[2], 10);
+            } else {
+                const minMatch = msg.duration.match(/^PT(\d+)M$/);
+                if (minMatch) {
+                    durationSec = parseInt(minMatch[1], 10) * 60;
+                } else {
+                    durationSec = Number(msg.duration) || 0;
+                }
+            }
+
+            // normalize startTime string
+            const raw = msg.startTime;
+            const ts = (/^[0-9\-T:.]+Z$/.test(raw) || /[+-]\d\d:\d\d$/.test(raw)) ? raw : raw + 'Z';
+            const start = new Date(ts);
+            // determine running: break status means paused
+            const running = msg.status !== 'BREAK';
+
+            // update participants status
+            setParticipants(prev => prev.map(u => u.id === userId ? { ...u, status: msg.status } : u));
+
+            // update timer info
             setTimers(prev => ({
                 ...prev,
-                [userId]: {
-                    start: new Date(msg.startTime),
-                    duration: Number(msg.duration),
-                },
+                [userId]: { start, duration: durationSec, running }
             }));
-        } else /* msg.type === 'STATUS' */ {
-            setParticipants(prev =>
-                prev.map(u =>
-                    u.id === userId ? { ...u, status: msg.status } : u
-                )
-            );
+
+        } else {
+            // STATUS message
+            setParticipants(prev => prev.map(u => u.id === userId ? { ...u, status: msg.status } : u));
         }
     }, []);
 
-    // 3) STOMP / SockJS setup
+    // 3) STOMP/SockJS connection
     useEffect(() => {
         if (!token || typeof window === 'undefined') return;
 
-        // Determine backend host for WebSocket
-        // Use localhost:8080 in dev, same origin in prod
-        const backendHost =
-            window.location.hostname === 'localhost'
-                ? 'http://localhost:8080'
-                : window.location.origin;
-
-        // Point SockJS at the Spring Boot /ws endpoint
-        const sock = new SockJS(`${backendHost}/ws`);
+        const backend = window.location.hostname === 'localhost'
+            ? 'http://localhost:8080'
+            : window.location.origin;
+        const sock = new SockJS(`${backend}/ws`);
         const client = new Client({
             webSocketFactory: () => sock,
             connectHeaders: { Authorization: token },
             debug: () => {},
-            onStompError: frame => {
-                console.error('STOMP error:', frame.headers['message']);
-            },
+            onStompError: frame => console.error('STOMP error:', frame.headers['message']),
         });
 
-        // now `client` exists, so we can refer to it
         client.onConnect = () => {
-            console.log('STOMP connected to', `${backendHost}/ws`);
             client.subscribe(`/topic/group.${groupId}`, (message: IMessage) => {
-                console.log('[WS RAW]', message.body);
                 try {
-                    const data = JSON.parse(message.body) as WSMessage;
-                    console.log('[WS PARSED]', data);
-                    handleMessage(data);
+                    handleMessage(JSON.parse(message.body));
                 } catch (e) {
-                    console.error('Invalid WS message', e);
+                    console.error('Invalid WS payload', e);
                 }
             });
         };
 
         client.activate();
         clientRef.current = client;
-
-        return () => {
-            client.deactivate();
-        };
+        return () => { client.deactivate(); };
     }, [groupId, token, handleMessage]);
 
     return { participants, timers, loading, error };

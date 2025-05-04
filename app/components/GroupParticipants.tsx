@@ -1,10 +1,11 @@
+// components/GroupParticipants.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Table, Tag } from 'antd';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import '@/styles/pages/participants.css';
-import { useGroupParticipants, Participant } from '@/hooks/useGroupParticipants';
+import { useGroupParticipants, Participant, TimerInfo } from '@/hooks/useGroupParticipants';
 
 interface GroupParticipantsProps {
   groupId: string;
@@ -15,29 +16,36 @@ export function GroupParticipants({ groupId, adminId }: GroupParticipantsProps) 
   const { value: token } = useLocalStorage<string>('token', '');
   const { participants, timers, loading, error } = useGroupParticipants(groupId, token);
 
-  // countdown tick
+  // tick for countdown
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
     const interval = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(interval);
   }, []);
 
-  // format remaining seconds into MM:SS
-  const formatRemaining = (start: Date, duration: number) => {
-    const end = start.getTime() + duration * 1000;
+  // Format remaining time, pausing when not running
+  const formatRemaining = (timer: TimerInfo) => {
+    if (!timer.running) {
+      // paused: show static remaining
+      const m = Math.floor(timer.duration / 60).toString().padStart(2, '0');
+      const s = (timer.duration % 60).toString().padStart(2, '0');
+      return `${m}:${s}`;
+    }
+    // running: calculate countdown
+    const end = timer.start.getTime() + timer.duration * 1000;
     const secs = Math.max(0, Math.ceil((end - now) / 1000));
-    const m = String(Math.floor(secs / 60)).padStart(2, '0');
-    const s = String(secs % 60).padStart(2, '0');
+    const m = Math.floor(secs / 60).toString().padStart(2, '0');
+    const s = (secs % 60).toString().padStart(2, '0');
     return `${m}:${s}`;
   };
 
-  // merge timers into participants for display
-  const data = participants.map((u) => ({
-    ...u,
-    timeRemaining: timers[u.id]
-        ? formatRemaining(timers[u.id].start, timers[u.id].duration)
-        : '—',
-  }));
+  const data = participants.map(user => {
+    const timer = timers[user.id];
+    return {
+      ...user,
+      timeRemaining: timer ? formatRemaining(timer) : '—'
+    };
+  });
 
   const columns = [
     {
@@ -45,7 +53,7 @@ export function GroupParticipants({ groupId, adminId }: GroupParticipantsProps) 
       dataIndex: 'username',
       key: 'username',
       render: (username: string, record: Participant) =>
-          record.id === adminId ? `${username} (admin)` : username,
+          record.id === adminId ? `${username} (admin)` : username
     },
     {
       title: 'Status',
@@ -57,13 +65,13 @@ export function GroupParticipants({ groupId, adminId }: GroupParticipantsProps) 
         else if (status === 'WORK') color = 'red';
         else if (status === 'BREAK') color = 'orange';
         return <Tag color={color}>{status}</Tag>;
-      },
+      }
     },
     {
       title: 'Time Remaining',
       dataIndex: 'timeRemaining',
-      key: 'timeRemaining',
-    },
+      key: 'timeRemaining'
+    }
   ];
 
   return (
@@ -76,8 +84,8 @@ export function GroupParticipants({ groupId, adminId }: GroupParticipantsProps) 
                 className="group-members-table"
                 columns={columns}
                 dataSource={data}
-                loading={loading}
                 rowKey="id"
+                loading={loading}
                 pagination={false}
             />
         )}
