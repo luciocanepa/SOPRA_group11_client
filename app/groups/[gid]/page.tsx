@@ -1,7 +1,7 @@
 "use client";
 
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
 import { PomodoroTimer } from "@/components/PomodoroTimer";
 import { GroupParticipants } from "@/components/GroupParticipants";
 import { Modal, Card } from "antd";
@@ -13,31 +13,58 @@ import "@/styles/pages/login.css";
 import Navbar from "@/components/Navbar";
 import { ChatBox } from "@/components/Chat";
 
-
 interface User {
     id: string;
     username: string;
 }
 
 export default function GroupPage() {
-    const params = useParams();
-    const groupId = params.gid as string;
-    const apiService = useApi();
+    const { gid } = useParams();
+    const groupId = gid as string;
+    const api = useApi();
     const router = useRouter();
     const { value: token } = useLocalStorage<string>("token", "");
     const { value: localUserId } = useLocalStorage<string>("id", "");
 
-    const [calendarModalOpen, setCalendarModalOpen] = useState(false);
-    const [isRunning, setIsRunning] = useState(false);
     const [group, setGroup] = useState<Group | null>(null);
-    const [inviteModalOpen, setInviteModalOpen] = useState(false);
-    const [inviteFormKey, setInviteFormKey] = useState(0);
+    const [inviteOpen, setInviteOpen] = useState(false);
+    const [inviteKey, setInviteKey] = useState(0);
+    const [calendarOpen, setCalendarOpen] = useState(false);
+    const [isRunning, setIsRunning] = useState(false);
+
+    // For chat
     const [username, setUsername] = useState<string>("");
     const [isLoadingUser, setIsLoadingUser] = useState(true);
 
-    const handleTimerStatusChange = (isRunning: boolean) => {
-        setIsRunning(isRunning);
-    };
+    const handleStatus = useCallback((running: boolean) => {
+        setIsRunning(running);
+    }, []);
+
+    const handleUpdate = useCallback(
+        async ({ status, startTime, duration }: { status: string; startTime: string; duration: number }) => {
+            if (!token || !localUserId) return;
+            const mins = Math.floor(duration / 60);
+            const secs = duration % 60;
+            const isoDur = `PT${mins}M${secs}S`;
+            try {
+                await api.put(
+                    `/users/${localUserId}/timer`,
+                    { status, startTime, duration: isoDur },
+                    token
+                );
+            } catch (e) {
+                console.error("Timer update failed", e);
+            }
+        },
+        [api, token, localUserId]
+    );
+
+    useEffect(() => {
+        if (!token || !localUserId) return;
+        api.get<Group>(`/groups/${groupId}`, token)
+            .then((data) => setGroup(data))
+            .catch(console.error);
+    }, [groupId, token, localUserId, api]);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -47,7 +74,7 @@ export default function GroupPage() {
             }
 
             try {
-                const userData = await apiService.get<User>(`/users/${localUserId}`, token);
+                const userData = await api.get<User>(`/users/${localUserId}`, token);
                 setUsername(userData.username);
             } catch (error) {
                 console.error("Failed to fetch user data:", error);
@@ -57,34 +84,19 @@ export default function GroupPage() {
         };
 
         fetchUserData();
-    }, [token, localUserId, apiService]);
-
-    useEffect(() => {
-        const fetchGroup = async () => {
-            if (!token || !localUserId) return;
-            try {
-                const groupData: Group = await apiService.get<Group>(
-                    `/groups/${groupId}`,
-                    token,
-                );
-                setGroup(groupData);
-            } catch (error) {
-                console.error("Failed to fetch group admin data", error);
-            }
-        };
-        fetchGroup();
-    }, [groupId, apiService, localUserId, token]);
+    }, [token, localUserId, api]);
 
     return (
         <div className="main-container">
             <Navbar user={null} group={group} />
             <div className="main-content" style={{ display: "flex", gap: "2rem" }}>
-                {/* Left: Timer */}
-                <div className="timer-column" style={{ flex: 2 }}>
-                    <PomodoroTimer onTimerStatusChange={handleTimerStatusChange} />
+                <div className="timer-column" style={{ flex: 2, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <PomodoroTimer
+                        onTimerStatusChange={handleStatus}
+                        onTimerUpdate={handleUpdate}
+                    />
                 </div>
 
-                {/* Right: Side Section */}
                 <div
                     className="left-column"
                     style={{
@@ -95,11 +107,11 @@ export default function GroupPage() {
                         marginTop: "1rem",
                     }}
                 >
-                    <button className="stop" onClick={() => setInviteModalOpen(true)}>
+                    <button className="stop" onClick={() => setInviteOpen(true)}>
                         + Invite Users
                     </button>
 
-                    <button className="start" onClick={() => setCalendarModalOpen(true)}>
+                    <button className="start" onClick={() => setCalendarOpen(true)}>
                         + Plan Session
                     </button>
 
@@ -122,7 +134,6 @@ export default function GroupPage() {
                 </div>
             </div>
 
-            {/* Chat at the bottom (only on break) */}
             {!isRunning && (
                 <div className="chat-section" style={{ marginTop: "2rem" }}>
                     <div className="chat-header" style={{ fontSize: "1.5rem", fontWeight: "bold" }}>
@@ -131,41 +142,30 @@ export default function GroupPage() {
                     {isLoadingUser ? (
                         <p>Loading chat...</p>
                     ) : username && localUserId ? (
-                        <ChatBox
-                            groupId={groupId}
-                            userId={localUserId}
-                            username={username}
-                        />
+                        <ChatBox groupId={groupId} userId={localUserId} username={username} />
                     ) : (
                         <p>Please log in to access the chat</p>
                     )}
                 </div>
             )}
 
-
-            {/* Invite Modal */}
             <Modal
-                open={inviteModalOpen}
+                open={inviteOpen}
                 title="Invite User"
                 onCancel={() => {
-                    setInviteModalOpen(false);
-                    setInviteFormKey((prev) => prev + 1);
+                    setInviteOpen(false);
+                    setInviteKey((k) => k + 1);
                 }}
                 footer={null}
                 className="groupPage-modal"
             >
-                <InviteUser
-                    key={inviteFormKey}
-                    groupId={groupId}
-                    isVisible={inviteModalOpen}
-                />
+                <InviteUser key={inviteKey} groupId={groupId} isVisible={inviteOpen} />
             </Modal>
 
-            {/* Calendar Modal */}
             <Modal
-                open={calendarModalOpen}
+                open={calendarOpen}
                 title="Plan Study Session"
-                onCancel={() => setCalendarModalOpen(false)}
+                onCancel={() => setCalendarOpen(false)}
                 footer={null}
                 className="groupPage-modal"
             >

@@ -41,6 +41,7 @@ const Register: () => JSX.Element = () => {
     } catch (error) {
       if (error instanceof Error) {
         console.error("Registration failed:", error.message);
+        alert("This username is already taken")
       } else {
         console.error("An unknown error occurred during registration.");
       }

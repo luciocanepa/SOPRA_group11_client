@@ -114,6 +114,7 @@ const ManageGroup: React.FC = () => {
     } catch (error) {
       message.error("Failed to update the group.");
       console.error(error);
+      alert("Edit was unsuccessful!");
     }
   };
 
@@ -131,6 +132,7 @@ const ManageGroup: React.FC = () => {
     } catch (error) {
       message.error("Failed to delete the group.");
       console.error(error);
+      alert("The deletion of your group failed!");
     }
   };
 
@@ -161,6 +163,7 @@ const ManageGroup: React.FC = () => {
     } catch (error) {
       message.error("Failed to remove member.");
       console.error(error);
+      alert("The member-removal failed!");
     }
   };
 
