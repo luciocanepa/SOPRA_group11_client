@@ -15,6 +15,9 @@ interface TimerState {
   showSettings: boolean;
   settings: TimerSettings;
   activeSettings: TimerSettings;
+  notificationPermission: NotificationPermission;
+  notificationsEnabled: boolean;
+  alarmEnabled: boolean;
 }
 
 export interface PomodoroTimerProps {
@@ -37,12 +40,25 @@ export function PomodoroTimer({
     showSettings: false,
     settings: { session: initialSession, break: initialBreak },
     activeSettings: { session: initialSession, break: initialBreak },
+    notificationPermission: 'default' as NotificationPermission,
+    notificationsEnabled: false,
+    alarmEnabled: true,
   });
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
   useEffect(() => {
     audioRef.current = new Audio("/sounds/alarm.mp3");
     audioRef.current.load();
+
+    // Check notification permission on mount
+    if ('Notification' in window) {
+      setState(prev => ({
+        ...prev,
+        notificationPermission: Notification.permission
+      }));
+    }
+
     return () => {
       audioRef.current?.pause();
       audioRef.current = null;
@@ -63,10 +79,81 @@ export function PomodoroTimer({
     return () => clearInterval(timer);
   }, [state.isRunning]);
 
+  const requestNotificationPermission = async () => {
+    if (!('Notification' in window)) {
+      console.warn('This browser does not support notifications');
+      return 'denied';
+    }
+
+    try {
+      const permission = await Notification.requestPermission();
+      setState(prev => ({
+        ...prev,
+        notificationPermission: permission,
+        notificationsEnabled: permission === 'granted'
+      }));
+      return permission;
+    } catch (error) {
+      console.error('Error requesting notification permission:', error);
+      return 'denied';
+    }
+  };
+
+  const showNotification = (title: string, options?: NotificationOptions) => {
+    if (!state.notificationsEnabled || state.notificationPermission !== 'granted') {
+      return;
+    }
+
+    try {
+      new Notification(title, {
+        body: options?.body || '',
+        icon: '/icons/timer-icon.png',
+        vibrate: [200, 100, 200],
+        ...options
+      });
+    } catch (error) {
+      console.error('Error showing notification:', error);
+    }
+  };
+
+  const playAlarm = () => {
+    if (!state.alarmEnabled) {
+      alert('Please enable alarm sound first');
+      return;
+    }
+
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(error => {
+        console.warn('Audio playback failed:', error);
+        alert('Failed to play alarm sound. Please check your browser settings.');
+      });
+    }
+  };
+
   // Session <-> Break switch
   useEffect(() => {
     if (state.timeLeft > 0) return;
-    audioRef.current?.play().catch(console.warn);
+
+    if (state.alarmEnabled) {
+      playAlarm();
+    }
+
+    // Show notification when timer phase changes
+    if (state.notificationsEnabled && state.notificationPermission === 'granted') {
+      if (state.isSession) {
+        // Session ending - time for break
+        showNotification(`Time to BREAK!`, {
+          body: `Your study session has ended.`,
+        });
+      } else {
+        // Break ending - time for studying
+        showNotification(`Time to STUDY!`, {
+          body: `Your break has ended.`,
+        });
+      }
+    }
+
     setState(prev => {
       const nextSession = !prev.isSession;
       const nextDur = (nextSession ? prev.activeSettings.session : prev.activeSettings.break) * 60;
@@ -74,7 +161,7 @@ export function PomodoroTimer({
       onTimerUpdate?.({ status: nextSession ? "WORK" : "BREAK", startTime: nowISO, duration: nextDur });
       return { ...prev, isSession: nextSession, timeLeft: nextDur, isRunning: true };
     });
-  }, [state.timeLeft, state.isSession, state.activeSettings, onTimerUpdate]);
+  }, [state.timeLeft, state.isSession, state.activeSettings, onTimerUpdate, state.notificationsEnabled, state.notificationPermission, state.alarmEnabled]);
 
   // Format MM:SS
   const formatTime = (sec: number) => {
@@ -89,12 +176,11 @@ export function PomodoroTimer({
     const nowISO = new Date().toISOString();
     onTimerUpdate?.({ status: "WORK", startTime: nowISO, duration: state.timeLeft });
   };
+
   const pauseTimer = () => {
-    // Stop the local countdown
     setState(prev => ({ ...prev, isRunning: false }));
     onTimerStatusChange(false);
 
-    // Broadcast a BREAK update
     const nowISO = new Date().toISOString();
     onTimerUpdate?.({
       status: "BREAK",
@@ -104,7 +190,10 @@ export function PomodoroTimer({
   };
 
   const resetTimer = () => {
-    audioRef.current?.pause();
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
     setState(prev => ({ ...prev, isRunning: false, isSession: true, timeLeft: prev.activeSettings.session * 60 }));
     const nowISO = new Date().toISOString();
     onTimerUpdate?.({ status: "BREAK", startTime: nowISO, duration: initialSession * 60 });
@@ -112,12 +201,14 @@ export function PomodoroTimer({
 
   // Settings UI
   const toggleSettings = () => setState(prev => ({ ...prev, showSettings: !prev.showSettings }));
+
   const updateSettings = (updates: Partial<TimerSettings>) => {
     setState(prev => {
       const newSettings = { ...prev.settings, ...updates };
       return { ...prev, settings: newSettings };
     });
   };
+
   const applySettings = () => {
     setState(prev => ({
       ...prev,
@@ -144,22 +235,84 @@ export function PomodoroTimer({
         {!state.isRunning && <button onClick={toggleSettings} className="settings-btn">Timer Settings</button>}
         {state.showSettings && (
             <div className="settings-popup">
-              <h2>Timer Settings</h2>
-              <label>Session (minutes):</label>
+              <h2 className="popup-title">Timer Settings</h2>
+
+              <label htmlFor="session-input">Session (minutes):</label>
               <input
+                  min="1"
+                  step="1"
+                  id="session-input"
                   type="number"
+                  className="input-box-green"
                   value={state.settings.session}
-                  onChange={e => updateSettings({ session: Math.max(1, +e.target.value) })}
+                  onChange={e => updateSettings({ session: Math.max(1, Math.floor(Number(e.target.value) || 1)) })}
               />
-              <label>Break (minutes):</label>
+
+              <label htmlFor="break-input">Break (minutes):</label>
               <input
+                  min="1"
+                  step="1"
+                  id="break-input"
                   type="number"
+                  className="input-box-red"
                   value={state.settings.break}
-                  onChange={e => updateSettings({ break: Math.max(1, +e.target.value) })}
+                  onChange={e => updateSettings({ break: Math.max(1, Math.floor(Number(e.target.value) || 1)) })}
               />
-              <button onClick={applySettings}>Apply</button>
+
+              <h3 className="popup-title">Sound & Notifications</h3>
+
+              <div className="alarm-row">
+                <label className="alarm-label">
+                  <input
+                      type="checkbox"
+                      checked={state.alarmEnabled}
+                      onChange={e => setState(prev => ({ ...prev, alarmEnabled: e.target.checked }))}
+                  />
+                  Enable alarm sound
+                </label>
+                <button
+                    className="test-alarm"
+                    onClick={playAlarm}
+                    disabled={!state.alarmEnabled}
+                >
+                  Test 🔔
+                </button>
+              </div>
+
+              <div className="notification-row">
+                <label className="notification-label">
+                  <input
+                      type="checkbox"
+                      checked={state.notificationsEnabled}
+                      onChange={async (e) => {
+                        if (e.target.checked) {
+                          const permission = await requestNotificationPermission();
+                          if (permission === 'granted') {
+                            setState(prev => ({ ...prev, notificationsEnabled: true }));
+                          }
+                        } else {
+                          setState(prev => ({ ...prev, notificationsEnabled: false }));
+                        }
+                      }}
+                  />
+                  Enable browser notifications
+                </label>
+              </div>
+
+
+              {state.notificationPermission === 'denied' && (
+                  <p className="notification-warning">
+                    Notifications are blocked. Please update your browser settings.
+                  </p>
+              )}
+
+              <div className="settings-actions popup-buttons-row">
+                <button className="apply-btn" onClick={applySettings}>Apply</button>
+                <button className="close-btn" onClick={toggleSettings}>Cancel</button>
+              </div>
             </div>
         )}
+
       </div>
   );
 }

@@ -1,6 +1,6 @@
 :root {
-    --chat-height: 400px;
-    --chat-width: 400px;
+    --chat-height: 400px; /* height */
+    --chat-width: 1300px; /* width */
     --primary-red: #730000;
     --bright-red: #000000;
     --dark-red: #3e0000;
@@ -8,7 +8,7 @@
 }
 
 .chat-header {
-    background-color: #730000; /* Same as send button */
+    background-color: #730000;
     color: white !important;
     padding: 12px 20px;
     border-radius: 18px 18px 0 0;
@@ -16,6 +16,13 @@
     font-size: 1.25rem;
     text-align: center;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: var(--chat-width) !important;
+    max-width: 100%;
+    min-width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: auto;
     /*margin-bottom: -16px; !* Connects with the chat container *!*/
 }
 
@@ -25,10 +32,10 @@
     backdrop-filter: blur(8px);
     border-radius: 0 0 20px 20px;
     padding: 20px;
-    width: 100% !important;
     max-height: var(--chat-height);
-    max-width: 2170px;
-    min-width: 2170px;
+    width: var(--chat-width);
+    max-width: 100%;
+    min-width: 500px;
     overflow: hidden;
     box-shadow:
             inset 0 2px 5px rgba(0, 0, 0, 0.2),
@@ -176,7 +183,7 @@
     background-color: #272727;
 }
 
-/* Scrollbar styling */
+/* Scrollbar styling - doesnt work for firefox*/
 .chat-messages::-webkit-scrollbar {
     width: 12px;
 }
