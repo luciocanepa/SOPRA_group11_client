@@ -108,7 +108,6 @@ export function PomodoroTimer({
       new Notification(title, {
         body: options?.body || '',
         icon: '/icons/timer-icon.png',
-        vibrate: [200, 100, 200],
         ...options
       });
     } catch (error) {
@@ -161,8 +160,7 @@ export function PomodoroTimer({
       onTimerUpdate?.({ status: nextSession ? "WORK" : "BREAK", startTime: nowISO, duration: nextDur });
       return { ...prev, isSession: nextSession, timeLeft: nextDur, isRunning: true };
     });
-  }, [state.timeLeft, state.isSession, state.activeSettings, onTimerUpdate, state.notificationsEnabled, state.notificationPermission, state.alarmEnabled]);
-
+  }, [state.timeLeft, state.isSession, state.activeSettings, onTimerUpdate, state.notificationsEnabled, state.notificationPermission, state.alarmEnabled, playAlarm, showNotification]);
   // Format MM:SS
   const formatTime = (sec: number) => {
     const m = Math.floor(sec / 60);
