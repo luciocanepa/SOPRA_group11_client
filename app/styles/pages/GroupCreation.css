@@ -1,0 +1,22 @@
+.group-creation-form {
+  min-height: 80vh;
+  max-height: 80vh;
+
+  justify-content: flex-start;
+}
+
+.group-creation-form h2 {
+  margin: 40px 0 20px 0;
+}
+
+.form-final-button-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 60%;
+  margin: auto auto 0 auto;
+}
+
+#group-creation-cancel-button {
+  align-self: flex-end;
+}

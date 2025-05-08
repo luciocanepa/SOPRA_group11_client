@@ -1,4 +1,3 @@
-import "@/styles/components/Navbar.css";
 import { Button } from "antd";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -6,15 +5,11 @@ import { useEffect, useState } from "react";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
-import { Group } from "@/types/group";
 
-export default function Navbar({
-  user,
-  group,
-}: {
-  user: User | null;
-  group: Group | null;
-}) {
+import "../styles/module.css";
+import "../styles/components/Navbar.css";
+
+export default function Navbar({ user }: { user: User | null }) {
   const apiService = useApi();
   const router = useRouter();
 
@@ -25,7 +20,6 @@ export default function Navbar({
   const { value: id, clear: clearId } = useLocalStorage<string>("id", "");
 
   const [loggedInUser, setLoggedInUser] = useState<User | null>(user);
-  const [activeGroup, setActiveGroup] = useState<Group | null>(group);
 
   useEffect(() => {
     if (!id || !token || user) return;
@@ -35,15 +29,6 @@ export default function Navbar({
     };
     fetchUser();
   }, [id, token, apiService, user]);
-
-  useEffect(() => {
-    if (!id || !token || !group) return;
-    const fetchGroup = async () => {
-      const fetchedGroup = await apiService.get(`/groups/${group.id}`, token);
-      setActiveGroup(fetchedGroup as Group);
-    };
-    fetchGroup();
-  }, [group, token, apiService, id]);
 
   const handleLogout = async () => {
     if (!user) return;
@@ -64,7 +49,7 @@ export default function Navbar({
 
   return (
     <div className="navbar-container">
-      {activeGroup && (
+      {/* {activeGroup && (
         <>
           {activeGroup?.image && (
             <Image
@@ -88,37 +73,43 @@ export default function Navbar({
             {activeGroup?.name} ({loggedInUser?.name || loggedInUser?.username})
           </h1>
         </>
-      )}
-      {loggedInUser && !activeGroup && (
-        <>
-          {loggedInUser?.profilePicture && (
-            <Image
-              src={`data:image/png;base64,${loggedInUser?.profilePicture}`}
-              alt="Profile"
-              id="navbar-profile-picture"
-              width={40}
-              height={40}
-            />
-          )}
-          <h1>{loggedInUser?.name || loggedInUser?.username}</h1>
-        </>
-      )}
+      )} */}
+      <div className="navbar-container-left">
+        <Button
+          className="button secondary"
+          onClick={() => router.push("/dashboard")}
+        >
+          Dashboard
+        </Button>
+      </div>
+      <div className="navbar-user-container">
+        {loggedInUser && (
+          <>
+            {loggedInUser?.profilePicture && (
+              <Image
+                src={`data:image/png;base64,${loggedInUser?.profilePicture}`}
+                alt="Profile"
+                id="navbar-profile-picture"
+                width={40}
+                height={40}
+              />
+            )}
+            <h3>{loggedInUser?.name || loggedInUser?.username}</h3>
+          </>
+        )}
 
-      <div className="navbar-container-right">
-        <Button
-          className="navbar-button"
-          id="navbar-profile-button"
-          onClick={() => router.push(`/edit/${loggedInUser?.id}`)}
-        >
-          Edit profile
-        </Button>
-        <Button
-          className="navbar-button"
-          id="navbar-logout-button"
-          onClick={handleLogout}
-        >
-          Logout
-        </Button>
+        <div className="navbar-button-container">
+          <Button
+            className="button secondary"
+            id="navbar-profile-button"
+            onClick={() => router.push(`/edit/${loggedInUser?.id}`)}
+          >
+            Edit profile
+          </Button>
+          <Button className="red" onClick={handleLogout}>
+            Logout
+          </Button>
+        </div>
       </div>
     </div>
   );

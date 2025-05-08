@@ -1,0 +1,89 @@
+.timer-container {
+  width: calc(30vw + 40px);
+  max-height: 55vh;
+
+  padding: 20px;
+
+  background-color: var(--bg-secondary);
+  border-radius: 10px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.timer-container h3 {
+  margin-bottom: 10px 0 20px 0;
+
+  /* background-color: green; */
+  text-align: center;
+
+  font-size: 1rem;
+}
+
+.timer-display {
+  width: 30vw;
+  height: 15vh;
+
+  background-color: var(--bg-primary);
+  border-radius: 10px;
+  color: var(--text-primary);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 4rem;
+  font-weight: bold;
+}
+
+.timer-button-group {
+  width: 100%;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.timer-button-group-left button {
+  margin-right: 10px;
+}
+
+.settings-popup {
+  margin-top: 20px;
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.settings-row {
+  width: 100%;
+  padding: 10px 0;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.settings-row input {
+  border: 1px solid var(--border-primary);
+  border-radius: 5px;
+  padding: 5px;
+  /* width: 100px; */
+}
+
+.settings-row .settings-popup h3 {
+  margin-top: 10px;
+}
+
+.settings-popup-button-group button {
+  margin-right: 10px;
+}

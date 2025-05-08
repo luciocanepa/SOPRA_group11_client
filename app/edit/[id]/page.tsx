@@ -5,12 +5,12 @@ import { useApi } from "@/hooks/useApi";
 import { User } from "@/types/user";
 import { Button, Form, Input, message, Select, Upload, DatePicker } from "antd";
 import { EditOutlined, UploadOutlined } from "@ant-design/icons";
-import "@/styles/pages/edit.css";
-import "@/styles/pages/login.css";
 import Image from "next/image";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import dayjs from "dayjs";
 import moment from "moment-timezone";
+import Navbar from "@/components/Navbar";
+import "@/styles/pages/ProfileManagement.css";
 
 const timezones = moment.tz.names();
 
@@ -140,13 +140,16 @@ const ManageProfile: React.FC = () => {
     } catch (error) {
       message.error("Failed to update profile");
       console.error(error);
-      alert("Edit was not successful! Most likely because the username is already taken.")
+      alert(
+        "Edit was not successful! Most likely because the username is already taken.",
+      );
     }
   };
 
   return (
-    <div className="background-container">
-      <div className="groupCreation-container">
+    <div className="page-container">
+      <Navbar user={user} />
+      <div className="form-container profile-management-form">
         <Form
           form={form}
           name="profile management"
@@ -154,9 +157,8 @@ const ManageProfile: React.FC = () => {
           variant="outlined"
           onFinish={handleUserEdit}
           layout="vertical"
+          className="form"
         >
-          <h2>Profile Management</h2>
-
           <div className="profile-image-container">
             <Image
               src={
@@ -171,6 +173,7 @@ const ManageProfile: React.FC = () => {
               unoptimized={!!uploadedImage} // Needed for base64 images
             />
           </div>
+          <h2>Profile Management</h2>
 
           <Form.Item name="username" label="Username">
             <Input
@@ -336,19 +339,18 @@ const ManageProfile: React.FC = () => {
             </Upload>
           </Form.Item>
 
-          <Form.Item>
-            <Button htmlType="submit" className="groupCreation-button-save">
-              Save Profile Changes
-            </Button>
-          </Form.Item>
-          <Form.Item>
-            <Button
-              className="groupCreation-button"
-              onClick={() => router.push("/dashboard")}
-            >
-              Back to Dashboard
-            </Button>
-          </Form.Item>
+          <div className="form-final-button-container">
+            <Form.Item>
+              <Button htmlType="submit" className="green">
+                Save
+              </Button>
+            </Form.Item>
+            <Form.Item>
+              <Button className="red" onClick={() => router.push("/dashboard")}>
+                Cancel
+              </Button>
+            </Form.Item>
+          </div>
         </Form>
       </div>
     </div>

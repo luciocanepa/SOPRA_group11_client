@@ -5,10 +5,11 @@ import { useApi } from "@/hooks/useApi";
 import { Group } from "@/types/group";
 import { Button, Form, Input, message, Upload, Select } from "antd";
 import { EditOutlined, UploadOutlined } from "@ant-design/icons";
-import "@/styles/pages/edit.css";
 import Image from "next/image";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
+import Navbar from "@/components/Navbar";
+import "@/styles/pages/GroupEdit.css";
 
 const ManageGroup: React.FC = () => {
   const router = useRouter();
@@ -168,18 +169,18 @@ const ManageGroup: React.FC = () => {
   };
 
   return (
-    <div className="background-container">
-      <div className="groupCreation-container">
+    <div className="page-container">
+      <Navbar user={null} />
+      <div className="form-container group-edit-form">
         <Form
           form={form}
-          name="profile management"
+          name="group management"
           size="large"
           variant="outlined"
           onFinish={handleGroupEdit}
           layout="vertical"
+          className="form"
         >
-          <h2>Group Management</h2>
-
           <div className="profile-image-container">
             <Image
               src={
@@ -194,6 +195,7 @@ const ManageGroup: React.FC = () => {
               unoptimized={!!uploadedImage}
             />
           </div>
+          <h2>Group Management</h2>
 
           <Form.Item
             name="name"
@@ -250,12 +252,22 @@ const ManageGroup: React.FC = () => {
             </Upload>
           </Form.Item>
 
-          <Form.Item>
-            <Button htmlType="submit" className="groupCreation-button-save">
-              Save Group Changes
-            </Button>
-          </Form.Item>
+          <div className="form-final-button-container">
+            <Form.Item>
+              <Button htmlType="submit" className="green">
+                Save
+              </Button>
+            </Form.Item>
 
+            <Form.Item>
+              <Button
+                className="red"
+                onClick={() => router.push(`/groups/${gid}`)}
+              >
+                Cancel
+              </Button>
+            </Form.Item>
+          </div>
           <Form.Item label="Remove Member From Group">
             <Select
               placeholder="Select a member to remove"
@@ -283,20 +295,8 @@ const ManageGroup: React.FC = () => {
           </Form.Item>
 
           <Form.Item>
-            <Button
-              className="groupCreation-button-delete"
-              onClick={handleGroupDeletion}
-            >
+            <Button className="red" onClick={handleGroupDeletion}>
               Delete your Group
-            </Button>
-          </Form.Item>
-
-          <Form.Item>
-            <Button
-              className="groupCreation-button"
-              onClick={() => router.push(`/groups/${gid}`)}
-            >
-              Back to Group Dashboard
             </Button>
           </Form.Item>
         </Form>

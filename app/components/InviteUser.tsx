@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { AutoComplete, Form, Button, message } from "antd";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import "@/styles/pages/inviteUser.css";
 interface InviteUserProps {
   groupId?: string; // optional for local
   isVisible: boolean;

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import "./styles/pages/home.css";
 import { Button } from "antd";
 import { useRouter } from "next/navigation";
 
