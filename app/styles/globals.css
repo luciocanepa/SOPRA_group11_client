@@ -402,3 +402,25 @@ li {
   background-color: orange;
   color: white;
 }
+
+
+.statistics-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+}
+
+.week-navigation {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.chart-container {
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex: 1;
+}
