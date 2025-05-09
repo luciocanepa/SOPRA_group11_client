@@ -31,9 +31,15 @@ export default function Navbar({ user }: { user: User | null }) {
   }, [id, token, apiService, user]);
 
   const handleLogout = async () => {
-    if (!user) return;
+    console.log("logging out");
+    console.log(loggedInUser);
+    if (!loggedInUser) return;
     try {
-      await apiService.post<void>(`/users/${user.id}/logout`, {}, token);
+      await apiService.post<void>(
+        `/users/${loggedInUser.id}/logout`,
+        {},
+        token,
+      );
     } catch (error) {
       if (error instanceof Error) {
         alert(`Something went wrong while logging out:\n${error.message}`);
@@ -46,7 +52,6 @@ export default function Navbar({ user }: { user: User | null }) {
     clearId();
     router.push("/login");
   };
-
   return (
     <div className="navbar-container">
       {/* {activeGroup && (
@@ -92,6 +97,13 @@ export default function Navbar({ user }: { user: User | null }) {
                 id="navbar-profile-picture"
                 width={40}
                 height={40}
+              />
+            )}
+            {!loggedInUser?.profilePicture && (
+              <img
+                src={"/tomato.JPG"}
+                alt="Profile"
+                id="navbar-profile-picture"
               />
             )}
             <h3>{loggedInUser?.name || loggedInUser?.username}</h3>

@@ -171,7 +171,7 @@ const ManageGroup: React.FC = () => {
   return (
     <div className="page-container">
       <Navbar user={null} />
-      <div className="form-container group-edit-form">
+      <div className="form-container">
         <Form
           form={form}
           name="group management"
@@ -189,7 +189,7 @@ const ManageGroup: React.FC = () => {
                   : "/group_tomato.JPG"
               }
               alt="Profile"
-              className="profile-image"
+              // className="profile-image"
               width={150}
               height={150}
               unoptimized={!!uploadedImage}

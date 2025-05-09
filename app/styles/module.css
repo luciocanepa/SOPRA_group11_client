@@ -1,13 +1,12 @@
 .form-container {
   min-width: 40vw;
   max-width: 40vw;
-  min-height: 40vh;
-  max-height: 40vh;
+  min-height: fit-content;
 
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
 
   background-color: var(--bg-secondary);
 
@@ -17,84 +16,44 @@
 .form {
   width: 30vw;
   height: fit-content;
-  margin-top: 10px;
+}
+
+.form-container h2,
+.form h2 {
+  margin: 20px 0 20px 0;
+}
+
+.profile-image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  height: 100px;
+  margin-top: 20px;
+}
+
+.form img {
+  width: 100px !important;
+  height: 100px !important;
+  border-radius: 50%;
+
+  margin: 0;
+}
+
+.form-final-button-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 60%;
+  margin: auto auto 0 auto;
 }
 
 .card {
   width: 30vw;
   height: fit-content;
   margin: 20px auto;
-}
 
-.button {
-  border: none !important;
-  padding: 10px !important;
-  border-radius: 5px;
-}
-
-.primary {
-  background-color: var(--button-primary);
-  color: var(--text-primary);
-  transition: background-color 0.4s ease;
-}
-
-.primary:hover {
-  background-color: var(--button-primary-hover);
-  cursor: pointer;
-}
-
-.secondary {
-  background-color: none;
-  color: var(--button-secondary) !important;
-  border-radius: 5px;
-  border: 1px solid var(--button-secondary) !important;
-
-  transition: background-color 0.4s ease;
-}
-
-.secondary:hover {
-  background-color: none;
-  color: var(--button-secondary-hover) !important;
-  border: 1px solid var(--button-secondary-hover) !important;
-  cursor: pointer;
-}
-
-.link {
-  background-color: none;
-  color: var(--text-links);
-}
-
-.link:hover {
-  background-color: none;
-  color: var(--text-links-hover);
-  cursor: pointer;
-}
-
-.green {
-  background-color: var(--button-green);
-  color: var(--text-primary);
-  border: none !important;
-  transition: background-color 0.4s ease;
-}
-
-.green:hover {
-  background-color: var(--button-green-hover) !important;
-  border: none !important;
-  color: var(--text-primary) !important;
-  cursor: pointer;
-}
-
-.red {
-  background-color: var(--button-red);
-  color: var(--text-primary);
-  border: none !important;
-
-  transition: background-color 0.4s ease;
-}
-
-.red:hover {
-  background-color: var(--button-red-hover) !important;
-  border: none !important;
-  color: var(--text-primary) !important;
-  cursor: pointer;
+  background-color: var(--bg-secondary);
+  border: none;
+  box-shadow: 5px 5px 0 2px rgba(255, 255, 255, 0.624);
 }

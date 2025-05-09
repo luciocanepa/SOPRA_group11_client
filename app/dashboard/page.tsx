@@ -6,7 +6,6 @@ import { Group } from "@/types/group";
 import { User } from "@/types/user";
 import { Button, Card } from "antd";
 import React, { useEffect, useState } from "react";
-import { PlusCircleOutlined } from "@ant-design/icons";
 import Navbar from "@/components/Navbar";
 
 import "../styles/pages/Dashboard.css";
@@ -253,8 +252,7 @@ const Dashboard: React.FC = () => {
                     onClick={() => router.push("/groups")}
                   >
                     <div className="create-group-aligning">
-                      <PlusCircleOutlined className="plus-icon" />
-                      <span>Create New Group</span>
+                      <span>+ Create New Group</span>
                     </div>
                   </Card>
                 </div>
@@ -266,8 +264,7 @@ const Dashboard: React.FC = () => {
                   onClick={() => router.push("/groups")}
                 >
                   <div className="create-group-aligning">
-                    <PlusCircleOutlined className="plus-icon" />
-                    <span>Create New Group</span>
+                    <span>+ Create New Group</span>
                   </div>
                 </Card>
               </div>

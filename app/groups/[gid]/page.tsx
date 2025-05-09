@@ -4,7 +4,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { PomodoroTimer } from "@/components/PomodoroTimer";
 import { GroupParticipants } from "@/components/GroupParticipants";
-import { Modal, Button } from "antd";
+import { Button } from "antd";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { useApi } from "@/hooks/useApi";
 import { Group } from "@/types/group";
@@ -29,7 +29,6 @@ export default function GroupPage() {
 
   const [group, setGroup] = useState<Group | null>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
-  const [inviteKey, setInviteKey] = useState(0);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
 
@@ -121,20 +120,39 @@ export default function GroupPage() {
         </div>
 
         <div className="group-dashboard-button-container">
-          <Button className="secondary" onClick={() => setInviteOpen(true)}>
-            + Invite Users
+          <Button
+            className="secondary"
+            onClick={() => {
+              setInviteOpen(!inviteOpen);
+              setCalendarOpen(false);
+            }}
+          >
+            {inviteOpen ? "-" : "+"} Invite Users
+          </Button>
+          {inviteOpen && <InviteUser group={group} isVisible={inviteOpen} />}
+
+          <Button
+            className="secondary"
+            onClick={() => {
+              setCalendarOpen(!calendarOpen);
+              setInviteOpen(false);
+            }}
+          >
+            {calendarOpen ? "-" : "+"} Plan Session
           </Button>
 
-          <Button className="secondary" onClick={() => setCalendarOpen(true)}>
-            + Plan Session
-          </Button>
+          {calendarOpen && (
+            <div className="group-dashboard-actions-container">
+              <p>📅 Google Calendar integration coming soon!</p>
+            </div>
+          )}
 
           {token && localUserId && group?.adminId === parseInt(localUserId) && (
             <Button
               className="secondary"
               onClick={() => router.push(`/edit/group/${groupId}`)}
             >
-              ⚙️ Manage Group
+              Manage Group ↗
             </Button>
           )}
         </div>
@@ -154,7 +172,7 @@ export default function GroupPage() {
         </div>
       )}
 
-      <Modal
+      {/* <Modal
         open={inviteOpen}
         title="Invite User"
         onCancel={() => {
@@ -165,17 +183,17 @@ export default function GroupPage() {
         className="groupPage-modal"
       >
         <InviteUser key={inviteKey} groupId={groupId} isVisible={inviteOpen} />
-      </Modal>
+      </Modal> */}
 
-      <Modal
+      {/* <Modal
         open={calendarOpen}
         title="Plan Study Session"
         onCancel={() => setCalendarOpen(false)}
         footer={null}
         className="groupPage-modal"
       >
-        <p>📅 Google Calendar integration coming soon!</p>
-      </Modal>
+        
+      </Modal> */}
     </div>
   );
 }

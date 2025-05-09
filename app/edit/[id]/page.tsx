@@ -31,14 +31,14 @@ const ManageProfile: React.FC = () => {
     timezone: false,
   });
 
-  const hashPassword = async (password: string) => {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(password);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    return Array.from(new Uint8Array(hashBuffer))
-      .map((byte) => byte.toString(16).padStart(2, "0"))
-      .join("");
-  };
+  // const hashPassword = async (password: string) => {
+  //   const encoder = new TextEncoder();
+  //   const data = encoder.encode(password);
+  //   const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  //   return Array.from(new Uint8Array(hashBuffer))
+  //     .map((byte) => byte.toString(16).padStart(2, "0"))
+  //     .join("");
+  // };
 
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const uploadingImage = (file: File) => {
@@ -94,7 +94,9 @@ const ManageProfile: React.FC = () => {
 
   const handleUserEdit = async () => {
     if (!token) return;
+    console.log(form.getFieldsValue());
     if (!isAuthorizedToEdit) {
+      console.log("not authorized");
       message.error("You are not authorized to edit this profile.");
       return;
     }
@@ -112,8 +114,8 @@ const ManageProfile: React.FC = () => {
       }
       if (values.password) {
         // Include password only if it's provided (new value)
-        const hashedPassword = await hashPassword(values.password);
-        edits.password = hashedPassword; // You may want to hash it before sending
+        // const hashedPassword = await hashPassword(values.password);
+        edits.password = values.password; // You may want to hash it before sending
       }
       if (values.birthday !== user?.birthday) {
         edits.birthday = dayjs(values.birthday).format("YYYY-MM-DD");
@@ -124,7 +126,7 @@ const ManageProfile: React.FC = () => {
       if (uploadedImage) {
         edits.profilePicture = uploadedImage;
       }
-
+      console.log("edits before sending", edits);
       await apiService.put(`/users/${user?.id}`, edits, token);
 
       message.success("Profile updated successfully");
@@ -149,7 +151,7 @@ const ManageProfile: React.FC = () => {
   return (
     <div className="page-container">
       <Navbar user={user} />
-      <div className="form-container profile-management-form">
+      <div className="form-container">
         <Form
           form={form}
           name="profile management"
@@ -330,10 +332,7 @@ const ManageProfile: React.FC = () => {
                 return false;
               }}
             >
-              <Button
-                className="groupCreation-upload"
-                icon={<UploadOutlined />}
-              >
+              <Button className="secondary" icon={<UploadOutlined />}>
                 Upload Profile Picture
               </Button>
             </Upload>

@@ -1,22 +1,52 @@
-.group-creation-form {
-  min-height: 80vh;
-  max-height: 80vh;
+.group-creation-invite-users .group-dashboard-actions-container {
+  width: 30vw !important;
+  background-color: green !important;
+}
 
+#invite-user-form div {
+  margin: 2px 0;
+}
+
+.invite-results {
+  width: calc(30vw - 20px);
+
+  margin-top: 20px !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.invite-results-table {
+  width: 30vw;
+  min-height: 10vh;
+  max-height: 20vh;
+  overflow-y: scroll;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.result-row {
+  width: 20vw;
+  height: 4vh;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   justify-content: flex-start;
 }
 
-.group-creation-form h2 {
-  margin: 40px 0 20px 0;
+#invite-username {
+  font-weight: bold;
+  margin-right: 5px;
 }
 
-.form-final-button-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  width: 60%;
-  margin: auto auto 0 auto;
+.success #invite-message {
+  color: green;
 }
 
-#group-creation-cancel-button {
-  align-self: flex-end;
+.error #invite-message {
+  color: red;
 }

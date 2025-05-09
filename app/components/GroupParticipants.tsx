@@ -73,7 +73,7 @@ export function GroupParticipants({
       dataIndex: "status",
       key: "status",
       render: (status: Participant["status"]) => {
-        let color = "grey";
+        let color = "purple";
         if (status === "ONLINE") color = "green";
         else if (status === "WORK") color = "red";
         else if (status === "BREAK") color = "orange";

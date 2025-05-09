@@ -10,6 +10,7 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 import { InviteUser } from "@/components/InviteUser";
 import Navbar from "@/components/Navbar";
 import "@/styles/pages/GroupCreation.css";
+
 interface FormFieldProps {
   name: string;
   description: string;
@@ -126,7 +127,7 @@ const GroupCreation: React.FC = () => {
     <div className="page-container">
       <Navbar user={loggedInUser} />
 
-      <div className="form-container group-creation-form">
+      <div className="form-container">
         <Form
           form={form}
           name="group creation"
@@ -166,7 +167,9 @@ const GroupCreation: React.FC = () => {
             />
           </Form.Item>
           <Form.Item>
+            <p>Invite Users</p>
             <InviteUser
+              group={null}
               isVisible={true}
               onInviteLocally={(user) => {
                 setInvitedUsers((prev) => {
