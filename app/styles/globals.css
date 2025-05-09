@@ -63,6 +63,10 @@ body {
   font-size: 16px;
 }
 
+.shadow {
+  box-shadow: 5px 5px 0 2px rgba(255, 255, 255, 0.624) !important;
+}
+
 .button {
   border: none !important;
   padding: 10px !important;
