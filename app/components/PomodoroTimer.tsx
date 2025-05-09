@@ -29,6 +29,7 @@ export interface PomodoroTimerProps {
     startTime: string;
     duration: number;
   }) => void;
+  fullscreen?: boolean;
 }
 
 export function PomodoroTimer({
@@ -36,6 +37,7 @@ export function PomodoroTimer({
   initialBreak = 5,
   onTimerStatusChange,
   onTimerUpdate,
+  fullscreen = false,
 }: PomodoroTimerProps) {
   const [state, setState] = useState<TimerState>({
     timeLeft: initialSession * 60,
@@ -48,6 +50,7 @@ export function PomodoroTimer({
     notificationsEnabled: false,
     alarmEnabled: true,
   });
+  const [fullScreen, setFullScreen] = useState(fullscreen);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -276,15 +279,44 @@ export function PomodoroTimer({
       duration: state.settings.session * 60,
     });
   };
-
+  console.log(state);
   return (
-    <div className="timer-container">
-      <div className="timer-display">
+    <div className={`timer-container ${fullScreen ? "fullscreen" : ""}`}>
+      <div
+        className={`timer-display ${
+          state.isRunning
+            ? state.isSession
+              ? "timer-display-work"
+              : "timer-display-break"
+            : state.isSession
+              ? "timer-display-session"
+              : "timer-display-break"
+        }`}
+      >
         <h3 className="title">
           {state.isSession ? "Time until break:" : "Break Time"}
         </h3>
         {formatTime(state.timeLeft)}
       </div>
+
+      {!fullScreen && (
+        <Button
+          className="fullscreen-button"
+          onClick={() => setFullScreen(true)}
+        >
+          +
+        </Button>
+      )}
+
+      {fullScreen && (
+        <Button
+          className="fullscreen-button"
+          onClick={() => setFullScreen(false)}
+        >
+          -
+        </Button>
+      )}
+
       <div className="timer-button-group">
         <div className="timer-button-group-left">
           <Button
@@ -308,7 +340,7 @@ export function PomodoroTimer({
         {!state.isRunning && (
           <div>
             <Button onClick={toggleSettings} className="secondary">
-              Timer Settings
+              {!state.showSettings ? "+" : "-"} Timer Settings
             </Button>
           </div>
         )}

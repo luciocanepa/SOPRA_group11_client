@@ -13,6 +13,7 @@ export default function Dashboard() {
             // You can add logic here to handle timer status changes
             console.log(`Timer is ${isRunning ? "running" : "paused"}`);
           }}
+          fullscreen={true}
         />
       </div>
     </div>

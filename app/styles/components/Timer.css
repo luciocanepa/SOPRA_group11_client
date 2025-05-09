@@ -39,6 +39,75 @@
   font-weight: bold;
 }
 
+.timer-display-session {
+  background-color: var(--bg-primary);
+}
+
+.timer-display-work {
+  background-color: green;
+}
+
+.timer-display-break {
+  background-color: #2d7da4;
+}
+
+.fullscreen-button {
+  background-color: transparent;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  border: none;
+  position: fixed;
+  margin-left: calc(30vw - 40px);
+}
+
+.fullscreen-button:hover {
+  background-color: transparent !important;
+  color: var(--text-primary) !important;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+}
+
+.fullscreen {
+  width: 90vw;
+  min-height: 55vh;
+  max-height: 90vh;
+  position: fixed;
+  top: 10vh;
+  left: 5vw;
+  margin-top: 20px;
+  z-index: 700;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.fullscreen .timer-display {
+  width: 70vw !important;
+  height: 45vh !important;
+}
+
+.fullscreen .timer-display {
+  font-size: 500%;
+}
+
+.fullscreen .timer-button-group {
+  width: 70vw !important;
+}
+
+.fullscreen .fullscreen-button {
+  margin-left: calc(70vw - 40px);
+  margin-bottom: calc(40vh + 40px);
+}
+
+.fullscreen .settings-popup {
+  width: 40vw !important;
+  align-self: flex-start;
+  margin-left: calc(10vw - 20px);
+}
+
 .timer-button-group {
   width: 100%;
 

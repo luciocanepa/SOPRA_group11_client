@@ -116,6 +116,7 @@ export default function GroupPage() {
           <PomodoroTimer
             onTimerStatusChange={handleStatus}
             onTimerUpdate={handleUpdate}
+            fullscreen={false}
           />
         </div>
 
