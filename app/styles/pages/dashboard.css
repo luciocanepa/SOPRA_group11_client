@@ -201,63 +201,101 @@
 
 .groups-grid {
   display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+
+
+.group-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  width: 90%;
+  min-height: 50px;
+  gap: 1rem;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  padding: 1rem;
 }
 
 .group-card-wrapper {
-  flex: 0 0 auto;
-  width: 150px;
-  height: 150px;
   display: flex;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  overflow: visible;
-  position: relative;
-}
-
-.group-card {
-  width: 150px;
-  text-align: center;
-  overflow: hidden;
-  word-wrap: break-word;
-  background-color: rgb(114, 0, 0) !important;
-  color: white !important;
-  border-radius: 18px !important;
-  border: none !important;
-  font-weight: bold !important;
-  font-size: 18px !important;
-  font-family: inherit !important;
+  justify-content: flex-start;
+  width: 90%;
+  min-height: 50px;
+  gap: 2rem;
+  padding: 1rem;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
   cursor: pointer;
-  box-shadow:
-    inset 0 2px 5px rgba(0, 0, 0, 0.2),
-    0 6px 12px rgba(0, 0, 0, 0.42) !important;
+  transition: transform 0.2s ease-in-out;
 }
 
-.group-card h3 {
-  margin: 0;
-  font-size: 1em;
-  line-height: 1.2;
-  color: white !important;
-  background-color: rgb(114, 0, 0) !important;
-}
-
-.group-card:hover {
-  background-color: #3e0000 !important;
+.group-card-wrapper:hover {
+  background-color: #edc5c5;
   transform: translateY(2px);
-  border: white;
-  outline: white;
 }
+
+.group-image-container {
+  flex-shrink: 0;
+  margin-left: 1rem;
+}
+
+.group-image {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #720000;
+}
+
+.group-text-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2rem;
+  white-space: nowrap;
+}
+
+.group-name {
+  font-size: 25px;
+  font-weight: bold;
+  color: #000;
+}
+
+.group-description {
+  font-size: 20px;
+  color: #555;
+}
+
+
+
 
 .dashboardMainPage-card h2 {
   color: white !important;
 }
 
-.group-card .plus-icon {
-  color: #ffffff !important;
-  font-size: 25px !important;
+
+.plus-icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  color: black !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 55px;
 }
+
+
+
 
 .create-group-aligning {
   display: flex;

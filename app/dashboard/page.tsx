@@ -9,6 +9,7 @@ import { Button, Card } from "antd";
 import React, { useEffect, useState } from "react";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import Navbar from "@/components/Navbar";
+import Image from "next/image";
 
 interface Invitation {
   id: number;
@@ -238,39 +239,50 @@ const Dashboard: React.FC = () => {
             {loggedInUserGroups && loggedInUserGroups.length > 0 ? (
               <>
                 {loggedInUserGroups.map((group) => (
-                  <div key={group.id} className="group-card-wrapper">
-                    <Card
-                      className="group-card"
-                      onClick={() => router.push(`/groups/${group.id}`)}
-                    >
-                      {group.name}
-                    </Card>
+                  <div key={group.id} className="group-card-wrapper" onClick={() => router.push(`/groups/${group.id}`)}>
+
+                      <div className= "group-image-container">
+                        {group?.image && (
+                          <Image className="group-image"
+                            src={`data:image/png;base64,${group?.image}`}
+                            alt="Profile"
+                            width={40}
+                            height={40}
+                          />
+                      )}
+                      {!group?.image && (
+                        <Image className="group-image"
+                          src={"/group_tomato.JPG"}
+                          alt="Profile"
+                          width={40}
+                          height={40}
+                        />
+                      )} </div>
+                      <div className="group-text-container">
+                        <div className="group-name"> 
+                          {group.name}
+                        </div>
+                        <div className="group-description"> 
+                          {group.description}
+                        </div>
+
+                      </div>
                   </div>
                 ))}
-                <div className="group-card-wrapper">
-                  <Card
-                    className="group-card"
-                    onClick={() => router.push("/groups")}
-                  >
-                    <div className="create-group-aligning">
-                      <PlusCircleOutlined className="plus-icon" />
-                      <span>Create New Group</span>
+                <div className="group-card-wrapper" onClick={() => router.push("/groups")}>
+                    <div className="group-image-container">
+                      <PlusCircleOutlined className="plus-icon"/>
                     </div>
-                  </Card>
+                    <div className="group-name">Create New Group </div>
                 </div>
               </>
             ) : (
-              <div className="group-card-wrapper">
-                <Card
-                  className="group-card"
-                  onClick={() => router.push("/groups")}
-                >
-                  <div className="create-group-aligning">
-                    <PlusCircleOutlined className="plus-icon" />
-                    <span>Create New Group</span>
+                <div className="group-card-wrapper" onClick={() => router.push("/groups")}>
+                  <div className="group-image-container">
+                    <PlusCircleOutlined className="plus-icon"/>
                   </div>
-                </Card>
-              </div>
+                  <div className="group-name">Create New Group </div>
+                </div>
             )}
           </div>
         </Card>
