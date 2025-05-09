@@ -6,9 +6,10 @@ import { Button, Form, Input, message, Upload } from "antd";
 import { User } from "@/types/user";
 import { Group } from "@/types/group";
 import { UploadOutlined } from "@ant-design/icons";
-import "@/styles/pages/groups.css";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { InviteUser } from "@/components/InviteUser";
+import Navbar from "@/components/Navbar";
+import "@/styles/pages/GroupCreation.css";
 
 interface FormFieldProps {
   name: string;
@@ -123,15 +124,18 @@ const GroupCreation: React.FC = () => {
   };
 
   return (
-    <div className="background-container">
-      <div className="groupCreation-container">
+    <div className="page-container">
+      <Navbar user={loggedInUser} />
+
+      <div className="form-container">
         <Form
           form={form}
           name="group creation"
-          size="large"
+          // size="large"
           variant="outlined"
           onFinish={handleGroupCreation}
           layout="vertical"
+          className="form"
         >
           <h2>Create Study Group</h2>
           <Form.Item
@@ -163,7 +167,9 @@ const GroupCreation: React.FC = () => {
             />
           </Form.Item>
           <Form.Item>
+            <p>Invite Users</p>
             <InviteUser
+              group={null}
               isVisible={true}
               onInviteLocally={(user) => {
                 setInvitedUsers((prev) => {
@@ -196,29 +202,28 @@ const GroupCreation: React.FC = () => {
                 return false;
               }}
             >
-              <Button
-                className="groupCreation-upload"
-                icon={<UploadOutlined />}
-              >
+              <Button className="secondary" icon={<UploadOutlined />}>
                 Upload Group Picture
               </Button>
             </Upload>
           </Form.Item>
 
-          <Form.Item>
-            <Button htmlType="submit" className="groupCreation-button">
-              Create Group
-            </Button>
-          </Form.Item>
-          <Form.Item>
-            <Button
-              className="groupCreation-button-back"
-              onClick={() => router.push("/dashboard")}
-            >
-              Back to Dashboard
-            </Button>
-            <p>Have you changed your mind on creating a group?</p>
-          </Form.Item>
+          <div className="form-final-button-container">
+            <Form.Item>
+              <Button htmlType="submit" className="green">
+                Create Group
+              </Button>
+            </Form.Item>
+            <Form.Item>
+              <Button
+                className="red"
+                id="group-creation-cancel-button"
+                onClick={() => router.push("/dashboard")}
+              >
+                Cancel
+              </Button>
+            </Form.Item>
+          </div>
         </Form>
       </div>
     </div>

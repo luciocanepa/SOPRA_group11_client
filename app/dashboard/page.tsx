@@ -1,5 +1,4 @@
 "use client";
-import "@/styles/pages/dashboard.css";
 import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
@@ -7,8 +6,9 @@ import { Group } from "@/types/group";
 import { User } from "@/types/user";
 import { Button, Card } from "antd";
 import React, { useEffect, useState } from "react";
-import { PlusCircleOutlined } from "@ant-design/icons";
 import Navbar from "@/components/Navbar";
+
+import "../styles/pages/Dashboard.css";
 
 interface Invitation {
   id: number;
@@ -23,35 +23,12 @@ interface Invitation {
 const Dashboard: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
-  const { value: token, clear: clearToken } = useLocalStorage<string>(
-    "token",
-    "",
-  );
-  const { value: id, clear: clearId } = useLocalStorage<string>("id", "");
+  const { value: token } = useLocalStorage<string>("token", "");
+  const { value: id } = useLocalStorage<string>("id", "");
 
   const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
   const [loggedInUserGroups, setLoggedInUserGroups] = useState<Group[]>([]);
   const [invitations, setInvitations] = useState<Invitation[]>([]);
-  const handleLogout = async () => {
-    if (!loggedInUser) return;
-    try {
-      await apiService.post<void>(
-        `/users/${loggedInUser.id}/logout`,
-        {},
-        token,
-      );
-    } catch (error) {
-      if (error instanceof Error) {
-        alert(`Something went wrong while logging out:\n${error.message}`);
-      } else {
-        console.error("Logout has failed");
-      }
-    }
-
-    clearToken();
-    clearId();
-    router.push("/login");
-  };
 
   const handleAcceptInvitation = async (invitationId: number) => {
     if (!token || !id) return;
@@ -186,21 +163,18 @@ const Dashboard: React.FC = () => {
 
   return (
     <>
-      <div className="dashboardMainPage-container">
-        {/* <Card className="dashboardMainPage-card">
-          <h3>Welcome, {loggedInUser?.username}!</h3>
-        </Card> */}
-        <Navbar user={loggedInUser} group={null} />
-        <Card className="dashboardMainPage-card">
-          <div className="dashboardMainPage-button-container">
+      <Navbar user={loggedInUser} />
+      <div className="page-container">
+        <Card className="card dashboard-card">
+          <div className="dashboard-button-container">
             <Button
-              className="dashboardMainPage-button"
+              className="button secondary"
               onClick={() => router.push("/statistics")}
             >
               Statistics
             </Button>
             <Button
-              className="dashboardMainPage-button"
+              className="button secondary"
               onClick={() => router.push("/timer")}
             >
               Pomodoro Timer
@@ -208,87 +182,95 @@ const Dashboard: React.FC = () => {
           </div>
         </Card>
 
-        <Card className="dashboardMainPage-card">
+        <Card className="card dashboard-card">
           {invitations.length > 0 && (
             <>
               <h3>Your invitations:</h3>
-              <div className="invitations-grid">
+              <div className="dashboard-grid">
                 {invitations.map((invitation) => (
-                  <div key={invitation.id} className="invitation-card-wrapper">
-                    <a className="invitation-card">{invitation.groupName}</a>
-                    <button
-                      id="accept"
-                      onClick={() => handleAcceptInvitation(invitation.id)}
-                    >
-                      Accept
-                    </button>
-                    <button
-                      id="reject"
-                      onClick={() => handleDeclineInvitation(invitation.id)}
-                    >
-                      Decline
-                    </button>
+                  <div
+                    key={invitation.id}
+                    className="card-wrapper invitation-card-wrapper"
+                  >
+                    <Card className="line-card">
+                      {invitation.groupName}
+                      <div className="invitation-card-button-container">
+                        <Button
+                          id="accept"
+                          className="green"
+                          onClick={() => handleAcceptInvitation(invitation.id)}
+                        >
+                          Accept
+                        </Button>
+
+                        <Button
+                          id="reject"
+                          className="red"
+                          onClick={() => handleDeclineInvitation(invitation.id)}
+                        >
+                          Decline
+                        </Button>
+                      </div>
+                    </Card>
                   </div>
+                  // <div key={invitation.id} className="invitation-card-wrapper">
+                  //   <a className="invitation-card">{invitation.groupName}</a>
+                  //   <button
+                  //     id="accept"
+                  //     onClick={() => handleAcceptInvitation(invitation.id)}
+                  //   >
+                  //     Accept
+                  //   </button>
+                  //   <button
+                  //     id="reject"
+                  //     onClick={() => handleDeclineInvitation(invitation.id)}
+                  //   >
+                  //     Decline
+                  //   </button>
+                  // </div>
                 ))}
               </div>
             </>
           )}
           <h3>Your Groups:</h3>
-          <div className="groups-grid">
+          <div className="dashboard-grid">
             {loggedInUserGroups && loggedInUserGroups.length > 0 ? (
               <>
                 {loggedInUserGroups.map((group) => (
-                  <div key={group.id} className="group-card-wrapper">
+                  <div key={group.id} className="card-wrapper">
                     <Card
-                      className="group-card"
+                      className="line-card"
                       onClick={() => router.push(`/groups/${group.id}`)}
                     >
                       {group.name}
                     </Card>
                   </div>
                 ))}
-                <div className="group-card-wrapper">
+                <div className="card-wrapper">
                   <Card
-                    className="group-card"
+                    className="line-card"
                     onClick={() => router.push("/groups")}
                   >
                     <div className="create-group-aligning">
-                      <PlusCircleOutlined className="plus-icon" />
-                      <span>Create New Group</span>
+                      <span>+ Create New Group</span>
                     </div>
                   </Card>
                 </div>
               </>
             ) : (
-              <div className="group-card-wrapper">
+              <div className="card-wrapper">
                 <Card
-                  className="group-card"
+                  className="line-card"
                   onClick={() => router.push("/groups")}
                 >
                   <div className="create-group-aligning">
-                    <PlusCircleOutlined className="plus-icon" />
-                    <span>Create New Group</span>
+                    <span>+ Create New Group</span>
                   </div>
                 </Card>
               </div>
             )}
           </div>
         </Card>
-      </div>
-
-      <div className="dashboardMPL-button-container">
-        <Button
-          className="dashboardMainPage-button-profile"
-          onClick={() => router.push(`/edit/${loggedInUser?.id}`)}
-        >
-          Profile
-        </Button>
-        <Button
-          className="dashboardMainPage-button-black"
-          onClick={handleLogout}
-        >
-          Logout
-        </Button>
       </div>
     </>
   );

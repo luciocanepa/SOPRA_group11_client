@@ -1,0 +1,6 @@
+.profile-management-form {
+  min-height: 90vh;
+  max-height: 90vh;
+
+  justify-content: flex-start;
+}

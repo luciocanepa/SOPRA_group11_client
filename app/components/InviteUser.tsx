@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import { AutoComplete, Form, Button, message } from "antd";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import "@/styles/pages/inviteUser.css";
+import { Group } from "@/types/group";
+
 interface InviteUserProps {
-  groupId?: string; // optional for local
+  group: Group | null; // optional for local
   isVisible: boolean;
   onInviteLocally?: (user: User) => void; // callback for local-only use
 }
@@ -17,7 +18,7 @@ interface User {
 }
 
 export function InviteUser({
-  groupId,
+  group,
   isVisible,
   onInviteLocally,
 }: InviteUserProps) {
@@ -25,6 +26,7 @@ export function InviteUser({
   const { value: token } = useLocalStorage<string>("token", "");
   const { value: localUserId } = useLocalStorage<string>("id", "");
 
+  const groupId = group?.id;
   const [username, setUsername] = useState("");
   const [filteredOptions, setFilteredOptions] = useState<{ value: string }[]>(
     [],
@@ -41,7 +43,6 @@ export function InviteUser({
       message: string;
     }[]
   >([]);
-
   // Fetch all users on component mount
   useEffect(() => {
     if (!token) return;
@@ -56,7 +57,6 @@ export function InviteUser({
         console.error("Failed to fetch users:", error);
       }
     };
-
     fetchUsers();
   }, [apiService, token, localUserId]);
 
@@ -155,7 +155,7 @@ export function InviteUser({
   };
 
   return (
-    <div className="invite-container">
+    <div className="group-dashboard-actions-container">
       <Form
         form={form}
         name="invite-user-form"
@@ -163,7 +163,7 @@ export function InviteUser({
         layout="vertical"
         onFinish={handleInvite}
       >
-        <h3 className="invite-title">Invite Users</h3>
+        {/* <h3>Invite Users</h3> */}
 
         <Form.Item name="username" rules={[{ required: false }]}>
           <AutoComplete
@@ -178,7 +178,7 @@ export function InviteUser({
         </Form.Item>
 
         <Button
-          className="invite-button"
+          className="green"
           onClick={handleInvite}
           loading={loading}
           disabled={!username}
@@ -192,8 +192,12 @@ export function InviteUser({
             <div className="invite-results-table">
               {inviteResults.map((res, idx) => (
                 <div key={idx} className={`result-row ${res.status}`}>
-                  <span className="username">{res.username}</span>
-                  <span className="message">{res.message}</span>
+                  <span id="invite-username">{res.username}</span>
+                  <span id="invite-message">
+                    {res.message.includes("failed")
+                      ? "Invitation failed"
+                      : res.message}
+                  </span>
                 </div>
               ))}
             </div>
