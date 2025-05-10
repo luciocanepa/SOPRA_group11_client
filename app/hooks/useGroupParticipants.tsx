@@ -2,26 +2,28 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Client, IMessage }            from "@stomp/stompjs";
-import SockJS                          from "sockjs-client";
-import { useApi }                      from "@/hooks/useApi";
+import { Client, IMessage } from "@stomp/stompjs";
+import SockJS from "sockjs-client";
+import { useApi } from "@/hooks/useApi";
 
 export interface Participant {
-    id:       number;
+    id: number;
     username: string;
-    status:   "ONLINE" | "OFFLINE" | "WORK" | "BREAK";
+    status: "ONLINE" | "OFFLINE" | "WORK" | "BREAK";
 }
 
 export interface TimerInfo {
-    start:    Date;
-    duration: number;  // seconds
-    running:  boolean;
+    start: Date;
+    duration: number;   // seconds
+    running: boolean;
 }
 
 interface GroupUserDTO {
-    id:        number;
-    username:  string;
-    status:    "ONLINE" | "OFFLINE" | "WORK" | "BREAK";
+    id: number;
+    username: string;
+    status: Participant["status"];
+    startTime: string;  // ISO string from backend
+    duration: string;   // ISO8601 “PT##M##S”
 }
 
 interface GroupResponse {
@@ -29,15 +31,15 @@ interface GroupResponse {
 }
 
 type TimerUpdateMsg = {
-    type:      "TIMER_UPDATE" | "SYNC";
-    userId:    string;
-    status:    Participant["status"];
-    startTime: string;   // ISO string
-    duration:  string;   // ISO8601 “PT##M##S”
+    type: "TIMER_UPDATE" | "SYNC";
+    userId: string;
+    status: Participant["status"];
+    startTime: string;
+    duration: string;
 };
 
 type StatusMsg = {
-    type:   "STATUS";
+    type: "STATUS";
     userId: string;
     status: Participant["status"];
 };
@@ -46,36 +48,54 @@ type WSMessage = TimerUpdateMsg | StatusMsg;
 
 export function useGroupParticipants(
     groupId: string,
-    token:   string | null
+    token: string | null
 ) {
-    const api       = useApi();
-    const clientRef = useRef<Client|null>(null);
+    const api = useApi();
+    const clientRef = useRef<Client | null>(null);
     const [connected, setConnected] = useState(false);
 
     const [participants, setParticipants] = useState<Participant[]>([]);
-    const [timers,       setTimers]       = useState<Record<number,TimerInfo>>({});
-    const [loading,      setLoading]      = useState(true);
-    const [error,        setError]        = useState<string|null>(null);
+    const [timers, setTimers] = useState<Record<number, TimerInfo>>({});
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    // helper to turn PT##M##S → seconds
+    // ─── helper to turn PT##M##S → seconds ───────────────────────
     function parseIso(iso: string): number {
         const m = Number((iso.match(/PT(\d+)M/) || [])[1] || 0);
         const s = Number((iso.match(/(\d+)S/)   || [])[1] || 0);
-        return m*60 + s;
+        return m * 60 + s;
     }
 
-    // 1) initial REST → participants list
+    // ─── 1) initial REST fetch → seed participants & timers ───────
     useEffect(() => {
         if (!token) return;
         setLoading(true);
 
         api.get<GroupResponse>(`/groups/${groupId}`, token)
             .then(res => {
+                // 1a) participants
                 setParticipants(res.users.map(u => ({
                     id:       u.id,
                     username: u.username,
                     status:   u.status
                 })));
+
+                // 1b) timers
+                const initial: Record<number, TimerInfo> = {};
+                res.users.forEach(u => {
+                    if (u.status === "WORK" || u.status === "BREAK") {
+                        const ts = u.startTime.endsWith("Z")
+                            ? u.startTime
+                            : u.startTime + "Z";
+                        initial[u.id] = {
+                            start:    new Date(ts),
+                            duration: parseIso(u.duration),
+                            running:  u.status === "WORK"
+                        };
+                    }
+                });
+                setTimers(initial);
+
                 setError(null);
             })
             .catch(err => {
@@ -85,44 +105,34 @@ export function useGroupParticipants(
             .finally(() => setLoading(false));
     }, [groupId, token, api]);
 
-    // 2) WS message handler for both TIMER_UPDATE and the SYNC responses
-    const handleMessage = useCallback((raw: any) => {
-        const type = raw.type as string;
-        // pick the right id field:
-        const uid = Number(raw.userId ?? raw.senderId);
+    // ─── 2) WS message handler ───────────────────────────────────
+    const handleMessage = useCallback((msg: WSMessage) => {
+        const uid = Number(msg.userId);
         if (isNaN(uid)) return;
 
-        if (type === "TIMER_UPDATE" || type === "SYNC") {
-            // parse PT##M##S → seconds
-            const m = Number((raw.duration.match(/PT(\d+)M/)||[])[1] || 0);
-            const s = Number((raw.duration.match(/(\d+)S/)   ||[])[1] || 0);
-            const secs = m*60 + s;
-            // normalize startTime to a real Date
-            const ts = raw.startTime.endsWith("Z")
-                ? raw.startTime
-                : raw.startTime + "Z";
-            const start = new Date(ts);
-            // running only if WORK
-            const running = raw.status === "WORK";
+        if (msg.type === "TIMER_UPDATE" || msg.type === "SYNC") {
+            const secs = parseIso(msg.duration);
+            const ts   = msg.startTime.endsWith("Z")
+                ? msg.startTime
+                : msg.startTime + "Z";
+            const start   = new Date(ts);
+            const running = msg.status === "WORK";
 
-            // update both status & timers
             setParticipants(ps =>
-                ps.map(u => u.id === uid ? { ...u, status: raw.status } : u)
+                ps.map(u => u.id === uid ? { ...u, status: msg.status } : u)
             );
-            setTimers(ts => ({
-                ...ts,
-                [uid]: { start, duration: secs, running }
-            }));
-        }
-        else if (type === "STATUS") {
+            setTimers(ts =>
+                ({ ...ts, [uid]: { start, duration: secs, running } })
+            );
+        } else {
+            // plain STATUS
             setParticipants(ps =>
-                ps.map(u => u.id === uid ? { ...u, status: raw.status } : u)
+                ps.map(u => u.id === uid ? { ...u, status: msg.status } : u)
             );
         }
     }, []);
 
-
-    // 3) Open STOMP subscription
+    // ─── 3) STOMP/SockJS connection ──────────────────────────────
     useEffect(() => {
         if (!token || typeof window === "undefined") return;
 
@@ -141,32 +151,35 @@ export function useGroupParticipants(
         client.onConnect = () => {
             setConnected(true);
             client.subscribe(`/topic/group.${groupId}`, (m: IMessage) => {
-                try { handleMessage(JSON.parse(m.body)); }
-                catch(e) { console.error("Invalid WS payload", e); }
+                try {
+                    handleMessage(JSON.parse(m.body) as WSMessage);
+                } catch (e) {
+                    console.error("Invalid WS payload", e);
+                }
             });
         };
 
         client.activate();
         clientRef.current = client;
         return () => { client.deactivate(); };
-
     }, [groupId, token, handleMessage]);
 
-    // 4) as soon as we have both a participant list and the socket is up,
-    //    fire off one /app/group.sync per user who’s mid‐timer.
-    // 4) fire one sync per person mid‐timer
+    // ─── 4) fire SYNC for anyone already mid-timer ───────────────
     useEffect(() => {
         if (!clientRef.current || !connected) return;
+
         participants.forEach(u => {
             if (u.status === "WORK" || u.status === "BREAK") {
                 clientRef.current!.publish({
                     destination: "/app/group.sync",
-                    body: JSON.stringify({ senderId: u.id.toString(), groupId })
+                    body: JSON.stringify({
+                        senderId: u.id.toString(),
+                        groupId
+                    })
                 });
             }
         });
     }, [connected, participants, groupId]);
-
 
     return { participants, timers, loading, error };
 }
