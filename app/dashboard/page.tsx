@@ -8,7 +8,7 @@ import { Button, Card } from "antd";
 import React, { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 
-import "../styles/pages/Dashboard.css";
+import "../styles/pages/dashboard.css";
 
 interface Invitation {
   id: number;
@@ -29,19 +29,29 @@ const Dashboard: React.FC = () => {
   const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
   const [loggedInUserGroups, setLoggedInUserGroups] = useState<Group[]>([]);
   const [invitations, setInvitations] = useState<Invitation[]>([]);
+  const [previousInvitations, setPreviousInvitations] = useState<number[]>([]);
 
   const handleAcceptInvitation = async (invitationId: number) => {
     if (!token || !id) return;
 
     try {
       await apiService.put<void>(
-        `/invitations/${invitationId}/accept`,
-        {},
-        token,
+          `/invitations/${invitationId}/accept`,
+          {},
+          token,
       );
+
       setInvitations(
-        invitations.filter((invitation) => invitation.id !== invitationId),
+          invitations.filter((invitation) => invitation.id !== invitationId),
       );
+
+      // Remove from previously notified IDs
+      const notifiedIds = JSON.parse(localStorage.getItem("notifiedInvitations") || "[]");
+      localStorage.setItem(
+          "notifiedInvitations",
+          JSON.stringify(notifiedIds.filter((id: number) => id !== invitationId))
+      );
+
     } catch (error) {
       if (error instanceof Error) {
         console.error("Error accepting invitation:", error.message);
@@ -56,13 +66,22 @@ const Dashboard: React.FC = () => {
 
     try {
       await apiService.put<void>(
-        `/invitations/${invitationId}/reject`,
-        {},
-        token,
+          `/invitations/${invitationId}/reject`,
+          {},
+          token,
       );
+
       setInvitations(
-        invitations.filter((invitation) => invitation.id !== invitationId),
+          invitations.filter((invitation) => invitation.id !== invitationId),
       );
+
+      // Remove from previously notified IDs
+      const notifiedIds = JSON.parse(localStorage.getItem("notifiedInvitations") || "[]");
+      localStorage.setItem(
+          "notifiedInvitations",
+          JSON.stringify(notifiedIds.filter((id: number) => id !== invitationId))
+      );
+
     } catch (error) {
       if (error instanceof Error) {
         console.error("Error declining invitation:", error.message);
@@ -141,19 +160,40 @@ const Dashboard: React.FC = () => {
       if (!token || !id) return;
 
       try {
-        const invitations: Invitation[] = await apiService.get<Invitation[]>(
-          `/users/${id}/invitations`,
-          token,
+        const fetchedInvitations: Invitation[] = await apiService.get<Invitation[]>(
+            `/users/${id}/invitations`,
+            token
         );
-        setInvitations(invitations);
-        console.log("Invitations:", invitations);
+
+        // Here we load previously notified IDs from localStorage (so we dont get notified for things we've seen already)
+        const notifiedIds: number[] = JSON.parse(
+            localStorage.getItem("notifiedInvitationIds") || "[]"
+        );
+
+        const newInvitations = fetchedInvitations.filter(
+            (inv) => !notifiedIds.includes(inv.id)
+        );
+
+        // notification for each -new- invitation
+        newInvitations.forEach((inv) => {
+          if (Notification.permission === "granted") {
+            new Notification("New Group Invitation", {
+              body: `You've been invited to join "${inv.groupName}".`,
+            });
+          }
+        });
+
+        // Here the state and the localStorage get updated with all seen invitation IDs
+        setInvitations(fetchedInvitations);
+        const updatedIds = [
+          ...new Set([...notifiedIds, ...fetchedInvitations.map((inv) => inv.id)]),
+        ];
+        localStorage.setItem("notifiedInvitationIds", JSON.stringify(updatedIds));
       } catch (error) {
         if (error instanceof Error) {
           console.error("Error fetching invitations:", error.message);
         } else {
-          console.error(
-            "An unknown error occurred while fetching invitations.",
-          );
+          console.error("An unknown error occurred while fetching invitations.");
         }
       }
     };

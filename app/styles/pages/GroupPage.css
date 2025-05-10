@@ -172,10 +172,15 @@
   padding: 10px;
   border-radius: 10px;
   margin: 5px 0;
+
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .message-content {
   width: 60%;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .message-info {
