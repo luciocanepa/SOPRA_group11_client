@@ -24,7 +24,10 @@ export function GroupParticipants({ groupId, adminId }: GroupParticipantsProps) 
   }, []);
 
   // Format remaining time, pausing when not running
-  const formatRemaining = (timer: TimerInfo) => {
+  const formatRemaining = (timer: TimerInfo, status: Participant['status'] )=> {
+    if (status === 'ONLINE' || status === 'OFFLINE') {
+      return '—';
+    }
     if (!timer.running) {
       // paused: show static remaining
       const m = Math.floor(timer.duration / 60).toString().padStart(2, '0');
@@ -43,7 +46,7 @@ export function GroupParticipants({ groupId, adminId }: GroupParticipantsProps) 
     const timer = timers[user.id];
     return {
       ...user,
-      timeRemaining: timer ? formatRemaining(timer) : '—'
+      timeRemaining: timer ? formatRemaining(timer, user.status) : '—'
     };
   });
 

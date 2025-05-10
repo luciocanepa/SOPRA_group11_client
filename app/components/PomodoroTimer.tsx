@@ -21,7 +21,7 @@ export interface PomodoroTimerProps {
   initialSession?: number;
   initialBreak?: number;
   onTimerStatusChange: (isRunning: boolean) => void;
-  onTimerUpdate?: (info: { status: "WORK" | "BREAK"; startTime: string; duration: number }) => void;
+  onTimerUpdate?: (info: { status: "WORK" | "BREAK" | "ONLINE"; startTime: string; duration: number }) => void;
 }
 
 export function PomodoroTimer({
@@ -97,7 +97,7 @@ export function PomodoroTimer({
     // Broadcast a BREAK update
     const nowISO = new Date().toISOString();
     onTimerUpdate?.({
-      status: "BREAK",
+      status: "ONLINE",
       startTime: nowISO,
       duration: state.timeLeft
     });
@@ -107,7 +107,7 @@ export function PomodoroTimer({
     audioRef.current?.pause();
     setState(prev => ({ ...prev, isRunning: false, isSession: true, timeLeft: prev.activeSettings.session * 60 }));
     const nowISO = new Date().toISOString();
-    onTimerUpdate?.({ status: "BREAK", startTime: nowISO, duration: initialSession * 60 });
+    onTimerUpdate?.({ status: "ONLINE", startTime: nowISO, duration: initialSession * 60 });
   };
 
   // Settings UI
@@ -119,16 +119,26 @@ export function PomodoroTimer({
     });
   };
   const applySettings = () => {
+    // snapshot the new session in seconds
+    const newSessionSec = state.settings.session * 60;
+
+    // update your own timer display
     setState(prev => ({
       ...prev,
       activeSettings: prev.settings,
-      timeLeft: prev.settings.session * 60,
-      isSession: true,
-      showSettings: false,
+      timeLeft:       newSessionSec,
+      isSession:      true,
+      showSettings:   false,
     }));
-    const nowISO = new Date().toISOString();
-    onTimerUpdate?.({ status: "WORK", startTime: nowISO, duration: state.settings.session * 60 });
+
+    // fire your server update so the WS broadcast comes back
+    onTimerUpdate?.({
+      status:    "ONLINE",
+      startTime: new Date().toISOString(),
+      duration:  newSessionSec
+    });
   };
+
 
   return (
       <div className="white-container">
