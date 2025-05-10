@@ -1,0 +1,52 @@
+.group-creation-invite-users .group-dashboard-actions-container {
+  width: 30vw !important;
+  background-color: green !important;
+}
+
+#invite-user-form div {
+  margin: 2px 0;
+}
+
+.invite-results {
+  width: calc(30vw - 20px);
+
+  margin-top: 20px !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.invite-results-table {
+  width: 30vw;
+  min-height: 10vh;
+  max-height: 20vh;
+  overflow-y: scroll;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.result-row {
+  width: 20vw;
+  height: 4vh;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+#invite-username {
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+.success #invite-message {
+  color: green;
+}
+
+.error #invite-message {
+  color: red;
+}

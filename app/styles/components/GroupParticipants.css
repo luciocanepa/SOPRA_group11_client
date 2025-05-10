@@ -1,0 +1,15 @@
+.group-members-container {
+  width: 30vw;
+  height: 55vh;
+
+  display: flex;
+  flex-direction: column;
+
+  background-color: var(--bg-secondary);
+  border-radius: 10px;
+}
+
+.group-members-container h2 {
+  margin: 20px 0 10px 0;
+  text-align: center;
+}

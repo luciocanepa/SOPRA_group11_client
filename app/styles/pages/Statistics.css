@@ -1,0 +1,48 @@
+.statistics-card {
+  width: 90vw;
+  height: 10vh;
+  margin-top: 0;
+}
+
+.statistics-card .ant-card-body {
+  padding: 0 20px;
+}
+
+.statistics-header {
+  width: calc(90vw - 40px);
+  height: 10vh;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0;
+}
+
+.week-navigation {
+  width: 30vw;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0;
+}
+
+.chart-container {
+  width: 90vw;
+  min-height: 70vh;
+  max-height: 70vh;
+  padding: 0;
+  background-color: var(--bg-secondary);
+  border-radius: 10px;
+
+  /* display: flex;
+    justify-content: center;
+    align-items: center; */
+}
+
+.chart-container div {
+  max-width: 80vw;
+  height: 60vh !important;
+  margin: 5vh auto;
+}

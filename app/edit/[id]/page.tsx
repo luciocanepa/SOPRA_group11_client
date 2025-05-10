@@ -5,12 +5,12 @@ import { useApi } from "@/hooks/useApi";
 import { User } from "@/types/user";
 import { Button, Form, Input, message, Select, Upload, DatePicker } from "antd";
 import { EditOutlined, UploadOutlined } from "@ant-design/icons";
-import "@/styles/pages/edit.css";
-import "@/styles/pages/login.css";
 import Image from "next/image";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import dayjs from "dayjs";
 import moment from "moment-timezone";
+import Navbar from "@/components/Navbar";
+import "@/styles/pages/ProfileManagement.css";
 
 const timezones = moment.tz.names();
 
@@ -31,14 +31,14 @@ const ManageProfile: React.FC = () => {
     timezone: false,
   });
 
-  const hashPassword = async (password: string) => {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(password);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    return Array.from(new Uint8Array(hashBuffer))
-      .map((byte) => byte.toString(16).padStart(2, "0"))
-      .join("");
-  };
+  // const hashPassword = async (password: string) => {
+  //   const encoder = new TextEncoder();
+  //   const data = encoder.encode(password);
+  //   const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  //   return Array.from(new Uint8Array(hashBuffer))
+  //     .map((byte) => byte.toString(16).padStart(2, "0"))
+  //     .join("");
+  // };
 
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const uploadingImage = (file: File) => {
@@ -94,7 +94,9 @@ const ManageProfile: React.FC = () => {
 
   const handleUserEdit = async () => {
     if (!token) return;
+    console.log(form.getFieldsValue());
     if (!isAuthorizedToEdit) {
+      console.log("not authorized");
       message.error("You are not authorized to edit this profile.");
       return;
     }
@@ -112,8 +114,8 @@ const ManageProfile: React.FC = () => {
       }
       if (values.password) {
         // Include password only if it's provided (new value)
-        const hashedPassword = await hashPassword(values.password);
-        edits.password = hashedPassword; // You may want to hash it before sending
+        // const hashedPassword = await hashPassword(values.password);
+        edits.password = values.password; // You may want to hash it before sending
       }
       if (values.birthday !== user?.birthday) {
         edits.birthday = dayjs(values.birthday).format("YYYY-MM-DD");
@@ -124,7 +126,7 @@ const ManageProfile: React.FC = () => {
       if (uploadedImage) {
         edits.profilePicture = uploadedImage;
       }
-
+      console.log("edits before sending", edits);
       await apiService.put(`/users/${user?.id}`, edits, token);
 
       message.success("Profile updated successfully");
@@ -140,12 +142,16 @@ const ManageProfile: React.FC = () => {
     } catch (error) {
       message.error("Failed to update profile");
       console.error(error);
+      alert(
+        "Edit was not successful! Most likely because the username is already taken.",
+      );
     }
   };
 
   return (
-    <div className="background-container">
-      <div className="groupCreation-container">
+    <div className="page-container">
+      <Navbar user={user} />
+      <div className="form-container">
         <Form
           form={form}
           name="profile management"
@@ -153,9 +159,8 @@ const ManageProfile: React.FC = () => {
           variant="outlined"
           onFinish={handleUserEdit}
           layout="vertical"
+          className="form"
         >
-          <h2>Profile Management</h2>
-
           <div className="profile-image-container">
             <Image
               src={
@@ -170,6 +175,7 @@ const ManageProfile: React.FC = () => {
               unoptimized={!!uploadedImage} // Needed for base64 images
             />
           </div>
+          <h2>Profile Management</h2>
 
           <Form.Item name="username" label="Username">
             <Input
@@ -326,28 +332,24 @@ const ManageProfile: React.FC = () => {
                 return false;
               }}
             >
-              <Button
-                className="groupCreation-upload"
-                icon={<UploadOutlined />}
-              >
+              <Button className="secondary" icon={<UploadOutlined />}>
                 Upload Profile Picture
               </Button>
             </Upload>
           </Form.Item>
 
-          <Form.Item>
-            <Button htmlType="submit" className="groupCreation-button-save">
-              Save Profile Changes
-            </Button>
-          </Form.Item>
-          <Form.Item>
-            <Button
-              className="groupCreation-button"
-              onClick={() => router.push("/dashboard")}
-            >
-              Back to Dashboard
-            </Button>
-          </Form.Item>
+          <div className="form-final-button-container">
+            <Form.Item>
+              <Button htmlType="submit" className="green">
+                Save
+              </Button>
+            </Form.Item>
+            <Form.Item>
+              <Button className="red" onClick={() => router.push("/dashboard")}>
+                Cancel
+              </Button>
+            </Form.Item>
+          </div>
         </Form>
       </div>
     </div>

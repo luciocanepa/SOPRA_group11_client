@@ -7,7 +7,8 @@ import Link from "next/link";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
 import { JSX } from "react";
-import "../styles/pages/login.css";
+
+import "../styles/module.css";
 
 interface RegisterForm {
   username: string;
@@ -41,6 +42,7 @@ const Register: () => JSX.Element = () => {
     } catch (error) {
       if (error instanceof Error) {
         console.error("Registration failed:", error.message);
+        alert("This username is already taken");
       } else {
         console.error("An unknown error occurred during registration.");
       }
@@ -48,8 +50,8 @@ const Register: () => JSX.Element = () => {
   };
 
   return (
-    <div className="login-page">
-      <div className="login-container">
+    <div className="single-page-container">
+      <div className="form-container">
         <h2 className="login-title">Pomodoro Study Room</h2>
         <Form<RegisterForm>
           form={form}
@@ -57,7 +59,7 @@ const Register: () => JSX.Element = () => {
           size="large"
           onFinish={handleRegister}
           layout="vertical"
-          className="login-form"
+          className="form"
         >
           <div className="form-group">
             <Form.Item
@@ -68,7 +70,7 @@ const Register: () => JSX.Element = () => {
               ]}
             >
               <Input
-                className="login-input"
+                className="input"
                 placeholder="Enter username"
                 size="large"
               />
@@ -106,7 +108,7 @@ const Register: () => JSX.Element = () => {
               ]}
             >
               <Input.Password
-                className="login-input"
+                className="input"
                 placeholder="Enter password"
                 size="large"
               />
@@ -117,14 +119,14 @@ const Register: () => JSX.Element = () => {
               <div style={{ display: "flex", gap: "20px", width: "100%" }}>
                 <button
                   type="submit"
-                  className="login-button"
+                  className="button primary"
                   style={{ flex: 1 }}
                 >
                   Sign Up
                 </button>
                 <Link
                   href="/login"
-                  className="signup-button"
+                  className="button link"
                   style={{ flex: 1, display: "flex", justifyContent: "center" }}
                 >
                   Go to Login
@@ -132,7 +134,7 @@ const Register: () => JSX.Element = () => {
               </div>
             </Form.Item>
           </div>
-          <p className="signup-prompt">Already have an account?</p>
+          {/* <p className="signup-prompt">Already have an account?</p> */}
         </Form>
       </div>
     </div>

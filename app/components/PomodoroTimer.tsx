@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import "../styles/pages/timer.css";
-
+import { useState, useEffect, useRef, useCallback } from "react";
+import { Button } from "antd";
+import "../styles/components/Timer.css";
 interface TimerSettings {
   session: number;
   break: number;
@@ -15,225 +15,436 @@ interface TimerState {
   showSettings: boolean;
   settings: TimerSettings;
   activeSettings: TimerSettings;
+  notificationPermission: NotificationPermission;
+  notificationsEnabled: boolean;
+  alarmEnabled: boolean;
 }
 
-interface PomodoroTimerProps {
+export interface PomodoroTimerProps {
   initialSession?: number;
   initialBreak?: number;
-  onTimerStatusChange: (isRunning: boolean) => void; // New prop to notify the parent about the timer status
+  onTimerStatusChange: (isRunning: boolean) => void;
+  onTimerUpdate?: (info: {
+    status: "WORK" | "BREAK";
+    startTime: string;
+    duration: number;
+  }) => void;
+  fullscreen?: boolean;
 }
 
 export function PomodoroTimer({
   initialSession = 25,
   initialBreak = 5,
   onTimerStatusChange,
+  onTimerUpdate,
+  fullscreen = false,
 }: PomodoroTimerProps) {
   const [state, setState] = useState<TimerState>({
     timeLeft: initialSession * 60,
     isRunning: false,
     isSession: true,
     showSettings: false,
-    settings: {
-      session: initialSession,
-      break: initialBreak,
-    },
-    activeSettings: {
-      session: initialSession,
-      break: initialBreak,
-    },
+    settings: { session: initialSession, break: initialBreak },
+    activeSettings: { session: initialSession, break: initialBreak },
+    notificationPermission: "default" as NotificationPermission,
+    notificationsEnabled: false,
+    alarmEnabled: true,
   });
-
-  useEffect(() => {
-    onTimerStatusChange(state.isRunning); // Notify parent about timer state
-  }, [state.isRunning, onTimerStatusChange]);
+  const [fullScreen, setFullScreen] = useState(fullscreen);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     audioRef.current = new Audio("/sounds/alarm.mp3");
-    audioRef.current.load(); // Preload audio
+    audioRef.current.load();
+
+    // Check notification permission on mount
+    if ("Notification" in window) {
+      setState((prev) => ({
+        ...prev,
+        notificationPermission: Notification.permission,
+      }));
+    }
+
     return () => {
       audioRef.current?.pause();
       audioRef.current = null;
     };
   }, []);
 
-  // Countdown timer tick
+  // Inform parent of running state
   useEffect(() => {
-    if (!state.isRunning || state.timeLeft <= 0) return;
+    onTimerStatusChange(state.isRunning);
+  }, [state.isRunning, onTimerStatusChange]);
 
+  // Countdown tick
+  useEffect(() => {
+    if (!state.isRunning) return;
     const timer = setInterval(() => {
-      setState((prev) => ({ ...prev, timeLeft: prev.timeLeft - 1 }));
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [state.isRunning, state.timeLeft]);
-
-  // Handle timer end (audio + switch)
-  useEffect(() => {
-    if (!state.isRunning || state.timeLeft > 0) return;
-
-    // Play alarm
-    audioRef.current?.play().catch((err) => {
-      console.warn("Audio failed to play:", err);
-    });
-
-    // Slight delay before switching phase
-    const timeout = setTimeout(() => {
-      const newIsSession = !state.isSession;
-      const newTimeLeft =
-        (newIsSession
-          ? state.activeSettings.session
-          : state.activeSettings.break) * 60;
-
       setState((prev) => ({
         ...prev,
-        isSession: newIsSession,
-        timeLeft: newTimeLeft,
+        timeLeft: Math.max(prev.timeLeft - 1, 0),
       }));
-    }, 1500); // 1.5 seconds delay
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [state.isRunning]);
 
-    return () => clearTimeout(timeout);
-  }, [state.timeLeft, state.isRunning, state.activeSettings, state.isSession]);
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-  };
-
-  const startTimer = () => setState((prev) => ({ ...prev, isRunning: true }));
-  const pauseTimer = () => setState((prev) => ({ ...prev, isRunning: false }));
-
-  const resetTimer = () => {
-    audioRef.current?.pause();
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.load(); // Reset audio state
+  const requestNotificationPermission = async () => {
+    if (!("Notification" in window)) {
+      console.warn("This browser does not support notifications");
+      return "denied";
     }
 
+    try {
+      const permission = await Notification.requestPermission();
+      setState((prev) => ({
+        ...prev,
+        notificationPermission: permission,
+        notificationsEnabled: permission === "granted",
+      }));
+      return permission;
+    } catch (error) {
+      console.error("Error requesting notification permission:", error);
+      return "denied";
+    }
+  };
+
+  const showNotification = useCallback(
+    (title: string, options?: NotificationOptions) => {
+      if (
+        !state.notificationsEnabled ||
+        state.notificationPermission !== "granted"
+      ) {
+        return;
+      }
+
+      try {
+        new Notification(title, {
+          body: options?.body || "",
+          icon: "/icons/timer-icon.png",
+          ...options,
+        });
+      } catch (error) {
+        console.error("Error showing notification:", error);
+      }
+    },
+    [state.notificationsEnabled, state.notificationPermission],
+  );
+
+  const playAlarm = useCallback(() => {
+    if (!state.alarmEnabled) {
+      alert("Please enable alarm sound first");
+      return;
+    }
+
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch((error) => {
+        console.warn("Audio playback failed:", error);
+        alert(
+          "Failed to play alarm sound. Please check your browser settings.",
+        );
+      });
+    }
+  }, [state.alarmEnabled]);
+
+  // Session <-> Break switch
+  useEffect(() => {
+    if (state.timeLeft > 0) return;
+
+    if (state.alarmEnabled) {
+      playAlarm();
+    }
+
+    // Show notification when timer phase changes
+    if (
+      state.notificationsEnabled &&
+      state.notificationPermission === "granted"
+    ) {
+      if (state.isSession) {
+        // Session ending - time for break
+        showNotification(`Time to BREAK!`, {
+          body: `Your study session has ended.`,
+        });
+      } else {
+        // Break ending - time for studying
+        showNotification(`Time to STUDY!`, {
+          body: `Your break has ended.`,
+        });
+      }
+    }
+
+    setState((prev) => {
+      const nextSession = !prev.isSession;
+      const nextDur =
+        (nextSession
+          ? prev.activeSettings.session
+          : prev.activeSettings.break) * 60;
+      const nowISO = new Date().toISOString();
+      onTimerUpdate?.({
+        status: nextSession ? "WORK" : "BREAK",
+        startTime: nowISO,
+        duration: nextDur,
+      });
+      return {
+        ...prev,
+        isSession: nextSession,
+        timeLeft: nextDur,
+        isRunning: true,
+      };
+    });
+  }, [
+    state.timeLeft,
+    state.isSession,
+    state.activeSettings,
+    onTimerUpdate,
+    state.notificationsEnabled,
+    state.notificationPermission,
+    state.alarmEnabled,
+    playAlarm,
+    showNotification,
+  ]);
+  // Format MM:SS
+  const formatTime = (sec: number) => {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+  };
+
+  // Handlers
+  const startTimer = () => {
+    setState((prev) => ({ ...prev, isRunning: true }));
+    const nowISO = new Date().toISOString();
+    onTimerUpdate?.({
+      status: "WORK",
+      startTime: nowISO,
+      duration: state.timeLeft,
+    });
+  };
+
+  const pauseTimer = () => {
+    setState((prev) => ({ ...prev, isRunning: false }));
+    onTimerStatusChange(false);
+
+    const nowISO = new Date().toISOString();
+    onTimerUpdate?.({
+      status: "BREAK",
+      startTime: nowISO,
+      duration: state.timeLeft,
+    });
+  };
+
+  const resetTimer = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
     setState((prev) => ({
       ...prev,
       isRunning: false,
       isSession: true,
       timeLeft: prev.activeSettings.session * 60,
     }));
+    const nowISO = new Date().toISOString();
+    onTimerUpdate?.({
+      status: "BREAK",
+      startTime: nowISO,
+      duration: initialSession * 60,
+    });
+  };
+
+  // Settings UI
+  const toggleSettings = () =>
+    setState((prev) => ({ ...prev, showSettings: !prev.showSettings }));
+
+  const updateSettings = (updates: Partial<TimerSettings>) => {
+    setState((prev) => {
+      const newSettings = { ...prev.settings, ...updates };
+      return { ...prev, settings: newSettings };
+    });
   };
 
   const applySettings = () => {
     setState((prev) => ({
       ...prev,
-      activeSettings: { ...prev.settings },
+      activeSettings: prev.settings,
       timeLeft: prev.settings.session * 60,
       isSession: true,
       showSettings: false,
     }));
-  };
-
-  const setToDefault = () => {
-    setState((prev) => ({
-      ...prev,
-      settings: { session: 25, break: 5 },
-    }));
-  };
-
-  const updateSettings = (newSettings: Partial<TimerSettings>) => {
-    setState((prev) => {
-      const sanitized: Partial<TimerSettings> = {};
-
-      // Sanitize each value to be integer ≥1
-      for (const [key, value] of Object.entries(newSettings)) {
-        sanitized[key as keyof TimerSettings] = Math.max(
-          1,
-          Math.floor(Number(value)),
-        );
-      }
-
-      return {
-        ...prev,
-        settings: { ...prev.settings, ...sanitized },
-      };
+    const nowISO = new Date().toISOString();
+    onTimerUpdate?.({
+      status: "WORK",
+      startTime: nowISO,
+      duration: state.settings.session * 60,
     });
   };
-
-  const toggleSettings = () => {
-    setState((prev) => ({
-      ...prev,
-      showSettings: !prev.showSettings,
-    }));
-  };
-
+  console.log(state);
   return (
-    <div className="white-container">
-      <div className="pink-container">
-        <h1 className="title">
+    <div className={`timer-container ${fullScreen ? "fullscreen" : ""}`}>
+      <div
+        className={`timer-display ${
+          state.isRunning
+            ? state.isSession
+              ? "timer-display-work"
+              : "timer-display-break"
+            : state.isSession
+              ? "timer-display-session"
+              : "timer-display-break"
+        }`}
+      >
+        <h3 className="title">
           {state.isSession ? "Time until break:" : "Break Time"}
-        </h1>
-        <div className="timer-display">{formatTime(state.timeLeft)}</div>
-      </div>
-      <div className="button-group">
-        <button
-          onClick={startTimer}
-          disabled={state.isRunning}
-          className="start"
-        >
-          Start
-        </button>
-        <button
-          onClick={pauseTimer}
-          disabled={!state.isRunning}
-          className="stop"
-        >
-          Stop
-        </button>
-        <button onClick={resetTimer} className="reset">
-          Reset
-        </button>
+        </h3>
+        {formatTime(state.timeLeft)}
       </div>
 
-      {!state.isRunning && (
-        <button onClick={toggleSettings} className="settings-btn">
-          Timer Settings
-        </button>
+      {!fullScreen && (
+        <Button
+          className="fullscreen-button"
+          onClick={() => setFullScreen(true)}
+        >
+          +
+        </Button>
       )}
 
+      {fullScreen && (
+        <Button
+          className="fullscreen-button"
+          onClick={() => setFullScreen(false)}
+        >
+          -
+        </Button>
+      )}
+
+      <div className="timer-button-group">
+        <div className="timer-button-group-left">
+          <Button
+            onClick={startTimer}
+            disabled={state.isRunning}
+            className="green"
+          >
+            Start
+          </Button>
+          <Button
+            onClick={pauseTimer}
+            disabled={!state.isRunning}
+            className="red"
+          >
+            Stop
+          </Button>
+          <Button onClick={resetTimer} className="secondary">
+            Reset
+          </Button>
+        </div>
+        {!state.isRunning && (
+          <div>
+            <Button onClick={toggleSettings} className="secondary">
+              {!state.showSettings ? "+" : "-"} Timer Settings
+            </Button>
+          </div>
+        )}
+      </div>
       {state.showSettings && (
         <div className="settings-popup">
           <h2 className="popup-title">Timer Settings</h2>
-          <label>Study Duration (minutes):</label>
-          <input
-            type="number"
-            value={state.settings.session}
-            onChange={(e) =>
-              updateSettings({ session: Number(e.target.value) })
-            }
-            className="input-box-green"
-            min="1"
-            step="1"
-            pattern="\d*"
-          />
-          <label>Break Duration (minutes):</label>
-          <input
-            type="number"
-            value={state.settings.break}
-            onChange={(e) => updateSettings({ break: Number(e.target.value) })}
-            className="input-box-red"
-            min="1"
-            step="1"
-            pattern="\d*"
-          />
-          <div className="popup-buttons">
-            <button onClick={setToDefault} className="default-btn">
-              Default (25/5)
-            </button>
-            <div className="popup-buttons-row">
-              <button onClick={toggleSettings} className="close">
-                Close
-              </button>
-              <button onClick={applySettings} className="apply-btn">
-                Apply
-              </button>
-            </div>
+
+          <div className="settings-row">
+            <label htmlFor="session-input">Session (minutes):</label>
+            <input
+              min="1"
+              step="1"
+              id="session-input"
+              type="number"
+              value={state.settings.session}
+              onChange={(e) =>
+                updateSettings({
+                  session: Math.max(1, Math.floor(Number(e.target.value) || 1)),
+                })
+              }
+            />
+          </div>
+
+          <div className="settings-row">
+            <label htmlFor="break-input">Break (minutes):</label>
+            <input
+              min="1"
+              step="1"
+              id="break-input"
+              type="number"
+              value={state.settings.break}
+              onChange={(e) =>
+                updateSettings({
+                  break: Math.max(1, Math.floor(Number(e.target.value) || 1)),
+                })
+              }
+            />
+          </div>
+
+          <h3 className="popup-title">Sound & Notifications</h3>
+
+          <div className="settings-row">
+            <label className="alarm-label">
+              <input
+                type="checkbox"
+                checked={state.alarmEnabled}
+                onChange={(e) =>
+                  setState((prev) => ({
+                    ...prev,
+                    alarmEnabled: e.target.checked,
+                  }))
+                }
+              />
+              Enable alarm sound
+            </label>
+            <Button
+              className="secondary"
+              onClick={playAlarm}
+              disabled={!state.alarmEnabled}
+            >
+              Test 🔔
+            </Button>
+          </div>
+
+          <div className="settings-row">
+            <label className="notification-label">
+              <input
+                type="checkbox"
+                checked={state.notificationsEnabled}
+                onChange={async (e) => {
+                  if (e.target.checked) {
+                    const permission = await requestNotificationPermission();
+                    if (permission === "granted") {
+                      setState((prev) => ({
+                        ...prev,
+                        notificationsEnabled: true,
+                      }));
+                    }
+                  } else {
+                    setState((prev) => ({
+                      ...prev,
+                      notificationsEnabled: false,
+                    }));
+                  }
+                }}
+              />
+              Enable browser notifications
+            </label>
+          </div>
+
+          {state.notificationPermission === "denied" && (
+            <p className="notification-warning">
+              Notifications are blocked. Please update your browser settings.
+            </p>
+          )}
+
+          <div className="settings-popup-button-group">
+            <Button className="green" onClick={applySettings}>
+              Apply
+            </Button>
+            <Button className="red" onClick={toggleSettings}>
+              Cancel
+            </Button>
           </div>
         </div>
       )}
