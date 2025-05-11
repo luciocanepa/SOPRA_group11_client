@@ -76,12 +76,14 @@ const ManageGroup: React.FC = () => {
           name: group.name ?? undefined,
         });
       } catch (error) {
-        toast.error(
-            <div>
-              <strong>Error fetching group:</strong>
-              <div>{error.message || "An unknown error occurred."}</div>
-            </div>
-        );
+          const errorMessage =
+              error instanceof Error ? error.message : "An unknown error occurred.";
+          toast.error(
+              <div>
+                  <strong>Error fetching group:</strong>
+                  <div>{errorMessage}</div>
+              </div>
+          );
       }
     };
 
