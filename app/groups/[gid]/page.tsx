@@ -10,10 +10,10 @@ import { Button } from "antd";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { useApi } from "@/hooks/useApi";
 import { Group } from "@/types/group";
-//import { User } from "@/types/user";
 import { InviteUser } from "@/components/InviteUser";
 import Navbar from "@/components/Navbar";
 import { ChatBox } from "@/components/Chat";
+import ScheduledSessions from "@/components/ScheduledSessions";
 
 import "@/styles/pages/GroupPage.css";
 
@@ -86,7 +86,7 @@ export default function GroupPage() {
     const checkIfAdmin = async () => {
       if (!token || !localUserId) return;
       try {
-        const groupData: Group = await api.get<Group>(
+        const group: Group = await api.get<Group>(
           `/groups/${groupId}`,
           token,
         );
@@ -186,12 +186,17 @@ export default function GroupPage() {
           >
             {calendarOpen ? "-" : "+"} Plan Session
           </Button>
-
-          <button className="start" onClick={() => {
-            setCalendarOpen(true)}
-            }>
-            + Plan Session
-          </button>
+          {/* Calendar Modal */}
+          {calendarOpen && (
+            <CalendarAPI
+              isOpen={calendarOpen}
+              onClose={() => setCalendarOpen(false)}
+              groupName={group?.name || "Unnamed Group"}
+              userTimezone={user?.timezone || "Europe/Zurich"}
+              userId={user?.id || ""}
+              groupId={group?.id || 0}
+            />
+          )}
 
           {token && localUserId && group?.adminId === parseInt(localUserId) && (
             <Button
@@ -201,6 +206,9 @@ export default function GroupPage() {
               Manage Group ↗
             </Button>
           )}
+
+          <ScheduledSessions groupId={groupId} userTimezone={user?.timezone || "Europe/Zurich"}/>
+
         </div>
       </div>
       {!isRunning && (
@@ -216,33 +224,6 @@ export default function GroupPage() {
             <p>Please log in to access the chat</p>
           )}
         </div>
-      )}
-
-      {/* <Modal
-        open={inviteOpen}
-        title="Invite User"
-        onCancel={() => {
-          setInviteOpen(false);
-          setInviteKey((k) => k + 1);
-        }}
-        footer={null}
-        className="groupPage-modal"
-      >
-        <InviteUser
-          key={inviteFormKey}
-          groupId={groupId}
-          isVisible={inviteModalOpen}
-        />
-      </Modal>
-
-      {/* Calendar Modal */}
-      {calendarOpen && (
-        <CalendarAPI
-          isOpen={calendarOpen}
-          onClose={() => setCalendarOpen(false)}
-          groupName={group?.name || "Unnamed Group"}
-          userTimezone={user?.timezone || "Europe/Zurich"}
-        />
       )}
     </div>
   );

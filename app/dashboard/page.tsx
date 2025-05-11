@@ -8,7 +8,7 @@ import { Button, Card } from "antd";
 import React, { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 
-import "../styles/pages/Dashboard.css";
+import "../styles/pages/dashboard.css";
 
 interface Invitation {
   id: number;

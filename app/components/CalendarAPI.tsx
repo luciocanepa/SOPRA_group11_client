@@ -4,93 +4,41 @@ import { useState, useEffect } from "react";
 import { Modal, DatePicker, TimePicker, Form, Button } from "antd";
 import { gapi } from "gapi-script";
 import dayjs, { Dayjs } from "dayjs";
-import "@/styles/pages/edit.css";
-import "@/styles/pages/login.css";
-import "@/styles/pages/calendarAPI.css";
+import { useApi } from "@/hooks/useApi";
+import useLocalStorage from "@/hooks/useLocalStorage";
+import { useGoogleCalendar } from "@/hooks/useGoogleCalendarAPI";
+
+//import "@/styles/pages/edit.css";
+//import "@/styles/pages/login.css";
+//import "@/styles/pages/calendarAPI.css";
+//import "@/styles/pages/GroupPage.css";
 
 interface CalendarPlannerProps {
   isOpen: boolean;
   onClose: () => void;
   groupName: string;
   userTimezone: string;
+  userId: string
+  groupId: Number;
 }
 
-export function CalendarAPI({ isOpen, onClose, groupName, userTimezone }: CalendarPlannerProps) {
-  const [isSignedIn, setIsSignedIn] = useState(false);
+export function CalendarAPI({ isOpen, onClose, groupName, userTimezone, userId, groupId }: CalendarPlannerProps) {
   const [calendarView, setCalendarView] = useState<"init" | "form">("init");
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
   const [startTime, setStartTime] = useState<Dayjs | null>(null);
   const [endTime, setEndTime] = useState<Dayjs | null>(null);
+  const { isReady, isSignedIn, signInWithGoogle, logOutOfGoogle } = useGoogleCalendar();
 
-  const CLIENT_ID = "132315875574-t1suu2183q7vo2imc8qlfuqa0kenrpq3.apps.googleusercontent.com";
-  const SCOPES = "https://www.googleapis.com/auth/calendar.events";
+  const api = useApi();
+  const { value: token } = useLocalStorage<string>("token", "");
 
 
   useEffect(() => {
     if (isOpen) {
       resetCalendarForm();
     }
-    const initiateCalendarAPI = () => {
-        gapi.load("client:auth2", async () => {
-          try {
-            await gapi.client.init({
-              clientId: CLIENT_ID,
-              scope: SCOPES,
-              discoveryDocs: [
-                "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest",
-              ],
-            });
-      
-            await gapi.client.load("calendar", "v3");
-
-            const authInstance = gapi.auth2.getAuthInstance();
-            setIsSignedIn(authInstance.isSignedIn.get());
-
-            if (authInstance.isSignedIn.get()) {
-                setIsSignedIn(true);
-                setCalendarView("form");
-              }
-  
-      
-          } catch (error) {
-            console.error("Error initializing Google API client:", error);
-          }
-        });
-      };
-      initiateCalendarAPI();
 
   }, [isOpen]);
-
-  
-  const signInWithGoogle = async () => {
-    try {
-      const authInstance = gapi.auth2.getAuthInstance();
-      await authInstance.signIn();
-      setIsSignedIn(true);
-      const user = authInstance.currentUser.get();
-
-
-      const grantedScopes = user.getGrantedScopes();
-      console.log("Granted Scopes:", grantedScopes);
-
-    } catch (error) {
-      console.error("Google Sign-in error", error);
-      alert("Signing-in with Google failed.");
-    }
-  };
-
-  const logOutOfGoogle = async () => {
-    try {
-      const authInstance = gapi.auth2.getAuthInstance();
-      await authInstance.signOut();
-      setIsSignedIn(false);
-      alert("Signed out of Google.");
-    } catch (error) {
-      console.error("Google Sign-out error:", error);
-      alert("Sign-out failed.");
-    }
-  }
-
 
 
   const addEventToCalendar = async () => {
@@ -130,6 +78,16 @@ export function CalendarAPI({ isOpen, onClose, groupName, userTimezone }: Calend
         calendarId: "primary",
         resource: event,
       });
+
+      const data = {title: event.summary,
+                    description: event.description,
+                    startTime: event.start.dateTime,
+                    endTime: event.end.dateTime,
+                    }
+      console.log("data: ", data)
+
+      await api.post(`/calendar-entries/groups/${groupId}`, data, token);
+
       alert(`Study session successfully added to your calendar with regards to your timezone: ${userTimezone}`);
       onClose();
     } catch (error) {
