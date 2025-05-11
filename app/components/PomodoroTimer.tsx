@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "antd";
 import "../styles/components/Timer.css";
+import toast from "react-hot-toast";
 
 interface TimerSettings {
   session: number;
@@ -122,7 +123,6 @@ export function PomodoroTimer({
       try {
         new Notification(title, {
           body: options?.body || "",
-          icon: "/icons/timer-icon.png",
           ...options,
         });
       } catch (error) {
@@ -250,6 +250,8 @@ export function PomodoroTimer({
     }));
     const nowISO = new Date().toISOString();
     onTimerUpdate?.({ status: "ONLINE", startTime: nowISO, duration: initialSession * 60 });
+
+    toast.success("Timer has been successfully reset!");
   };
 
   const toggleSettings = () =>
@@ -281,6 +283,8 @@ export function PomodoroTimer({
       startTime: new Date().toISOString(),
       duration:  newSessionSec
     });
+
+    toast.success("Timer settings applied successfully!");
   };
 
 

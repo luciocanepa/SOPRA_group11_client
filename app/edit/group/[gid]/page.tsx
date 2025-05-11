@@ -3,13 +3,14 @@ import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import { Group } from "@/types/group";
-import { Button, Form, Input, message, Upload, Select } from "antd";
+import { Button, Form, Input, Upload, Select } from "antd";
 import { EditOutlined, UploadOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
 import Navbar from "@/components/Navbar";
 import "@/styles/pages/GroupEdit.css";
+import toast from "react-hot-toast";
 
 const ManageGroup: React.FC = () => {
   const router = useRouter();
@@ -39,7 +40,12 @@ const ManageGroup: React.FC = () => {
     };
 
     reader.onerror = (error) => {
-      message.error(`${file.name} upload failed.`);
+      toast.error(
+          <div>
+            <strong>Upload failed:</strong>
+            <div>{file.name} could not be uploaded.</div>
+          </div>
+      );
       console.error("Upload error:", error);
     };
   };
@@ -57,7 +63,12 @@ const ManageGroup: React.FC = () => {
         if (id === group.adminId) {
           setIsAuthorizedToEdit(true);
         } else {
-          message.error("You are not authorized to edit this profile.");
+          toast.error(
+              <div>
+                <strong>Unauthorized:</strong>
+                <div>You are not authorized to edit this profile.</div>
+              </div>
+          );
         }
 
         if (group.image) {
@@ -69,11 +80,19 @@ const ManageGroup: React.FC = () => {
         });
       } catch (error) {
         if (error instanceof Error) {
-          alert(
-            `Something went wrong while fetching the group:\n${error.message}`,
+          toast.error(
+              <div>
+                <strong>Error fetching group:</strong>
+                <div>{error.message}</div>
+              </div>
           );
         } else {
-          console.error("An unknown error occurred while fetching the group.");
+          toast.error(
+              <div>
+                <strong>Error:</strong>
+                <div>An unknown error occurred while fetching the group.</div>
+              </div>
+          );
         }
       }
     };
@@ -84,7 +103,12 @@ const ManageGroup: React.FC = () => {
   const handleGroupEdit = async () => {
     if (!token) return;
     if (!isAuthorizedToEdit) {
-      message.error("You are not authorized to edit this profile.");
+      toast.error(
+          <div>
+            <strong>Unauthorized:</strong>
+            <div>You are not authorized to edit this profile.</div>
+          </div>
+      );
       return;
     }
     try {
@@ -105,35 +129,53 @@ const ManageGroup: React.FC = () => {
 
       await apiService.put(`/groups/${gid}`, edits, token);
 
-      message.success("Group updated successfully");
+      toast.success(
+          <div>
+            <strong>Group updated successfully!</strong>
+          </div>
+      );
       setIsEdit({
         description: false,
         name: false,
       });
-      alert("Edit successful!");
+
       router.push(`/edit/group/${group?.id}`);
+
+
     } catch (error) {
-      message.error("Failed to update the group.");
+      toast.error(
+          <div>
+            <strong>Failed to update the group.</strong>
+          </div>
+      );
       console.error(error);
-      alert("Edit was unsuccessful!");
+
     }
   };
 
   const handleGroupDeletion = async () => {
-    const confirmDelete = window.confirm(
-      "Do you really want to delete your group?",
-    );
+    const confirmDelete = window.confirm("Do you really want to delete your group?");
     if (!confirmDelete) return;
 
     try {
       await apiService.delete(`/groups/${gid}`, token);
 
-      alert("Successful Deletion of your group!");
-      router.push(`/dashboard`);
+      toast.success(
+          <div>
+            <strong>Successful Deletion of your group!</strong>
+          </div>
+      );
+
+      setTimeout(() => {
+        router.push(`/dashboard`);
+      }, 800);
     } catch (error) {
-      message.error("Failed to delete the group.");
+      toast.error(
+          <div>
+            <strong>Failed to delete the group.</strong>
+          </div>
+      );
       console.error(error);
-      alert("The deletion of your group failed!");
     }
   };
 
@@ -158,13 +200,22 @@ const ManageGroup: React.FC = () => {
       );
       setGroup(updatedGroup);
 
-      message.success(
-        `User ${userToRemove.username} has been removed from the group.`,
+      toast.success(
+          <div>
+            <strong>User {userToRemove.username} has been removed from the group.</strong>
+          </div>
       );
+
     } catch (error) {
-      message.error("Failed to remove member.");
-      console.error(error);
-      alert("The member-removal failed!");
+      // Display error toast instead of alert and message.error
+      toast.error(
+          <div>
+            <strong>Failed to remove member.</strong>
+            <br />
+            Please try again later.
+          </div>
+      );
+      console.error("Error while removing user:", error);
     }
   };
 

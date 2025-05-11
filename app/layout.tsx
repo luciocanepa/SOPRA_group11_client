@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "@/styles/globals.css";
+import { Toaster } from 'react-hot-toast';
 
 export const metadata: Metadata = {
   title: "Pomodoro Study Room",
@@ -49,6 +50,7 @@ export default function RootLayout({
         > */}
         {children}
         {/* </ConfigProvider> */}
+        <Toaster position="top-center" reverseOrder={false} />
       </body>
     </html>
   );

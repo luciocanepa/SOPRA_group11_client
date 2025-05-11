@@ -23,8 +23,9 @@
     "process": "^0.11.10",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "sockjs-client": "^1.6.1",
-    "recharts": "^2.15.3"
+    "react-hot-toast": "^2.5.2",
+    "recharts": "^2.15.3",
+    "sockjs-client": "^1.6.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.0",

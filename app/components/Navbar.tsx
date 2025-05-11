@@ -6,6 +6,7 @@ import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
 
+import toast from "react-hot-toast";
 import "../styles/module.css";
 import "../styles/components/Navbar.css";
 
@@ -40,17 +41,21 @@ export default function Navbar({ user }: { user: User | null }) {
         {},
         token,
       );
+      toast.success("Logged out successfully! \n Redirecting to Login Page.");
     } catch (error) {
       if (error instanceof Error) {
-        alert(`Something went wrong while logging out:\n${error.message}`);
+        // alert(`Something went wrong while logging out:\n${error.message}`);
+        toast.error(`Logout failed: ${error.message}`);
       } else {
-        console.error("Logout has failed");
+        // console.error("Logout has failed");
+        toast.error("Logout failed: Unknown error occurred.");
       }
     }
-
     clearToken();
     clearId();
-    router.push("/login");
+    setTimeout(() => {
+      router.push("/login");
+    }, 800);
   };
   return (
     <div className="navbar-container">

@@ -7,6 +7,7 @@ import Link from "next/link";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
 import { JSX } from "react";
+import toast from "react-hot-toast";
 
 import "../styles/module.css";
 
@@ -36,14 +37,34 @@ const Login: () => JSX.Element = () => {
       if (response && response.token && response.id) {
         setToken(response.token);
         setUserId(response.id);
-        console.log("Login successful! Redirecting to dashboard.");
-        router.push("/dashboard");
+        // console.log("Login successful! Redirecting to dashboard.");
+        toast.success(
+            <div>
+              <div><strong>Login successful!</strong></div>
+              <div>Redirecting to Dashboard.</div>
+            </div>
+        );
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 800);
       }
     } catch (error) {
       if (error instanceof Error) {
-        console.error("Login failed:", error.message);
+        // console.error("Login failed:", error.message);
+        toast.error(
+            <div>
+              <div><strong>Login failed:</strong></div>
+              <div>User not found or wrong password.</div>
+            </div>
+        );
       } else {
-        console.error("An unknown error occurred during login.");
+        // console.error("An unknown error occurred during login.");
+        toast.error(
+            <div>
+              <div><strong>Login failed:</strong></div>
+              <div>Unknown error</div>
+            </div>
+        );
       }
     }
   };
