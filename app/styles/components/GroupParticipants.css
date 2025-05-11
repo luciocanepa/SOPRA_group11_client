@@ -1,6 +1,7 @@
 .group-members-container {
   width: 30vw;
-  height: 55vh;
+  min-height: 45vh;
+  max-height: 45vh;
 
   display: flex;
   flex-direction: column;
@@ -12,4 +13,10 @@
 .group-members-container h2 {
   margin: 20px 0 10px 0;
   text-align: center;
+}
+
+.group-members-table .ant-table-body {
+  height: calc(45vh - 150px);
+  overflow-y: scroll;
+  scrollbar-width: none;
 }

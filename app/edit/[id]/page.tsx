@@ -10,7 +10,6 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 import dayjs from "dayjs";
 import moment from "moment-timezone";
 import Navbar from "@/components/Navbar";
-import "@/styles/pages/ProfileManagement.css";
 
 const timezones = moment.tz.names();
 

@@ -11,6 +11,7 @@
   background-color: var(--bg-secondary);
 
   border-radius: 20px;
+  margin-bottom: 10px;
 }
 
 .form {

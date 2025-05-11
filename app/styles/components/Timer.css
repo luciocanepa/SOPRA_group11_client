@@ -1,6 +1,7 @@
 .timer-container {
   width: calc(30vw + 40px);
-  max-height: 55vh;
+  min-height: 25vh;
+  max-height: 45vh;
 
   padding: 20px;
 
@@ -16,9 +17,7 @@
 .timer-container h3 {
   margin-bottom: 10px 0 20px 0;
 
-  /* background-color: green; */
   text-align: center;
-
   font-size: 1rem;
 }
 
@@ -52,12 +51,13 @@
 }
 
 .fullscreen-button {
-  background-color: transparent;
-  color: var(--text-primary);
-  font-size: 1.5rem;
-  border: none;
-  position: fixed;
-  margin-left: calc(30vw - 40px);
+  background-color: transparent !important;
+  color: var(--text-primary) !important;
+  font-size: 1.5rem !important;
+  border: none !important;
+  box-shadow: none !important;
+  position: fixed !important;
+  margin-left: calc(30vw - 40px) !important;
 }
 
 .fullscreen-button:hover {
@@ -70,7 +70,7 @@
 
 .fullscreen {
   width: 90vw;
-  min-height: 55vh;
+  min-height: 45vh;
   max-height: 90vh;
   position: fixed;
   top: 10vh;
@@ -86,7 +86,7 @@
 
 .fullscreen .timer-display {
   width: 70vw !important;
-  height: 45vh !important;
+  height: 35vh !important;
 }
 
 .fullscreen .timer-display {
@@ -98,14 +98,19 @@
 }
 
 .fullscreen .fullscreen-button {
-  margin-left: calc(70vw - 40px);
-  margin-bottom: calc(40vh + 40px);
+  margin-left: calc(70vw - 40px) !important;
+  margin-bottom: calc(40vh + 40px) !important;
 }
 
 .fullscreen .settings-popup {
   width: 40vw !important;
+  height: 38vh !important;
+
   align-self: flex-start;
+  justify-content: flex-start;
+
   margin-left: calc(10vw - 20px);
+  margin-top: 40px;
 }
 
 .timer-button-group {
@@ -123,8 +128,10 @@
 }
 
 .settings-popup {
+  min-height: 100px;
   margin-top: 20px;
   width: 100%;
+  height: 20vh;
 
   display: flex;
   flex-direction: column;
@@ -146,7 +153,6 @@
   border: 1px solid var(--border-primary);
   border-radius: 5px;
   padding: 5px;
-  /* width: 100px; */
 }
 
 .settings-row .settings-popup h3 {

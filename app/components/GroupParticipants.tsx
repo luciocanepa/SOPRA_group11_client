@@ -100,6 +100,8 @@ export function GroupParticipants({
           rowKey="id"
           loading={loading}
           pagination={false}
+          // scroll={{ y: "calc(45vh - 150px)" }}
+          sticky={true}
         />
       )}
     </div>

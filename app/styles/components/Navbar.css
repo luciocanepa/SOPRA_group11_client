@@ -11,6 +11,10 @@
   margin-bottom: 20px;
 
   background-color: var(--bg-secondary);
+
+  position: sticky !important;
+  top: 0;
+  z-index: 100;
 }
 
 .navbar-container-left {

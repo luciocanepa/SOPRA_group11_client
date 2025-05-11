@@ -7,7 +7,7 @@ import { User } from "@/types/user";
 import { Button, Card } from "antd";
 import React, { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
-
+import Image from "next/image";
 import "../styles/pages/dashboard.css";
 
 interface Invitation {
@@ -29,29 +29,29 @@ const Dashboard: React.FC = () => {
   const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
   const [loggedInUserGroups, setLoggedInUserGroups] = useState<Group[]>([]);
   const [invitations, setInvitations] = useState<Invitation[]>([]);
-  const [previousInvitations, setPreviousInvitations] = useState<number[]>([]);
 
   const handleAcceptInvitation = async (invitationId: number) => {
     if (!token || !id) return;
 
     try {
       await apiService.put<void>(
-          `/invitations/${invitationId}/accept`,
-          {},
-          token,
+        `/invitations/${invitationId}/accept`,
+        {},
+        token,
       );
 
       setInvitations(
-          invitations.filter((invitation) => invitation.id !== invitationId),
+        invitations.filter((invitation) => invitation.id !== invitationId),
       );
 
       // Remove from previously notified IDs
-      const notifiedIds = JSON.parse(localStorage.getItem("notifiedInvitations") || "[]");
-      localStorage.setItem(
-          "notifiedInvitations",
-          JSON.stringify(notifiedIds.filter((id: number) => id !== invitationId))
+      const notifiedIds = JSON.parse(
+        localStorage.getItem("notifiedInvitations") || "[]",
       );
-
+      localStorage.setItem(
+        "notifiedInvitations",
+        JSON.stringify(notifiedIds.filter((id: number) => id !== invitationId)),
+      );
     } catch (error) {
       if (error instanceof Error) {
         console.error("Error accepting invitation:", error.message);
@@ -66,22 +66,23 @@ const Dashboard: React.FC = () => {
 
     try {
       await apiService.put<void>(
-          `/invitations/${invitationId}/reject`,
-          {},
-          token,
+        `/invitations/${invitationId}/reject`,
+        {},
+        token,
       );
 
       setInvitations(
-          invitations.filter((invitation) => invitation.id !== invitationId),
+        invitations.filter((invitation) => invitation.id !== invitationId),
       );
 
       // Remove from previously notified IDs
-      const notifiedIds = JSON.parse(localStorage.getItem("notifiedInvitations") || "[]");
-      localStorage.setItem(
-          "notifiedInvitations",
-          JSON.stringify(notifiedIds.filter((id: number) => id !== invitationId))
+      const notifiedIds = JSON.parse(
+        localStorage.getItem("notifiedInvitations") || "[]",
       );
-
+      localStorage.setItem(
+        "notifiedInvitations",
+        JSON.stringify(notifiedIds.filter((id: number) => id !== invitationId)),
+      );
     } catch (error) {
       if (error instanceof Error) {
         console.error("Error declining invitation:", error.message);
@@ -160,18 +161,17 @@ const Dashboard: React.FC = () => {
       if (!token || !id) return;
 
       try {
-        const fetchedInvitations: Invitation[] = await apiService.get<Invitation[]>(
-            `/users/${id}/invitations`,
-            token
-        );
+        const fetchedInvitations: Invitation[] = await apiService.get<
+          Invitation[]
+        >(`/users/${id}/invitations`, token);
 
         // Here we load previously notified IDs from localStorage (so we dont get notified for things we've seen already)
         const notifiedIds: number[] = JSON.parse(
-            localStorage.getItem("notifiedInvitationIds") || "[]"
+          localStorage.getItem("notifiedInvitationIds") || "[]",
         );
 
         const newInvitations = fetchedInvitations.filter(
-            (inv) => !notifiedIds.includes(inv.id)
+          (inv) => !notifiedIds.includes(inv.id),
         );
 
         // notification for each -new- invitation
@@ -186,14 +186,22 @@ const Dashboard: React.FC = () => {
         // Here the state and the localStorage get updated with all seen invitation IDs
         setInvitations(fetchedInvitations);
         const updatedIds = [
-          ...new Set([...notifiedIds, ...fetchedInvitations.map((inv) => inv.id)]),
+          ...new Set([
+            ...notifiedIds,
+            ...fetchedInvitations.map((inv) => inv.id),
+          ]),
         ];
-        localStorage.setItem("notifiedInvitationIds", JSON.stringify(updatedIds));
+        localStorage.setItem(
+          "notifiedInvitationIds",
+          JSON.stringify(updatedIds),
+        );
       } catch (error) {
         if (error instanceof Error) {
           console.error("Error fetching invitations:", error.message);
         } else {
-          console.error("An unknown error occurred while fetching invitations.");
+          console.error(
+            "An unknown error occurred while fetching invitations.",
+          );
         }
       }
     };
@@ -226,88 +234,81 @@ const Dashboard: React.FC = () => {
           {invitations.length > 0 && (
             <>
               <h3>Your invitations:</h3>
-              <div className="dashboard-grid">
+              <div>
                 {invitations.map((invitation) => (
-                  <div
+                  <Card
                     key={invitation.id}
-                    className="card-wrapper invitation-card-wrapper"
+                    className="line-card invitation-card"
                   >
-                    <Card className="line-card">
-                      {invitation.groupName}
-                      <div className="invitation-card-button-container">
-                        <Button
-                          id="accept"
-                          className="green"
-                          onClick={() => handleAcceptInvitation(invitation.id)}
-                        >
-                          Accept
-                        </Button>
+                    <p>{invitation.groupName}</p>
+                    <div className="invitation-card-button-container">
+                      <Button
+                        id="accept"
+                        className="green"
+                        onClick={() => handleAcceptInvitation(invitation.id)}
+                      >
+                        Accept
+                      </Button>
 
-                        <Button
-                          id="reject"
-                          className="red"
-                          onClick={() => handleDeclineInvitation(invitation.id)}
-                        >
-                          Decline
-                        </Button>
-                      </div>
-                    </Card>
-                  </div>
-                  // <div key={invitation.id} className="invitation-card-wrapper">
-                  //   <a className="invitation-card">{invitation.groupName}</a>
-                  //   <button
-                  //     id="accept"
-                  //     onClick={() => handleAcceptInvitation(invitation.id)}
-                  //   >
-                  //     Accept
-                  //   </button>
-                  //   <button
-                  //     id="reject"
-                  //     onClick={() => handleDeclineInvitation(invitation.id)}
-                  //   >
-                  //     Decline
-                  //   </button>
-                  // </div>
+                      <Button
+                        id="reject"
+                        className="red"
+                        onClick={() => handleDeclineInvitation(invitation.id)}
+                      >
+                        Decline
+                      </Button>
+                    </div>
+                  </Card>
                 ))}
               </div>
             </>
           )}
           <h3>Your Groups:</h3>
-          <div className="dashboard-grid">
+          <div>
             {loggedInUserGroups && loggedInUserGroups.length > 0 ? (
               <>
                 {loggedInUserGroups.map((group) => (
-                  <div key={group.id} className="card-wrapper">
-                    <Card
-                      className="line-card"
-                      onClick={() => router.push(`/groups/${group.id}`)}
-                    >
-                      {group.name}
-                    </Card>
-                  </div>
-                ))}
-                <div className="card-wrapper">
                   <Card
+                    key={group.id}
                     className="line-card"
-                    onClick={() => router.push("/groups")}
+                    onClick={() => router.push(`/groups/${group.id}`)}
                   >
-                    <div className="create-group-aligning">
-                      <span>+ Create New Group</span>
-                    </div>
+                    {group?.image && (
+                      <Image
+                        className="group-image"
+                        src={`data:image/png;base64,${group?.image}`}
+                        alt="Profile"
+                        width={40}
+                        height={40}
+                      />
+                    )}
+                    {!group?.image && (
+                      <Image
+                        className="group-image"
+                        src={"/group_tomato.JPG"}
+                        alt="Profile"
+                        width={40}
+                        height={40}
+                      />
+                    )}
+                    <p id="group-name">{group.name}</p>
+                    <p id="group-description">{group.description}</p>
                   </Card>
-                </div>
-              </>
-            ) : (
-              <div className="card-wrapper">
+                ))}
                 <Card
                   className="line-card"
                   onClick={() => router.push("/groups")}
                 >
-                  <div className="create-group-aligning">
-                    <span>+ Create New Group</span>
-                  </div>
+                  <div className="group-name">+ Create New Group </div>
                 </Card>
-              </div>
+              </>
+            ) : (
+              <Card
+                className="line-card"
+                onClick={() => router.push("/groups")}
+              >
+                <div className="group-name">+ Create New Group </div>
+              </Card>
             )}
           </div>
         </Card>

@@ -160,9 +160,6 @@ export default function GroupPage() {
       </div>
       {!isRunning && (
         <div className="group-chat-section">
-          {/* <div className="chat-header" style={{ fontSize: "1.5rem", fontWeight: "bold" }}>
-                        Group Chat
-                    </div> */}
           {isLoadingUser ? (
             <p>Loading chat...</p>
           ) : username && localUserId ? (
@@ -172,29 +169,6 @@ export default function GroupPage() {
           )}
         </div>
       )}
-
-      {/* <Modal
-        open={inviteOpen}
-        title="Invite User"
-        onCancel={() => {
-          setInviteOpen(false);
-          setInviteKey((k) => k + 1);
-        }}
-        footer={null}
-        className="groupPage-modal"
-      >
-        <InviteUser key={inviteKey} groupId={groupId} isVisible={inviteOpen} />
-      </Modal> */}
-
-      {/* <Modal
-        open={calendarOpen}
-        title="Plan Study Session"
-        onCancel={() => setCalendarOpen(false)}
-        footer={null}
-        className="groupPage-modal"
-      >
-        
-      </Modal> */}
     </div>
   );
 }
