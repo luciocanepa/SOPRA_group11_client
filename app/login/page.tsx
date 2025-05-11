@@ -7,7 +7,8 @@ import Link from "next/link";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
 import { JSX } from "react";
-import "../styles/pages/login.css";
+
+import "../styles/module.css";
 
 interface LoginForm {
   username: string;
@@ -48,16 +49,15 @@ const Login: () => JSX.Element = () => {
   };
 
   return (
-    <div className="login-page">
-      <div className="login-container">
+    <div className="single-page-container">
+      <div className="form-container">
         <h2 className="login-title">Pomodoro Study Room</h2>
         <Form<LoginForm>
           form={form}
           name="login"
-          size="large"
           onFinish={handleLogin}
           layout="vertical"
-          className="login-form"
+          className="form"
         >
           <div className="form-group">
             <Form.Item
@@ -96,14 +96,14 @@ const Login: () => JSX.Element = () => {
               <div style={{ display: "flex", gap: "20px", width: "100%" }}>
                 <button
                   type="submit"
-                  className="login-button"
+                  className="button primary"
                   style={{ flex: 1 }}
                 >
                   Login
                 </button>
                 <Link
                   href="/register"
-                  className="signup-button"
+                  className="button link"
                   style={{ flex: 1, display: "flex", justifyContent: "center" }}
                 >
                   Go to Sign Up
@@ -111,7 +111,7 @@ const Login: () => JSX.Element = () => {
               </div>
             </Form.Item>
           </div>
-          <p className="signup-prompt">No account yet?</p>
+          {/* <p className="signup-prompt">No account yet?</p> */}
         </Form>
       </div>
     </div>

@@ -1,0 +1,60 @@
+.form-container {
+  min-width: 40vw;
+  max-width: 40vw;
+  min-height: fit-content;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+
+  background-color: var(--bg-secondary);
+
+  border-radius: 20px;
+  margin-bottom: 10px;
+}
+
+.form {
+  width: 30vw;
+  height: fit-content;
+}
+
+.form-container h2,
+.form h2 {
+  margin: 20px 0 20px 0;
+}
+
+.profile-image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  height: 100px;
+  margin-top: 20px;
+}
+
+.form img {
+  width: 100px !important;
+  height: 100px !important;
+  border-radius: 50%;
+
+  margin: 0;
+}
+
+.form-final-button-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 60%;
+  margin: auto auto 0 auto;
+}
+
+.card {
+  width: 30vw;
+  height: fit-content;
+  margin: 20px auto;
+
+  background-color: var(--bg-secondary);
+  border: none;
+  box-shadow: 5px 5px 0 2px rgba(255, 255, 255, 0.624);
+}

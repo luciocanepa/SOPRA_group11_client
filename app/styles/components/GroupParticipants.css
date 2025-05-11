@@ -1,0 +1,22 @@
+.group-members-container {
+  width: 30vw;
+  min-height: 45vh;
+  max-height: 45vh;
+
+  display: flex;
+  flex-direction: column;
+
+  background-color: var(--bg-secondary);
+  border-radius: 10px;
+}
+
+.group-members-container h2 {
+  margin: 20px 0 10px 0;
+  text-align: center;
+}
+
+.group-members-table .ant-table-body {
+  height: calc(45vh - 150px);
+  overflow-y: scroll;
+  scrollbar-width: none;
+}

@@ -1,18 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { ConfigProvider, theme } from "antd";
-import { AntdRegistry } from "@ant-design/nextjs-registry";
 import "@/styles/globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Student XX-XXX-XXX",
@@ -26,10 +13,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <ConfigProvider
+      <body className={"page"}>
+        {/* <ConfigProvider
           theme={{
-            algorithm: theme.defaultAlgorithm,
+            algorithm: theme.compactAlgorithm,
             token: {
               // general theme options are set in token, meaning all primary elements (button, menu, ...) will have this color
               colorPrimary: "#22426b", // selected input field boarder will have this color as well
@@ -59,9 +46,9 @@ export default function RootLayout({
               Card: {},
             },
           }}
-        >
-          <AntdRegistry>{children}</AntdRegistry>
-        </ConfigProvider>
+        > */}
+        {children}
+        {/* </ConfigProvider> */}
       </body>
     </html>
   );
