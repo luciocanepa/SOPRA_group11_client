@@ -116,7 +116,7 @@ export function useGroupParticipants(
                 ? msg.startTime
                 : msg.startTime + "Z";
             const start   = new Date(ts);
-            const running = msg.status === "WORK";
+            const running = msg.status === "WORK" || msg.status === "BREAK" ;
 
             setParticipants(ps =>
                 ps.map(u => u.id === uid ? { ...u, status: msg.status } : u)
