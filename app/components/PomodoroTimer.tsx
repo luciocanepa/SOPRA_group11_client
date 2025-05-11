@@ -25,12 +25,7 @@ export interface PomodoroTimerProps {
   initialSession?: number;
   initialBreak?: number;
   onTimerStatusChange: (isRunning: boolean) => void;
-  onTimerUpdate?: (info: {
-    status: "WORK" | "BREAK";
-    startTime: string;
-    duration: number;
-  }) => void;
-  fullscreen?: boolean;
+  onTimerUpdate?: (info: { status: "WORK" | "BREAK" | "ONLINE"; startTime: string; duration: number }) => void;
 }
 
 export function PomodoroTimer({
@@ -235,7 +230,7 @@ export function PomodoroTimer({
 
     const nowISO = new Date().toISOString();
     onTimerUpdate?.({
-      status: "BREAK",
+      status: "ONLINE",
       startTime: nowISO,
       duration: state.timeLeft,
     });
@@ -253,11 +248,7 @@ export function PomodoroTimer({
       timeLeft: prev.activeSettings.session * 60,
     }));
     const nowISO = new Date().toISOString();
-    onTimerUpdate?.({
-      status: "BREAK",
-      startTime: nowISO,
-      duration: initialSession * 60,
-    });
+    onTimerUpdate?.({ status: "ONLINE", startTime: nowISO, duration: initialSession * 60 });
   };
 
   const toggleSettings = () =>
@@ -271,20 +262,26 @@ export function PomodoroTimer({
   };
 
   const applySettings = () => {
-    setState((prev) => ({
+    // snapshot the new session in seconds
+    const newSessionSec = state.settings.session * 60;
+
+    // update your own timer display
+    setState(prev => ({
       ...prev,
       activeSettings: prev.settings,
-      timeLeft: prev.settings.session * 60,
-      isSession: true,
-      showSettings: false,
+      timeLeft:       newSessionSec,
+      isSession:      true,
+      showSettings:   false,
     }));
-    const nowISO = new Date().toISOString();
+
+    // fire your server update so the WS broadcast comes back
     onTimerUpdate?.({
-      status: "WORK",
-      startTime: nowISO,
-      duration: state.settings.session * 60,
+      status:    "ONLINE",
+      startTime: new Date().toISOString(),
+      duration:  newSessionSec
     });
   };
+
 
   return (
     <div className={`timer-container ${fullScreen ? "fullscreen" : ""}`}>
