@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "@/styles/globals.css";
 
 export const metadata: Metadata = {
-  title: "Student XX-XXX-XXX",
+  title: "Pomodoro Study Room",
   description: "sopra-fs25-template-client",
 };
 

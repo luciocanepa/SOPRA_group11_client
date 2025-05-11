@@ -26,6 +26,7 @@ export interface PomodoroTimerProps {
   initialBreak?: number;
   onTimerStatusChange: (isRunning: boolean) => void;
   onTimerUpdate?: (info: { status: "WORK" | "BREAK" | "ONLINE"; startTime: string; duration: number }) => void;
+  fullscreen?: boolean;
 }
 
 export function PomodoroTimer({
