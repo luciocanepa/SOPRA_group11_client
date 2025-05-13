@@ -5,6 +5,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Client, IMessage } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { useApi } from "@/hooks/useApi";
+import { getApiDomain } from "@/utils/domain";
 
 export interface Participant {
     id: number;
@@ -23,7 +24,7 @@ interface GroupUserDTO {
     username: string;
     status: Participant["status"];
     startTime: string;  // ISO string from backend
-    duration: string;   // ISO8601 “PT##M##S”
+    duration: string;   // ISO8601 "PT##M##S"
 }
 
 interface GroupResponse {
@@ -136,9 +137,7 @@ export function useGroupParticipants(
     useEffect(() => {
         if (!token || typeof window === "undefined") return;
 
-        const backend = window.location.hostname === "localhost"
-            ? "http://localhost:8080"
-            : window.location.origin;
+        const backend = getApiDomain();
 
         const sock   = new SockJS(`${backend}/ws`);
         const client = new Client({

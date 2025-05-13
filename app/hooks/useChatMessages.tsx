@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Client, IMessage } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
+import { getApiDomain } from "@/utils/domain";
 
 interface ReceivedMessage {
   type: string;
@@ -59,10 +60,7 @@ export function useChatMessages(groupId: string, token: string | null) {
   useEffect(() => {
     if (!token || typeof window === "undefined") return;
 
-    const backendHost =
-      window.location.hostname === "localhost"
-        ? "http://localhost:8080"
-        : window.location.origin;
+    const backendHost = getApiDomain();
 
     const socket = new SockJS(`${backendHost}/ws`);
     const client = new Client({
