@@ -6,7 +6,7 @@ import { Form, Input } from "antd";
 import Link from "next/link";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
-import { JSX } from "react";
+import { JSX, useState } from "react";
 import toast from "react-hot-toast";
 
 import "../styles/module.css";
@@ -24,7 +24,11 @@ const Login: () => JSX.Element = () => {
   const { set: setToken } = useLocalStorage<string>("token", "");
   const { set: setUserId } = useLocalStorage<string>("id", "");
 
+  const [enabled, setEnabled] = useState(true);
+
   const handleLogin = async (values: LoginForm) => {
+    if (!enabled) return;
+    setEnabled(false);
     try {
       const response = await apiService.post<User>(
         "/users/login",
@@ -49,6 +53,7 @@ const Login: () => JSX.Element = () => {
         }, 800);
       }
     } catch (error) {
+      setEnabled(true);
       if (error instanceof Error) {
         // console.error("Login failed:", error.message);
         toast.error(
@@ -112,7 +117,7 @@ const Login: () => JSX.Element = () => {
             </Form.Item>
           </div>
 
-          <div className="button-group">
+          <div className={`button-group ${enabled ? "" : "disabled"}`}>
             <Form.Item style={{ width: "100%" }}>
               <div style={{ display: "flex", gap: "20px", width: "100%" }}>
                 <button
