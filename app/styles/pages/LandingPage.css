@@ -51,7 +51,7 @@ header p {
     margin-bottom: 2.5rem;
 }
 
-.secondary.ant-btn {
+.login-register-button {
     background-color: #ffffff;
     color: #000000;
     width: 8rem;
@@ -64,6 +64,10 @@ header p {
     box-shadow: 5px 5px 0 2px rgba(255, 255, 255, 0.624)
 }
 
+.login-register-button:hover{
+    color: #000000 !important;
+    background-color: #E4E4E4FF !important;
+}
 
 .content-columns {
     display: flex;

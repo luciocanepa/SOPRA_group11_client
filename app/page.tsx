@@ -67,13 +67,13 @@ export default function LandingPage() {
             take breaks together, and build better work habits - collaboratively.
           </p>
           <div className="button-container">
-            <Button className="secondary">
+            <Button className="login-register-button">
               <Link href="/login" onClick={() => router.push("/login")}>
                 Login
               </Link>
             </Button>
 
-            <Button className="secondary">
+            <Button className="login-register-button">
               <Link href="/register" onClick={() => router.push("/register")}>
                 Register
               </Link>
