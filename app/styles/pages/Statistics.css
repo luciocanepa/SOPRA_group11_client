@@ -1,7 +1,7 @@
 .statistics-card {
-  width: 90vw;
-  height: 10vh;
-  margin-top: 0;
+  width: 90vw !important; 
+  height: 10vh !important;
+  margin-top: 0 !important;
 }
 
 .statistics-card .ant-card-body {
@@ -9,7 +9,7 @@
 }
 
 .statistics-header {
-  width: calc(90vw - 40px);
+  width: calc(90vw - 40px) !important;
   height: 10vh;
 
   display: flex;

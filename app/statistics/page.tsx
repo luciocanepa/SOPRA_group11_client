@@ -45,12 +45,9 @@ export default function Statistics() {
   const { value: token } = useLocalStorage<string>("token", "");
   const { value: id } = useLocalStorage<string>("id", "");
   const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
-  const [currentWeek, setCurrentWeek] = useState<WeekRange>(
-    getCurrentWeekRange(),
-  );
-  const [mode, setMode] = useState<"user" | "group">("user");
+  const [currentWeek, setCurrentWeek] = useState<WeekRange>(getCurrentWeekRange(),);
   const [groups, setGroups] = useState<Group[]>([]);
-  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(groups.length > 0 ? groups[0].id : null);
+  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [groupActivityData, setGroupActivityData] = useState<GroupActivity[]>([]);
 
   // Get current week range (Monday to Sunday)
@@ -63,6 +60,19 @@ export default function Statistics() {
     end.setDate(start.getDate() + 6);
     return { start, end };
   }
+
+  //get color over hash
+  const stringToColor = (str: string) => {
+    str = str + "x7H!k";
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    
+    // Generate colors with fixed saturation and lightness
+    const h = Math.abs(hash) % 360;
+    return `hsl(${h}, 80%, 60%)`;
+  };
 
   // Format week range for display
   const weekRangeDisplay = useMemo(() => {
@@ -80,35 +90,26 @@ export default function Statistics() {
 
   // Prepare chart data
   const chartData = useMemo(() => {
-    const days = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
-    const currentDate = new Date(currentWeek.start);
-
-    return days.map((day, index) => {
-      const date = new Date(currentDate);
-      date.setDate(currentDate.getDate() + index);
-      const dateString = date.toISOString().split("T")[0];
-      const activity = activities.find((a) => a.date === dateString);
-
-      return {
-        day,
-        duration: activity ? activity.duration : 0, // Convert to hours
-        fullDate: formatDate(date),
-        hasData: !!activity,
-      };
-    });
-  }, [activities, currentWeek]);
-
-  const groupChartData = useMemo(() => {
-  if (mode !== "group") return [];
-
   const days = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
   const currentDate = new Date(currentWeek.start);
 
-  return days.map((dayLabel, index) => {
+  return days.map((day, index) => {
     const date = new Date(currentDate);
     date.setDate(currentDate.getDate() + index);
     const dateString = date.toISOString().split("T")[0];
-
+    
+    // Show user data when no group is selected
+    if (!selectedGroupId) {
+      const activity = activities.find((a) => a.date === dateString);
+      return {
+        day,
+        duration: activity ? activity.duration : 0,
+        fullDate: formatDate(date),
+        hasData: !!activity,
+      };
+    }
+    
+    // Show group data when a group is selected
     const userDurations: Record<string, number> = {};
     groupActivityData.forEach((user) => {
       const activity = user.aggregatedActivities.find((a) => a.date === dateString);
@@ -116,12 +117,12 @@ export default function Statistics() {
     });
 
     return {
-      day: dayLabel,
+      day,
       fullDate: formatDate(date),
-      ...userDurations, // Spread usernames as keys with durations
+      ...userDurations,
     };
   });
-}, [groupActivityData, currentWeek, mode]);
+}, [activities, currentWeek, selectedGroupId, groupActivityData]);
 
   // Handle week navigation
   const handleWeekChange = (direction: "prev" | "next") => {
@@ -165,12 +166,11 @@ export default function Statistics() {
   }, [id, token, apiService]);
 
   useEffect(() => {
-    if (mode === "user" || !token) return;
+    if (!token) return;
     const fetchGroups = async () => {
       try {
         const data = await apiService.get<Group[]>(`/groups`,token);
         setGroups(data);
-        if (data.length > 0) setSelectedGroupId(data[0].id);
       } catch (error) {
         if (error instanceof Error) {
           alert(`Something went wrong while getting Groups:\n${error.message}`);
@@ -180,11 +180,11 @@ export default function Statistics() {
       }
     };
     fetchGroups();
-  },[mode,token, apiService]);
+  },[token, apiService]);
 
   useEffect(() => {
   const fetchGroupActivities = async () => {
-    if (mode !== "group" || !selectedGroupId || !token) return;
+    if (!selectedGroupId || !token) return;
 
     try {
       const start = currentWeek.start.toISOString().split("T")[0];
@@ -205,7 +205,7 @@ export default function Statistics() {
   };
 
   fetchGroupActivities();
-}, [mode, selectedGroupId, currentWeek, token]);
+}, [selectedGroupId, currentWeek, token]);
 
   return (
     <>
@@ -216,33 +216,18 @@ export default function Statistics() {
           <div className="statistics-header">
             <h2>Work Time Statistics</h2>
             <div className="mode-toggle">
-              <Button
-                className="green"
-                disabled={mode === "user"}
-                onClick={() => setMode("user")}
-              >
-                User
-              </Button>
-              <Button
-                className="red"
-                disabled={mode === "group"}
-                onClick={() => setMode("group")}
-              >
-                Group
-              </Button>
-              {mode === "group" && (
-                <Select
-                  className="select"
-                  value = {selectedGroupId}
-                  onChange={(groupId) => setSelectedGroupId(groupId)}
-                  options={groups.map((group) => ({
+              <Select
+                className="select"
+                value = {selectedGroupId}
+                onChange={(groupId) => setSelectedGroupId(groupId)}
+                options={[{label: "my statistics", value: null},
+                  ...groups.map((group) => ({
                     label: group.name,
                     value: group.id,
-                  }))}
-                />
-              )}
-              
-              </div> 
+                  }))
+                ]}
+              />
+            </div> 
             <div className="week-navigation">
               <Button
                 className="secondary"
@@ -263,7 +248,7 @@ export default function Statistics() {
         <div className="chart-container shadow">
           <div style={{ height: "300px" }}>
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={mode === "user" ? chartData : groupChartData}>
+              <BarChart data={chartData}>
                 <XAxis dataKey="day" />
                 <YAxis
                   label={{
@@ -275,13 +260,11 @@ export default function Statistics() {
                 <Tooltip
                   formatter={(value, name) => [`${value} minutes`, name]}
                   labelFormatter={(label) => {
-                    const data = (mode === "user" ? chartData : groupChartData).find(
-                      (d) => d.day === label,
-                    );
+                    const data = chartData.find((d) => d.day === label);
                     return data?.fullDate || label;
                   }}
                 />
-                {mode === "user" ? (
+                {!selectedGroupId ? (
                   <Bar dataKey="duration" name="Work Duration">
                     {chartData.map((entry, index) => (
                       <Cell
@@ -292,16 +275,21 @@ export default function Statistics() {
                     ))}
                   </Bar>
                 ): (
-                  groupActivityData.map((user) => (
-                    <Bar
-                      key={user.username}
-                      dataKey={user.username}
-                      name={user.username}
-                    />
-                      
-                  ))
+                    groupActivityData.map((user) => (
+                      <Bar
+                        key={user.username}
+                        dataKey={user.username}
+                        name={user.username}
+                      >
+                        {chartData.map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={stringToColor(user.username)}
+                          />
+                        ))}
+                      </Bar>
+                    ))
                   )}
-                
               </BarChart>
             </ResponsiveContainer>
           </div>
