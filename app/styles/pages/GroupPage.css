@@ -163,6 +163,10 @@
   margin: 5px 0;
 }
 
+.group-chat-section.hidden {
+  display: none;
+}
+
 .message {
   display: flex;
   flex-direction: row;

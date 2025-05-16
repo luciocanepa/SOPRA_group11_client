@@ -31,13 +31,18 @@ export default function GroupPage() {
   const [inviteOpen, setInviteOpen] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
-
+  const [isSession, setIsSession] = useState(true);
+  const isBreak = isRunning && !isSession;
   // For chat
   const [username, setUsername] = useState<string>("");
   const [isLoadingUser, setIsLoadingUser] = useState(true);
 
   const handleStatus = useCallback((running: boolean) => {
     setIsRunning(running);
+  }, []);
+
+  const handleSessionStatus = useCallback((session: boolean) => {
+    setIsSession(session);
   }, []);
 
   const handleUpdate = useCallback(
@@ -114,9 +119,10 @@ export default function GroupPage() {
           }}
         >
           <PomodoroTimer
-            onTimerStatusChange={handleStatus}
-            onTimerUpdate={handleUpdate}
-            fullscreen={false}
+              onTimerStatusChange={handleStatus}
+              onTimerUpdate={handleUpdate}
+              onSessionStatusChange={handleSessionStatus}
+              fullscreen={false}
           />
         </div>
 
@@ -158,17 +164,19 @@ export default function GroupPage() {
           )}
         </div>
       </div>
-      {!isRunning && (
-        <div className="group-chat-section">
-          {isLoadingUser ? (
+      <div
+          className={`group-chat-section ${
+              isRunning && !isBreak ? "hidden" : ""
+          }`}
+      >
+        {isLoadingUser ? (
             <p>Loading chat...</p>
-          ) : username && localUserId ? (
+        ) : username && localUserId ? (
             <ChatBox groupId={groupId} userId={localUserId} />
-          ) : (
+        ) : (
             <p>Please log in to access the chat</p>
-          )}
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
