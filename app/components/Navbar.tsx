@@ -1,4 +1,4 @@
-import { Button } from "antd";
+import { Button, Modal } from "antd";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -6,6 +6,7 @@ import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
 
+import InfoCarousel from "@/components/Info";
 import toast from "react-hot-toast";
 import "../styles/module.css";
 import "../styles/components/Navbar.css";
@@ -23,6 +24,7 @@ export default function Navbar({ user }: { user: User | null }) {
   const [loggedInUser, setLoggedInUser] = useState<User | null>(user);
 
   const [buttonEnabled, setButtonEnabled] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     if (!id || !token || user) return;
@@ -96,6 +98,13 @@ export default function Navbar({ user }: { user: User | null }) {
         >
           Dashboard
         </Button>
+          <Button
+              className="button secondary"
+              onClick={() => setIsModalOpen(true)}
+              style={{ marginLeft: "18px" }}
+          >
+            Info
+          </Button>
       </div>
       <div className="navbar-user-container">
         {loggedInUser && (
@@ -133,6 +142,24 @@ export default function Navbar({ user }: { user: User | null }) {
           </Button>
         </div>
       </div>
+
+      <Modal
+          open={isModalOpen}
+          onCancel={() => setIsModalOpen(false)}
+          footer={null}
+          width={600}
+          centered
+          styles={{
+            body: {
+              padding: "1.5rem",
+              height: "380px",
+              overflowY: "auto",
+            },
+          }}
+          destroyOnClose
+      >
+        <InfoCarousel />
+      </Modal>
     </div>
   );
 }
