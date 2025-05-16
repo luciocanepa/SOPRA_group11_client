@@ -326,37 +326,79 @@ export function PomodoroTimer({
           <div className="settings-row">
             <label htmlFor="session-input">Session (minutes):</label>
             <input
-              min="1"
-              step="1"
               id="session-input"
-              type="number"
-              value={state.settings.session}
-              onChange={(e) =>
-                updateSettings({
-                  session: Math.max(1, Math.floor(Number(e.target.value) || 1)),
-                })
+            type="text"
+            value={String(state.settings.session)}
+            className={
+              !state.settings.session || state.settings.session < 1
+                  ? "timer-input-error"
+                  : ""
+            }
+            onChange={(e) => {
+              const val = e.target.value;
+              // Allow empty input while typing
+              if (val === "") {
+                updateSettings({ session: 0 });
+              } else if (/^\d+$/.test(val)) {
+                updateSettings({ session: Math.floor(Number(val)) });
               }
+            }}
+            onBlur={(e) => {
+              const val = e.target.value.trim();
+              const num = Number(val);
+              if (!val || isNaN(num) || num < 1) {
+                updateSettings({ session: 0 });
+              } else {
+                updateSettings({ session: Math.floor(num) });
+              }
+            }}
+            placeholder="Enter minutes"
             />
           </div>
 
           <div className="settings-row">
             <label htmlFor="break-input">Break (minutes):</label>
             <input
-              min="1"
-              step="1"
               id="break-input"
-              type="number"
-              value={state.settings.break}
-              onChange={(e) =>
-                updateSettings({
-                  break: Math.max(1, Math.floor(Number(e.target.value) || 1)),
-                })
+            type="text"
+            value={String(state.settings.break)}
+            className={
+              !state.settings.break || state.settings.break < 1
+                  ? "timer-input-error"
+                  : ""
+            }
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val === "") {
+                updateSettings({ break: 0 });
+              } else if (/^\d+$/.test(val)) {
+                updateSettings({ break: Math.floor(Number(val)) });
               }
+                }}
+                onBlur={(e) => {
+                  const val = e.target.value.trim();
+                  const num = Number(val);
+                  if (!val || isNaN(num) || num < 1) {
+                    updateSettings({ break: 0 });
+                  } else {
+                    updateSettings({ break: Math.floor(num) });
+                  }
+                }}
+                placeholder="Enter minutes"
             />
           </div>
 
           <div className="settings-popup-button-group">
-            <Button className="green" onClick={applySettings}>
+            <Button
+                className="green"
+                onClick={() => {
+                  if (state.settings.session < 1 || state.settings.break < 1) {
+                    toast.error("Input a number ≥1 in both fields.");
+                    return;
+                  }
+                  applySettings();
+                }}
+            >
               Apply
             </Button>
             <Button className="red" onClick={toggleSettings}>

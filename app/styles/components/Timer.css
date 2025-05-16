@@ -162,3 +162,7 @@
 .settings-popup-button-group button {
   margin-right: 10px;
 }
+
+.timer-input-error {
+  background-color: #ffe6e6;
+}
