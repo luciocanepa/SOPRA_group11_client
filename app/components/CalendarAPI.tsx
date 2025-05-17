@@ -7,11 +7,16 @@ import dayjs, { Dayjs } from "dayjs";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { useGoogleCalendar } from "@/hooks/useGoogleCalendarAPI";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 
-//import "@/styles/pages/edit.css";
+import "@/styles/globals.css";
 //import "@/styles/pages/login.css";
 //import "@/styles/pages/calendarAPI.css";
 //import "@/styles/pages/GroupPage.css";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 interface CalendarPlannerProps {
   isOpen: boolean;
@@ -23,7 +28,7 @@ interface CalendarPlannerProps {
 }
 
 export function CalendarAPI({ isOpen, onClose, groupName, userTimezone, userId, groupId }: CalendarPlannerProps) {
-  const [calendarView, setCalendarView] = useState<"init" | "form">("init");
+  //const [calendarView, setCalendarView] = useState<"init" | "form">("init");
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
   const [startTime, setStartTime] = useState<Dayjs | null>(null);
   const [endTime, setEndTime] = useState<Dayjs | null>(null);
@@ -79,12 +84,26 @@ export function CalendarAPI({ isOpen, onClose, groupName, userTimezone, userId, 
         resource: event,
       });
 
-      const data = {title: event.summary,
-                    description: event.description,
-                    startTime: event.start.dateTime,
-                    endTime: event.end.dateTime,
-                    }
-      console.log("data: ", data)
+
+      const startCreatorTimezone = dayjs.tz(
+        `${selectedDate?.format("YYYY-MM-DD")}T${startTime?.format("HH:mm")}`,
+        userTimezone
+      );
+      
+      const endCreatorTimezone = endTime
+        ? dayjs.tz(`${selectedDate?.format("YYYY-MM-DD")}T${endTime?.format("HH:mm")}`, userTimezone)
+        : startCreatorTimezone.add(1, "hour");
+      
+      const startZhDefault = startCreatorTimezone.tz("Europe/Zurich");
+      const endZhDefault = endCreatorTimezone.tz("Europe/Zurich");
+      
+      const data = {
+        title: event.summary,
+        description: event.description,
+        startTime: startZhDefault.format("YYYY-MM-DDTHH:mm:ss"),
+        endTime: endZhDefault.format("YYYY-MM-DDTHH:mm:ss"),
+      };
+      
 
       await api.post(`/calendar-entries/groups/${groupId}`, data, token);
 
@@ -105,45 +124,35 @@ export function CalendarAPI({ isOpen, onClose, groupName, userTimezone, userId, 
 
 
   return (
-    <Modal
-      open={isOpen}
-      title="Plan your next Study Session"
-      onCancel={onClose}
-      footer={null}
-      className="groupPage-modal"
-    >
+    <div className="group-dashboard-actions-container">
+      <h4>Plan your next Study Session</h4>
       {!isSignedIn ? (
         <div>
           <p>Sign in to get a direct access to your Google Calendar</p>
-          <Button className= "button" onClick={signInWithGoogle}>Sign in with Google</Button>
-        </div>
-      ) : calendarView === "init" ? (
-        <div className = "button-row">
-          <button className = "button"onClick={() => setCalendarView("form")}>Schedule Session</button>
-          <button className = "button"onClick={logOutOfGoogle}>Log out of Google</button>
+          <Button className="secondary" onClick={signInWithGoogle}>
+            Sign in with Google
+          </Button>
         </div>
       ) : (
         <Form layout="vertical">
           <Form.Item label="Date">
             <DatePicker onChange={(date) => setSelectedDate(date)} style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item label="Start Time">
-            <TimePicker onChange={(time) => setStartTime(time)} format="HH:mm" style={{ width: "100%" }} />
-          </Form.Item>
-          <Form.Item label="End Time (optional)">
-            <TimePicker onChange={(time) => setEndTime(time)} format="HH:mm" style={{ width: "100%" }} />
-          </Form.Item>
-          <div className = "button-row">
-            <button className = "button" type="button" onClick={addEventToCalendar}>Add to Calendar</button>
-            <button className = "button" type="button" onClick={() => setCalendarView("init")}>Back</button>
+          <div style={{ display: "flex", gap: "16px" }}>
+            <Form.Item label="Start Time" style={{ flex: "1" }}>
+              <TimePicker onChange={(time) => setStartTime(time)} format="HH:mm" style={{ width: "100%" }} />
+            </Form.Item>
+            <Form.Item label="End Time (optional)" style={{ flex: "1" }}>
+              <TimePicker onChange={(time) => setEndTime(time)} format="HH:mm" style={{ width: "100%" }} />
+            </Form.Item>
+          </div>
+          <div style={{ display: "flex", gap: "16px", marginTop: "12px" }}>
+            <Button className = "secondary" onClick={addEventToCalendar} style={{ flex: "1" }}>Add to Calendar</Button>
+            <Button className = "secondary" onClick={logOutOfGoogle} style={{ flex: "1" }}>Log out of Google</Button>
           </div>
         </Form>
       )}
-    </Modal>
+    </div>
   );
 }
-
-
-
-
 

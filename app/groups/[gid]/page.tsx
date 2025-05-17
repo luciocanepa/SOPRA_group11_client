@@ -37,6 +37,7 @@ export default function GroupPage() {
   const [user, setUser] = useState<User | null>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const [plannedSessionsOpen, setPlannedSessionsOpen] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [isGroupOwner, setIsGroupOwner] = useState(false);
 
@@ -171,6 +172,7 @@ export default function GroupPage() {
             onClick={() => {
               setInviteOpen(!inviteOpen);
               setCalendarOpen(false);
+              setPlannedSessionsOpen(false);
             }}
           >
             {inviteOpen ? "-" : "+"} Invite Users
@@ -182,11 +184,11 @@ export default function GroupPage() {
             onClick={() => {
               setCalendarOpen(!calendarOpen);
               setInviteOpen(false);
+              setPlannedSessionsOpen(false);
             }}
           >
             {calendarOpen ? "-" : "+"} Plan Session
           </Button>
-          {/* Calendar Modal */}
           {calendarOpen && (
             <CalendarAPI
               isOpen={calendarOpen}
@@ -198,6 +200,26 @@ export default function GroupPage() {
             />
           )}
 
+
+          <Button
+            className="secondary"
+            onClick={() => {
+              setPlannedSessionsOpen(!plannedSessionsOpen);
+              setCalendarOpen(false);
+              setInviteOpen(false);
+            }}
+          >
+          {plannedSessionsOpen ? "-" : "+"} View Upcoming Study Sessions
+          </Button>
+          {plannedSessionsOpen && (
+            <ScheduledSessions
+              isOpen={plannedSessionsOpen} 
+              //onClose={() => setPlannedSessionsOpen(false)}
+              groupId={groupId}
+              userTimezone={user?.timezone || "Europe/Zurich"}
+            />
+          )}
+
           {token && localUserId && group?.adminId === parseInt(localUserId) && (
             <Button
               className="secondary"
@@ -206,8 +228,6 @@ export default function GroupPage() {
               Manage Group ↗
             </Button>
           )}
-
-          <ScheduledSessions groupId={groupId} userTimezone={user?.timezone || "Europe/Zurich"}/>
 
         </div>
       </div>
