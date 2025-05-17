@@ -1,4 +1,4 @@
-import { Button } from "antd";
+import { Button, Modal } from "antd";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -6,6 +6,8 @@ import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
 
+import InfoCarousel from "@/components/Info";
+import toast from "react-hot-toast";
 import "../styles/module.css";
 import "../styles/components/Navbar.css";
 
@@ -21,6 +23,9 @@ export default function Navbar({ user }: { user: User | null }) {
 
   const [loggedInUser, setLoggedInUser] = useState<User | null>(user);
 
+  const [buttonEnabled, setButtonEnabled] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   useEffect(() => {
     if (!id || !token || user) return;
     const fetchUser = async () => {
@@ -31,6 +36,8 @@ export default function Navbar({ user }: { user: User | null }) {
   }, [id, token, apiService, user]);
 
   const handleLogout = async () => {
+    if (!buttonEnabled) return;
+    setButtonEnabled(false);
     console.log("logging out");
     console.log(loggedInUser);
     if (!loggedInUser) return;
@@ -40,17 +47,22 @@ export default function Navbar({ user }: { user: User | null }) {
         {},
         token,
       );
+      toast.success("Logged out successfully! \n Redirecting to Login Page.");
     } catch (error) {
+      setButtonEnabled(true);
       if (error instanceof Error) {
-        alert(`Something went wrong while logging out:\n${error.message}`);
+        // alert(`Something went wrong while logging out:\n${error.message}`);
+        toast.error(`Logout failed: ${error.message}`);
       } else {
-        console.error("Logout has failed");
+        // console.error("Logout has failed");
+        toast.error("Logout failed: Unknown error occurred.");
       }
     }
-
     clearToken();
     clearId();
-    router.push("/login");
+    setTimeout(() => {
+      router.push("/login");
+    }, 800);
   };
   return (
     <div className="navbar-container">
@@ -86,6 +98,13 @@ export default function Navbar({ user }: { user: User | null }) {
         >
           Dashboard
         </Button>
+          <Button
+              className="button secondary"
+              onClick={() => setIsModalOpen(true)}
+              style={{ marginLeft: "18px" }}
+          >
+            Info
+          </Button>
       </div>
       <div className="navbar-user-container">
         {loggedInUser && (
@@ -110,7 +129,7 @@ export default function Navbar({ user }: { user: User | null }) {
           </>
         )}
 
-        <div className="navbar-button-container">
+        <div className={`navbar-button-container ${buttonEnabled ? "" : "disabled"}`}>
           <Button
             className="button secondary"
             id="navbar-profile-button"
@@ -118,11 +137,29 @@ export default function Navbar({ user }: { user: User | null }) {
           >
             Edit profile
           </Button>
-          <Button className="red" onClick={handleLogout}>
+          <Button className="red" onClick={handleLogout} disabled={!buttonEnabled}>
             Logout
           </Button>
         </div>
       </div>
+
+      <Modal
+          open={isModalOpen}
+          onCancel={() => setIsModalOpen(false)}
+          footer={null}
+          width={600}
+          centered
+          styles={{
+            body: {
+              padding: "1.5rem",
+              height: "380px",
+              overflowY: "auto",
+            },
+          }}
+          destroyOnClose
+      >
+        <InfoCarousel />
+      </Modal>
     </div>
   );
 }

@@ -3,13 +3,14 @@ import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import { Group } from "@/types/group";
-import { Button, Form, Input, message, Upload, Select } from "antd";
+import { Button, Form, Input, Upload, Select } from "antd";
 import { EditOutlined, UploadOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
 import Navbar from "@/components/Navbar";
 import "@/styles/pages/GroupEdit.css";
+import toast from "react-hot-toast";
 
 const ManageGroup: React.FC = () => {
   const router = useRouter();
@@ -39,7 +40,12 @@ const ManageGroup: React.FC = () => {
     };
 
     reader.onerror = (error) => {
-      message.error(`${file.name} upload failed.`);
+      toast.error(
+          <div>
+            <strong>Upload failed:</strong>
+            <div>{file.name} could not be uploaded.</div>
+          </div>
+      );
       console.error("Upload error:", error);
     };
   };
@@ -47,17 +53,19 @@ const ManageGroup: React.FC = () => {
   useEffect(() => {
     if (!gid || !token || !id) return;
 
-    console.log("checkpoint1");
     const fetchingGroup = async () => {
       try {
         const group = await apiService.get<Group>(`/groups/${gid}`, token);
         setGroup(group);
-        console.log("id:", id);
-        console.log("admin id:", group?.adminId);
-        if (id === group.adminId) {
+        if (id === group?.adminId) {
           setIsAuthorizedToEdit(true);
         } else {
-          message.error("You are not authorized to edit this profile.");
+          toast.error(
+              <div>
+                <strong>Unauthorized:</strong>
+                <div>You are not authorized to edit this profile.</div>
+              </div>
+          );
         }
 
         if (group.image) {
@@ -68,13 +76,14 @@ const ManageGroup: React.FC = () => {
           name: group.name ?? undefined,
         });
       } catch (error) {
-        if (error instanceof Error) {
-          alert(
-            `Something went wrong while fetching the group:\n${error.message}`,
+          const errorMessage =
+              error instanceof Error ? error.message : "An unknown error occurred.";
+          toast.error(
+              <div>
+                  <strong>Error fetching group:</strong>
+                  <div>{errorMessage}</div>
+              </div>
           );
-        } else {
-          console.error("An unknown error occurred while fetching the group.");
-        }
       }
     };
 
@@ -82,14 +91,18 @@ const ManageGroup: React.FC = () => {
   }, [gid, token, id, apiService, form]);
 
   const handleGroupEdit = async () => {
-    if (!token) return;
-    if (!isAuthorizedToEdit) {
-      message.error("You are not authorized to edit this profile.");
+  if (!token) return;
+  if (!isAuthorizedToEdit) {
+      toast.error(
+          <div>
+              <strong>Unauthorized:</strong>
+              <div>You are not authorized to edit this profile.</div>
+          </div>
+      );
       return;
-    }
+  }
     try {
       const values = form.getFieldsValue();
-
       const edits: Partial<Group> = {};
 
       if (values.description !== group?.description) {
@@ -105,36 +118,70 @@ const ManageGroup: React.FC = () => {
 
       await apiService.put(`/groups/${gid}`, edits, token);
 
-      message.success("Group updated successfully");
+      toast.success(
+          <div>
+            <strong>Group updated successfully!</strong>
+          </div>
+      );
       setIsEdit({
         description: false,
         name: false,
       });
-      alert("Edit successful!");
+
       router.push(`/edit/group/${group?.id}`);
     } catch (error) {
-      message.error("Failed to update the group.");
+      toast.error(
+          <div>
+            <strong>Failed to update the group.</strong>
+          </div>
+      );
       console.error(error);
-      alert("Edit was unsuccessful!");
     }
   };
 
+  const confirmWithToast = (message: string, onConfirm: () => void) => {
+    toast.custom((t) => (
+        <div className="toast-container">
+          <p><strong>{message}</strong></p>
+          <div>
+            <button
+                onClick={() => {
+                  onConfirm();
+                  toast.dismiss(t.id);
+                }}
+            >
+              Confirm
+            </button>
+            <button onClick={() => toast.dismiss(t.id)}>Cancel</button>
+          </div>
+        </div>
+    ));
+
+  };
+
   const handleGroupDeletion = async () => {
-    const confirmDelete = window.confirm(
-      "Do you really want to delete your group?",
-    );
-    if (!confirmDelete) return;
+    confirmWithToast("Do you really want to delete your group?", async () => {
+      try {
+        await apiService.delete(`/groups/${gid}`, token);
 
-    try {
-      await apiService.delete(`/groups/${gid}`, token);
+        toast.success(
+            <div>
+              <strong>Successful Deletion of your group!</strong>
+            </div>
+        );
 
-      alert("Successful Deletion of your group!");
-      router.push(`/dashboard`);
-    } catch (error) {
-      message.error("Failed to delete the group.");
-      console.error(error);
-      alert("The deletion of your group failed!");
-    }
+        setTimeout(() => {
+          router.push(`/dashboard`);
+        }, 800);
+      } catch (error) {
+        toast.error(
+            <div>
+              <strong>Failed to delete the group.</strong>
+            </div>
+        );
+        console.error(error);
+      }
+    });
   };
 
   const handleUserRemoval = async (userId: string) => {
@@ -143,165 +190,166 @@ const ManageGroup: React.FC = () => {
     const userToRemove = group.users.find((u) => u.id === userId);
     if (!userToRemove) return;
 
-    const confirmRemoval = window.confirm(
-      `Are you sure you want to remove ${userToRemove.username} from the group?`,
+    confirmWithToast(
+        `Are you sure you want to remove ${userToRemove.username} from the group?`,
+        async () => {
+          try {
+            await apiService.delete(`/groups/${group.id}/users/${userId}`, token);
+            setRemovedUsers([...removedUsers, userToRemove]);
+
+            const updatedGroup = await apiService.get<Group>(
+                `/groups/${group.id}`,
+                token
+            );
+            setGroup(updatedGroup);
+
+            toast.success(
+                <div>
+                  <strong>User {userToRemove.username} has been removed from the group.</strong>
+                </div>
+            );
+          } catch (error) {
+            toast.error(
+                <div>
+                  <strong>Failed to remove member.</strong>
+                  <br />
+                  Please try again later.
+                </div>
+            );
+            console.error("Error while removing user:", error);
+          }
+        }
     );
-    if (!confirmRemoval) return;
-
-    try {
-      await apiService.delete(`/groups/${group.id}/users/${userId}`, token);
-      setRemovedUsers([...removedUsers, userToRemove]);
-
-      const updatedGroup = await apiService.get<Group>(
-        `/groups/${group.id}`,
-        token,
-      );
-      setGroup(updatedGroup);
-
-      message.success(
-        `User ${userToRemove.username} has been removed from the group.`,
-      );
-    } catch (error) {
-      message.error("Failed to remove member.");
-      console.error(error);
-      alert("The member-removal failed!");
-    }
   };
 
   return (
-    <div className="page-container">
-      <Navbar user={null} />
-      <div className="form-container">
-        <Form
-          form={form}
-          name="group management"
-          size="large"
-          variant="outlined"
-          onFinish={handleGroupEdit}
-          layout="vertical"
-          className="form"
-        >
-          <div className="profile-image-container">
-            <Image
-              src={
-                uploadedImage
-                  ? `data:image/png;base64,${uploadedImage}`
-                  : "/group_tomato.JPG"
-              }
-              alt="Profile"
-              // className="profile-image"
-              width={150}
-              height={150}
-              unoptimized={!!uploadedImage}
-            />
-          </div>
-          <h2>Group Management</h2>
-
-          <Form.Item
-            name="name"
-            label="Name"
-            rules={[
-              { required: false, message: "Please input your new group name" },
-            ]}
+      <div className="page-container">
+        <Navbar user={null} />
+        <div className="form-container">
+          <Form
+              form={form}
+              name="group management"
+              size="large"
+              variant="outlined"
+              onFinish={handleGroupEdit}
+              layout="vertical"
+              className="form"
           >
-            <Input
-              disabled={!isEdit.name}
-              placeholder="Enter a new group name"
-              suffix={
-                <EditOutlined
-                  className="edit-icon"
-                  onClick={() => setIsEdit((prev) => ({ ...prev, name: true }))}
-                />
-              }
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="description"
-            label="Description"
-            rules={[{ required: false, message: "Please describe your group" }]}
-          >
-            <Input
-              disabled={!isEdit.description}
-              placeholder="Describe your group"
-              suffix={
-                <EditOutlined
-                  className="edit-icon"
-                  onClick={() =>
-                    setIsEdit((prev) => ({ ...prev, description: true }))
+            <div className="profile-image-container">
+              <Image
+                  src={
+                    uploadedImage
+                        ? `data:image/png;base64,${uploadedImage}`
+                        : "/group_tomato.JPG"
                   }
-                />
-              }
-            />
-          </Form.Item>
-
-          <Form.Item name="profilePicture" label="Group Picture">
-            <Upload
-              name="logo"
-              beforeUpload={(file) => {
-                uploadingImage(file);
-                return false;
-              }}
-            >
-              <Button
-                className="groupCreation-upload"
-                icon={<UploadOutlined />}
-              >
-                Upload Group Picture
-              </Button>
-            </Upload>
-          </Form.Item>
-
-          <div className="form-final-button-container">
-            <Form.Item>
-              <Button htmlType="submit" className="green">
-                Save
-              </Button>
-            </Form.Item>
-
-            <Form.Item>
-              <Button
-                className="red"
-                onClick={() => router.push(`/groups/${gid}`)}
-              >
-                Cancel
-              </Button>
-            </Form.Item>
-          </div>
-          <Form.Item label="Remove Member From Group">
-            <Select
-              placeholder="Select a member to remove"
-              className="removal-dropdown"
-              value={selectedUserId}
-              onChange={(value) => {
-                handleUserRemoval(value);
-                setSelectedUserId(null);
-              }}
-              allowClear
-            >
-              {group?.users
-                ?.filter((user) => user.id !== group.adminId)
-                .map((user) => (
-                  <Select.Option key={user.id} value={user.id}>
-                    {user.username}
-                  </Select.Option>
-                ))}
-            </Select>
-            <div className="removed-users-container">
-              {removedUsers.map((user) => (
-                <p key={user.id}>{user.username} successfully removed</p>
-              ))}
+                  alt="Profile"
+                  width={150}
+                  height={150}
+                  unoptimized={!!uploadedImage}
+              />
             </div>
-          </Form.Item>
+            <h2>Group Management</h2>
 
-          <Form.Item>
-            <Button className="red" onClick={handleGroupDeletion}>
-              Delete your Group
-            </Button>
-          </Form.Item>
-        </Form>
+            <Form.Item
+                name="name"
+                label="Name"
+                rules={[{ required: false, message: "Please input your new group name" }]}
+            >
+              <Input
+                  disabled={!isEdit.name}
+                  placeholder="Enter a new group name"
+                  suffix={
+                    <EditOutlined
+                        className="edit-icon"
+                        onClick={() => setIsEdit((prev) => ({ ...prev, name: true }))}
+                    />
+                  }
+              />
+            </Form.Item>
+
+            <Form.Item
+                name="description"
+                label="Description"
+                rules={[{ required: false, message: "Please describe your group" }]}
+            >
+              <Input
+                  disabled={!isEdit.description}
+                  placeholder="Describe your group"
+                  suffix={
+                    <EditOutlined
+                        className="edit-icon"
+                        onClick={() =>
+                            setIsEdit((prev) => ({ ...prev, description: true }))
+                        }
+                    />
+                  }
+              />
+            </Form.Item>
+
+            <Form.Item name="profilePicture" label="Group Picture">
+              <Upload
+                  name="logo"
+                  beforeUpload={(file) => {
+                    uploadingImage(file);
+                    return false;
+                  }}
+              >
+                <Button className="groupCreation-upload" icon={<UploadOutlined />}>
+                  Upload Group Picture
+                </Button>
+              </Upload>
+            </Form.Item>
+
+            <div className="form-final-button-container">
+              <Form.Item>
+                <Button htmlType="submit" className="green">
+                  Save
+                </Button>
+              </Form.Item>
+
+              <Form.Item>
+                <Button
+                    className="red"
+                    onClick={() => router.push(`/groups/${gid}`)}
+                >
+                  Cancel
+                </Button>
+              </Form.Item>
+            </div>
+            <Form.Item label="Remove Member From Group">
+              <Select
+                  placeholder="Select a member to remove"
+                  className="removal-dropdown"
+                  value={selectedUserId}
+                  onChange={(value) => {
+                    handleUserRemoval(value);
+                    setSelectedUserId(null);
+                  }}
+                  allowClear
+              >
+                {group?.users
+                    ?.filter((user) => user.id !== group.adminId)
+                    .map((user) => (
+                        <Select.Option key={user.id} value={user.id}>
+                          {user.username}
+                        </Select.Option>
+                    ))}
+              </Select>
+              <div className="removed-users-container">
+                {removedUsers.map((user) => (
+                    <p key={user.id}>{user.username} successfully removed</p>
+                ))}
+              </div>
+            </Form.Item>
+
+            <Form.Item>
+              <Button className="red" onClick={handleGroupDeletion}>
+                Delete your Group
+              </Button>
+            </Form.Item>
+          </Form>
+        </div>
       </div>
-    </div>
   );
 };
 

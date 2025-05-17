@@ -3,14 +3,14 @@ import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import { User } from "@/types/user";
-import { Button, Form, Input, message, Select, Upload, DatePicker } from "antd";
+import { Button, Form, Input, Select, Upload, DatePicker } from "antd";
 import { EditOutlined, UploadOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import dayjs from "dayjs";
 import moment from "moment-timezone";
 import Navbar from "@/components/Navbar";
-import "@/styles/pages/ProfileManagement.css";
+import toast from "react-hot-toast";
 
 const timezones = moment.tz.names();
 
@@ -50,9 +50,13 @@ const ManageProfile: React.FC = () => {
       setUploadedImage(base64String);
     };
 
-    reader.onerror = (error) => {
-      message.error(`${file.name} upload failed.`);
-      console.error("Upload error:", error);
+    reader.onerror = () => {
+      toast.error(
+          <div>
+              <div><strong>Upload failed:</strong></div>
+              <div>{file.name} could not be uploaded.</div>
+          </div>
+      );
     };
   };
 
@@ -65,7 +69,12 @@ const ManageProfile: React.FC = () => {
         if (token === user.token) {
           setIsAuthorizedToEdit(true);
         } else {
-          message.error("You are not authorized to edit this profile.");
+          toast.error(
+              <div>
+                <div><strong>Access Denied:</strong></div>
+                <div>You are not authorized to edit this profile.</div>
+              </div>
+          );
         }
         if (user.profilePicture) {
           setUploadedImage(user.profilePicture);
@@ -79,13 +88,21 @@ const ManageProfile: React.FC = () => {
           timezone: user.timezone ?? undefined,
         });
       } catch (error) {
-        if (error instanceof Error) {
-          alert(
-            `Something went wrong while fetching the user:\n${error.message}`,
-          );
-        } else {
-          console.error("An unknown error occurred while fetching the user.");
-        }
+          if (error instanceof Error) {
+              toast.error(
+                  <div>
+                      <div><strong>Failed to fetch user:</strong></div>
+                      <div>{error.message}</div>
+                  </div>
+              );
+          } else {
+              toast.error(
+                  <div>
+                      <div><strong>Failed to fetch user:</strong></div>
+                      <div>An unknown error occurred.</div>
+                  </div>
+              );
+          }
       }
     };
 
@@ -94,10 +111,15 @@ const ManageProfile: React.FC = () => {
 
   const handleUserEdit = async () => {
     if (!token) return;
-    console.log(form.getFieldsValue());
+    // console.log(form.getFieldsValue());
     if (!isAuthorizedToEdit) {
-      console.log("not authorized");
-      message.error("You are not authorized to edit this profile.");
+      // console.log("not authorized");
+      toast.error(
+          <div>
+            <div><strong>Unauthorized:</strong></div>
+            <div>You are not authorized to edit this profile.</div>
+          </div>
+      );
       return;
     }
     try {
@@ -126,10 +148,15 @@ const ManageProfile: React.FC = () => {
       if (uploadedImage) {
         edits.profilePicture = uploadedImage;
       }
-      console.log("edits before sending", edits);
+      // console.log("edits before sending", edits);
       await apiService.put(`/users/${user?.id}`, edits, token);
 
-      message.success("Profile updated successfully");
+      toast.success(
+          <div>
+            <div><strong>Profile updated successfully!</strong></div>
+            <div>Your changes have been saved.</div>
+          </div>
+      );
       setIsEdit({
         username: false,
         name: false,
@@ -137,13 +164,21 @@ const ManageProfile: React.FC = () => {
         birthday: false,
         timezone: false,
       }); // reset editable state
-      alert("Edit successful!");
+      // toast.success(
+      //     <div>
+      //       <div><strong>Edit successful!</strong></div>
+      //       <div>Redirecting back to your profile.</div>
+      //     </div>
+      // );
       router.push(`/edit/${user?.id}`);
     } catch (error) {
-      message.error("Failed to update profile");
-      console.error(error);
-      alert(
-        "Edit was not successful! Most likely because the username is already taken.",
+        console.error(error);
+      toast.error(
+          <div>
+            <div><strong>Profile update failed:</strong></div>
+            <div>Username may already be taken.</div>
+            <div>Please try a different one.</div>
+          </div>
       );
     }
   };

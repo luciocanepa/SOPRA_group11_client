@@ -33,7 +33,10 @@ export function GroupParticipants({
   }, []);
 
   // Format remaining time, pausing when not running
-  const formatRemaining = (timer: TimerInfo) => {
+  const formatRemaining = (timer: TimerInfo, status: Participant['status'] )=> {
+    if (status === 'ONLINE' || status === 'OFFLINE') {
+      return '—';
+    }
     if (!timer.running) {
       // paused: show static remaining
       const m = Math.floor(timer.duration / 60)
@@ -56,7 +59,7 @@ export function GroupParticipants({
     const timer = timers[user.id];
     return {
       ...user,
-      timeRemaining: timer ? formatRemaining(timer) : "—",
+      timeRemaining: timer ? formatRemaining(timer, user.status) : '—'
     };
   });
 
@@ -100,6 +103,8 @@ export function GroupParticipants({
           rowKey="id"
           loading={loading}
           pagination={false}
+          // scroll={{ y: "calc(45vh - 150px)" }}
+          sticky={true}
         />
       )}
     </div>

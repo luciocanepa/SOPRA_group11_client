@@ -26,13 +26,19 @@
   font-family: "Poppins", sans-serif;
 }
 
+html,
+body {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
 .page {
   min-width: 100vw;
   max-width: 100vw;
   min-height: 100vh;
-  max-height: 100vh;
+  /* max-height: 100vh; */
   overflow-x: hidden;
-  overflow-y: hidden;
+  /* overflow-y: hidden; */
 
   background-color: var(--bg-primary);
 }
@@ -49,7 +55,9 @@
   min-width: 100vw;
   max-width: 100vw;
   min-height: 90vh;
-  max-height: 90vh;
+  /* max-height: 90vh; */
+
+  margin-bottom: 20px !important;
 
   display: flex;
   flex-direction: column;
@@ -138,4 +146,9 @@ body {
   border: none !important;
   color: var(--text-primary) !important;
   cursor: pointer;
+}
+
+
+.disabled button {
+  opacity: 0.5;
 }

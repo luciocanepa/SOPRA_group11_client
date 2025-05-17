@@ -19,36 +19,49 @@
   border-radius: 10px;
 }
 
-.line-card {
-  width: 100%;
-}
-
-.card-wrapper .ant-card-body {
-  border-radius: 10px;
-  transition: background-color 0.4s ease;
-}
-
-.card-wrapper:hover .ant-card-body {
-  cursor: pointer;
-  background-color: var(--bg-secondary-hover);
-  border-radius: 10px;
-}
-
-.invitation-card-wrapper .ant-card-body {
-  min-width: 100%;
-
+.line-card .ant-card-body {
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: flex-start;
+}
+
+.line-card {
+  margin-bottom: 10px !important;
+}
+
+.line-card .ant-card-body:hover {
+  background-color: var(--bg-secondary-hover);
+  cursor: pointer;
+}
+
+.invitation-card .ant-card-body:hover {
+  background-color: var(--bg-secondary) !important;
+  cursor: default !important;
+}
+
+.invitation-card p {
+  font-weight: bold;
+}
+
+.line-card .ant-card-body img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: none;
+  margin-right: 20px;
+}
+
+#group-name {
+  min-width: 20vw;
+  max-width: 20vw;
+  margin-right: 20px;
+  font-weight: bold;
 }
 
 .invitation-card-button-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-self: flex-end;
-
-  margin: auto 0 auto auto;
+  margin: 0 0 0 auto !important;
 }
 
 .invitation-card-button-container button {

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
-import { Button, Form, Input, message, Upload } from "antd";
+import { Button, Form, Input, Upload } from "antd";
 import { User } from "@/types/user";
 import { Group } from "@/types/group";
 import { UploadOutlined } from "@ant-design/icons";
@@ -10,6 +10,7 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 import { InviteUser } from "@/components/InviteUser";
 import Navbar from "@/components/Navbar";
 import "@/styles/pages/GroupCreation.css";
+import toast from "react-hot-toast";
 
 interface FormFieldProps {
   name: string;
@@ -38,8 +39,11 @@ const GroupCreation: React.FC = () => {
         setLoggedInUser(user);
       } catch (error) {
         if (error instanceof Error) {
-          alert(
-            `Something went wrong while fetching groups:\n${error.message}`,
+          toast.error(
+              <div>
+                <strong>Failed to fetch user:</strong>
+                <div>{error.message}</div>
+              </div>
           );
         } else {
           console.error("An unknown error occurred while fetching groups.");
@@ -52,37 +56,43 @@ const GroupCreation: React.FC = () => {
 
   const handleGroupCreation = async (values: FormFieldProps) => {
     try {
-      // Create the group first
       const requestBody = {
         ...values,
-        members: invitedUsers.map((user) => user.id), // or usernames depending on backend
+        members: invitedUsers.map((user) => user.id),
         image: uploadedImage || null,
         adminId: loggedInUser?.id,
       };
 
-      // Create the new group
-      const newGroup = await apiService.post<Group>(
-        "/groups",
-        requestBody,
-        token,
-      );
+      const newGroup = await apiService.post<Group>("/groups", requestBody, token);
 
-      // Automatically send invitations for the users that were locally added
       for (const user of invitedUsers) {
-        await apiService.post(
-          `/groups/${newGroup.id}/invitations`, // API endpoint to send invitations
-          { inviteeId: user.id },
-          token,
-        );
+        await apiService.post(`/groups/${newGroup.id}/invitations`, { inviteeId: user.id }, token);
       }
 
-      message.success("Group created and users invited successfully!");
-      router.push(`/groups/${newGroup.id}`);
+      toast.success(
+          <div>
+            <strong>Group created successfully!</strong>
+            <div>Redirecting to Group Dashboard</div>
+          </div>
+      );
+      setTimeout(() => {
+        router.push(`/groups/${newGroup.id}`);
+      }, 800);
     } catch (error) {
       if (error instanceof Error) {
-        alert(`Something went wrong during group creation:\n${error.message}`);
+        toast.error(
+            <div>
+              <strong>Group creation failed:</strong>
+              <div>{error.message}</div>
+            </div>
+        );
       } else {
-        console.error("An unknown error occurred during group creation.");
+        toast.error(
+            <div>
+              <strong>Group creation failed:</strong>
+              <div>Unknown error</div>
+            </div>
+        );
       }
     }
   };
@@ -118,7 +128,12 @@ const GroupCreation: React.FC = () => {
     };
 
     reader.onerror = (error) => {
-      message.error(`${file.name} upload failed.`);
+      toast.error(
+          <div>
+            <strong>Upload failed:</strong>
+            <div>{file.name} could not be uploaded.</div>
+          </div>
+      );
       console.error("Upload error:", error);
     };
   };

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import "@/styles/globals.css";
+import { Toaster } from 'react-hot-toast';
 
 export const metadata: Metadata = {
-  title: "Student XX-XXX-XXX",
+  title: "Pomodoro Study Room",
   description: "sopra-fs25-template-client",
 };
 
@@ -49,6 +50,7 @@ export default function RootLayout({
         > */}
         {children}
         {/* </ConfigProvider> */}
+        <Toaster position="top-center" reverseOrder={false} />
       </body>
     </html>
   );

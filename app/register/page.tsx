@@ -6,7 +6,8 @@ import { Form, Input } from "antd";
 import Link from "next/link";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
-import { JSX } from "react";
+import { JSX, useState } from "react";
+import toast from "react-hot-toast";
 
 import "../styles/module.css";
 
@@ -23,7 +24,11 @@ const Register: () => JSX.Element = () => {
   const { set: setToken } = useLocalStorage<string>("token", "");
   const { set: setUserId } = useLocalStorage<string>("id", "");
 
+  const [enabled, setEnabled] = useState(true);
+
   const handleRegister = async (values: RegisterForm) => {
+    if(!enabled) return;
+    setEnabled(false)
     try {
       const response = await apiService.post<User>(
         "/users/register",
@@ -36,15 +41,34 @@ const Register: () => JSX.Element = () => {
       if (response && response.token && response.id) {
         setToken(response.token);
         setUserId(response.id);
-        console.log("Registration successful! Redirecting to dashboard.");
-        router.push("/dashboard");
+        // console.log("Registration successful! Redirecting to dashboard.");
+        toast.success(
+            <div>
+              <div><strong>Registration successful!</strong></div>
+              <div>Redirecting to Dashboard.</div>
+            </div>
+        );
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 800);
       }
     } catch (error) {
+      setEnabled(true);
       if (error instanceof Error) {
-        console.error("Registration failed:", error.message);
-        alert("This username is already taken");
+        toast.error(
+            <div>
+              <div><strong>Registration failed:</strong></div>
+              <div>This username is already taken.</div>
+            </div>
+        );
       } else {
-        console.error("An unknown error occurred during registration.");
+        // console.error("An unknown error occurred during registration.");
+        toast.error(
+            <div>
+              <div><strong>Registration failed:</strong></div>
+              <div>Unknown error occurred. Please try again.</div>
+            </div>
+        );
       }
     }
   };
@@ -114,7 +138,7 @@ const Register: () => JSX.Element = () => {
               />
             </Form.Item>
           </div>
-          <div className="button-group">
+          <div className={`button-group ${enabled ? "" : "disabled"}`}>
             <Form.Item style={{ width: "100%" }}>
               <div style={{ display: "flex", gap: "20px", width: "100%" }}>
                 <button
