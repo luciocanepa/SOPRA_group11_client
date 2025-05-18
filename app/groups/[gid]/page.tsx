@@ -73,13 +73,13 @@ export default function GroupPage() {
     setIncomingSync(req);
 };
 
-  const handleStatus = useCallback((running: boolean) => {
-    setIsRunning(running);
-  }, []);
+  // const handleStatus = useCallback((running: boolean) => {
+  //   setIsRunning(running);
+  // }, []);
 
-  const handleSessionStatus = useCallback((session: boolean) => {
-    setIsSession(session);
-  }, []);
+  // const handleSessionStatus = useCallback((session: boolean) => {
+  //   setIsSession(session);
+  // }, []);
 
 
 
