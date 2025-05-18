@@ -362,6 +362,7 @@ const ManageProfile: React.FC = () => {
           <Form.Item name="profilePicture" label="Profile Picture">
             <Upload
               name="logo"
+              listType="picture"
               beforeUpload={(file) => {
                 uploadingImage(file);
                 return false;

@@ -218,9 +218,10 @@ export default function Statistics() {
             <div className="mode-toggle">
               <Select
                 className="select"
-                value = {selectedGroupId}
-                onChange={(groupId) => setSelectedGroupId(groupId)}
-                options={[{label: "my statistics", value: null},
+                popupMatchSelectWidth={false}
+                value = {selectedGroupId ?? ""}
+                onChange={(groupId) => setSelectedGroupId(groupId === "" ? null : groupId)}
+                options={[{label: "my statistics", value: ""},
                   ...groups.map((group) => ({
                     label: group.name,
                     value: group.id,

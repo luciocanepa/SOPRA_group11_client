@@ -156,26 +156,16 @@ export function InviteUser({
 
   return (
     <div className="group-dashboard-actions-container">
-      <Form
-        form={form}
-        name="invite-user-form"
-        size="middle"
-        layout="vertical"
-        onFinish={handleInvite}
-      >
-        {/* <h3>Invite Users</h3> */}
-
-        <Form.Item name="username" rules={[{ required: false }]}>
-          <AutoComplete
-            className="invite-input"
-            options={filteredOptions}
-            onSearch={handleSearch}
-            onSelect={setUsername}
-            onChange={setUsername}
-            placeholder="Enter username"
-            value={username}
-          />
-        </Form.Item>
+      <div className="invite-user-fields">
+        <AutoComplete
+          className="invite-input"
+          options={filteredOptions}
+          onSearch={handleSearch}
+          onSelect={setUsername}
+          onChange={setUsername}
+          placeholder="Enter username"
+          value={username}
+        />
 
         <Button
           className="green"
@@ -185,25 +175,25 @@ export function InviteUser({
         >
           Send Invitation
         </Button>
+      </div>
 
-        {inviteResults.length > 0 && (
-          <div className="invite-results">
-            <h4>Invitations Sent:</h4>
-            <div className="invite-results-table">
-              {inviteResults.map((res, idx) => (
-                <div key={idx} className={`result-row ${res.status}`}>
-                  <span id="invite-username">{res.username}</span>
-                  <span id="invite-message">
-                    {res.message.includes("failed")
-                      ? "Invitation failed"
-                      : res.message}
-                  </span>
-                </div>
-              ))}
-            </div>
+      {inviteResults.length > 0 && (
+        <div className="invite-results">
+          <h4>Invitations Sent:</h4>
+          <div className="invite-results-table">
+            {inviteResults.map((res, idx) => (
+              <div key={idx} className={`result-row ${res.status}`}>
+                <span id="invite-username">{res.username}</span>
+                <span id="invite-message">
+                  {res.message.includes("failed")
+                    ? "Invitation failed"
+                    : res.message}
+                </span>
+              </div>
+            ))}
           </div>
-        )}
-      </Form>
+        </div>
+      )}
     </div>
   );
 }
