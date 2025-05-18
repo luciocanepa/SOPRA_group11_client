@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { AutoComplete, Form, Button, message } from "antd";
+import { AutoComplete, Button, message } from "antd";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Group } from "@/types/group";
@@ -35,7 +35,6 @@ export function InviteUser({
     [],
   );
   const [loading, setLoading] = useState(false);
-  const [form] = Form.useForm();
   const [inviteResults, setInviteResults] = useState<
     {
       username: string;
