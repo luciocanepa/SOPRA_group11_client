@@ -3,15 +3,14 @@
     width: 90vw;
     max-width: 500px;
     padding: 1rem;
-    background-color: var(--bg-primary, #ffffff);
+    background-color: #C45353FF;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     z-index: 1000;
 
     height: 100%;
-    overflow-y: auto;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 .info-card {
@@ -21,11 +20,15 @@
     justify-content: space-between;
     height: 100%;
     white-space: pre-wrap;
+    background-color: #C45353FF;
+    box-shadow: none;
+    overflow: hidden;
+    padding: 0;
 }
 
 .info-card h3 {
     font-size: 1.4rem;
-    color: var(--text-primary, #222);
+    color: #ffffff;
     margin-bottom: 0.2rem;
 }
 
@@ -33,13 +36,13 @@
 .slide p {
     font-size: 1rem;
     color: white;
-    line-height: 1.4;
+    line-height: 1.5;
     margin: 0;
 }
 
 .slide h4 {
     font-size: 1.2rem;
-    color: var(--text-primary);
+    color: #ffffff;
     margin-bottom: 0.3rem;
 }
 
@@ -52,14 +55,17 @@ hr {
 .info-nav {
     display: flex;
     justify-content: space-between;
-    margin-top: 0.5rem;
+    /*margin-top: 0.5rem;*/
     align-items: center;
 }
 
 .arrow {
     cursor: pointer;
     font-size: 1.5rem;
-    color: var(--text-primary);
+    color: #ffffff;
     transition: color 0.2s;
+    padding: 0;
+    margin-top: -1rem;
+    margin-bottom: 1rem;
 }
 
