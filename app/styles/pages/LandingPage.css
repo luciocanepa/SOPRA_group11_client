@@ -1,0 +1,196 @@
+.landing-page {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+
+    background: var(--bg-primary);
+    background-size: cover;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* This if for the transparent background, if not wanted, comment out or delete */
+.landing-page::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url("/images/clock_top_right.jpeg") no-repeat center center;
+    background-size: cover;
+    opacity: 0.5; /* adjust transparency here (0 = invisible, 1 = opaque) */
+    z-index: 0;
+}
+
+.landing-page > * {
+    position: relative;
+    z-index: 1; /* this ensures content is above overlay */
+}
+/*Until here*/
+
+header h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 0.5rem;
+}
+
+header p {
+    color: white;
+    margin-bottom: 1.5rem;
+    font-size: 1.15rem;
+    font-weight: bold;
+    max-width: 750px;
+}
+
+.button-container {
+    display: flex;
+    gap: 5rem;
+    justify-content: center;
+    margin-bottom: 2.5rem;
+}
+
+.login-register-button {
+    background-color: #ffffff;
+    color: #000000;
+    width: 8rem;
+    font-size: 1.15rem;
+    padding: 1.3rem 1.5rem;
+    border: none !important;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: background-color 0.4s ease;
+    box-shadow: 5px 5px 0 2px rgba(255, 255, 255, 0.624)
+}
+
+.login-register-button:hover{
+    color: #000000 !important;
+    background-color: #E4E4E4FF !important;
+}
+
+.content-columns {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin-bottom: 2rem;
+}
+
+.info-card, .carousel {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 550px;
+    box-shadow: 5px 5px 0 2px rgba(255, 255, 255, 0.624);
+    min-height: 310px;
+    font-size: 1.15rem;
+    position: relative;
+}
+
+.info-card h2, .carousel h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.red-text {
+    color: #930202;
+    font-weight: 500;
+    font-size: 1.15rem;
+    margin-top: 1.5rem;
+}
+
+.green-text {
+    color: #005f13;
+    font-weight: 500;
+    margin-top: 1.5rem;
+    font-size: 1.15rem;
+}
+
+.slide {
+    height: 110px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    font-size: 1.15rem;
+}
+
+
+.slide h3 {
+    margin: 1rem 0 0.5rem;
+    font-size: 1.3rem;
+}
+
+
+.nav-zone {
+    position: absolute;
+    bottom: 0;
+    width: 40%;
+    height: 155px;
+    display: flex;
+    align-items: flex-end;
+    padding: 0 2rem;
+    cursor: pointer;
+    color: #000000;
+    font-size: 1.8rem;
+    user-select: none;
+    transition: background 0.2s ease;
+}
+
+.nav-zone:hover {
+    background: rgba(195, 83, 83, 0.07);
+}
+
+.nav-left {
+    left: 0;
+    justify-content: flex-start;
+}
+
+.nav-right {
+    right: 0;
+    justify-content: flex-end;
+}
+
+.group-members {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    color: white;
+    font-size: 1.1rem;
+}
+
+.enjoy-box {
+    background: white;
+    padding: 0.8rem 1.2rem;
+    border-radius: 12px;
+    font-size: 1.15rem;
+    font-weight: 500;
+    color: #000000;
+    align-self: flex-end;
+    box-shadow: 5px 5px 0 2px rgba(255, 255, 255, 0.624);
+}
+
+.carousel-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2rem;
+}
+
+.tomato-icon {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    margin-top: -85px;
+    margin-right: -105px;
+}
+
+hr {
+    border: none;
+    height: 2px;
+    background-color: var(--bg-primary);
+    margin-top: 1rem;
+}

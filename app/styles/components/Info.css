@@ -1,0 +1,65 @@
+.info-card-wrapper {
+    position: relative;
+    width: 90vw;
+    max-width: 500px;
+    padding: 1rem;
+    background-color: var(--bg-primary, #ffffff);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+
+    height: 100%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.info-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    white-space: pre-wrap;
+}
+
+.info-card h3 {
+    font-size: 1.4rem;
+    color: var(--text-primary, #222);
+    margin-bottom: 0.2rem;
+}
+
+.info-card p,
+.slide p {
+    font-size: 1rem;
+    color: white;
+    line-height: 1.4;
+    margin: 0;
+}
+
+.slide h4 {
+    font-size: 1.2rem;
+    color: var(--text-primary);
+    margin-bottom: 0.3rem;
+}
+
+hr {
+    margin: 0.5rem 0;
+    border: none;
+    border-top: 1px solid #ddd;
+}
+
+.info-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    align-items: center;
+}
+
+.arrow {
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    transition: color 0.2s;
+}
+
