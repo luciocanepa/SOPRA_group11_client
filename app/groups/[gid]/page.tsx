@@ -187,7 +187,7 @@ export default function GroupPage() {
                     {token && localUserId && group?.adminId === parseInt(localUserId) && (
                         <Button
                             className="secondary"
-                            onClick={() => router.push(`/edit/group/${groupId}`)}
+                            onClick={() => router.push(`/groups/${groupId}/edit`)}
                         >
                             Manage Group ↗
                         </Button>

@@ -128,7 +128,7 @@ const ManageGroup: React.FC = () => {
         name: false,
       });
 
-      router.push(`/edit/group/${group?.id}`);
+      router.push(`/groups/${group?.id}/edit`);
     } catch (error) {
       toast.error(
           <div>
