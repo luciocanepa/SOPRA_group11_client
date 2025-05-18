@@ -45,9 +45,9 @@ type SyncMsg = {
     senderId:       string;
     senderName:     string;
     status:         Participant["status"];
-    startTime:      string; // original ISO (no longer used for anchor)
-    duration:       string; // original PT##M##S
-    secondDuration: string; // remaining PT##M##S at send-time
+    startTime:      string; // original ISO
+    duration:       string; // remaining PT##M##S
+    secondDuration: string; // total PT##M##S of other phase
 };
 type WSMessage = TimerUpdateMsg | StatusMsg | SyncMsg;
 
@@ -55,18 +55,17 @@ export function useGroupParticipants(
     groupId: string,
     token:   string | null,
     onSync?: (req: {
-        senderId:  string;
-        senderName: string;
-        status:    Participant["status"];
-        startTime: string;   // NOW when the message was received
-        duration:  string;   // PT##M##S remaining at send-time
+        senderId:       string;
+        senderName:     string;
+        status:         Participant["status"];
+        startTime:      string;
+        duration:       string;
+        secondDuration: string;
     }) => void
 ) {
-    const api           = useApi();
+    const api = useApi();
     const { value: localUserId } = useLocalStorage<string>("id", "");
-    const clientRef     = useRef<Client|null>(null);
-
-    // swallow exactly one echo of our own SYNC
+    const clientRef = useRef<Client|null>(null);
     const ignoreOwnSyncRef = useRef(false);
 
     const [participants, setParticipants] = useState<Participant[]>([]);
@@ -87,18 +86,21 @@ export function useGroupParticipants(
         setLoading(true);
         api.get<GroupResponse>(`/groups/${groupId}`, token)
             .then(res => {
-                setParticipants(res.users.map(u=>({
-                    id: u.id, username: u.username, status: u.status
+                setParticipants(res.users.map(u => ({
+                    id: u.id,
+                    username: u.username,
+                    status: u.status
                 })));
                 const initial: Record<number,TimerInfo> = {};
                 res.users.forEach(u => {
-                    if (u.status==="WORK"||u.status==="BREAK") {
+                    if (u.status === "WORK" || u.status === "BREAK") {
                         const ts = u.startTime.endsWith("Z")
-                            ? u.startTime : u.startTime+"Z";
+                            ? u.startTime
+                            : u.startTime + "Z";
                         initial[u.id] = {
-                            start:    new Date(ts),
+                            start: new Date(ts),
                             duration: parseIso(u.duration),
-                            running:  u.status==="WORK"
+                            running: u.status === "WORK"
                         };
                     }
                 });
@@ -109,23 +111,24 @@ export function useGroupParticipants(
                 console.error(err);
                 setError("Failed to load participants");
             })
-            .finally(()=>setLoading(false));
+            .finally(() => setLoading(false));
     }, [groupId, token, api]);
 
     // 2) unified WS handler
     const handleMessage = useCallback((raw: WSMessage) => {
-        switch(raw.type) {
+        switch (raw.type) {
             case "TIMER_UPDATE": {
                 const uid = Number(raw.userId);
                 if (isNaN(uid)) return;
                 const secs  = parseIso(raw.duration);
                 const tsIso = raw.startTime.endsWith("Z")
-                    ? raw.startTime : raw.startTime+"Z";
+                    ? raw.startTime
+                    : raw.startTime + "Z";
                 const start = new Date(tsIso);
-                const running = raw.status==="WORK"||raw.status==="BREAK";
+                const running = raw.status === "WORK";
 
                 setParticipants(ps =>
-                    ps.map(u => u.id===uid?{...u,status:raw.status}:u)
+                    ps.map(u => u.id === uid ? { ...u, status: raw.status } : u)
                 );
                 setTimers(ts => ({
                     ...ts,
@@ -133,76 +136,71 @@ export function useGroupParticipants(
                 }));
                 break;
             }
-
             case "STATUS": {
                 const uid = Number(raw.userId);
                 if (isNaN(uid)) return;
                 setParticipants(ps =>
-                    ps.map(u => u.id===uid?{...u,status:raw.status}:u)
+                    ps.map(u => u.id === uid ? { ...u, status: raw.status } : u)
                 );
                 break;
             }
-
             case "SYNC": {
-                // belt-and-suspenders: never process our own
                 if (String(raw.senderId) === String(localUserId)) return;
-
-                // remaining seconds straightforward
-                const remSecs = parseIso(raw.secondDuration);
-                // anchor at *receive* time
-                const start   = new Date();
-                const running = raw.status==="WORK"||raw.status==="BREAK";
-                const uid     = Number(raw.senderId);
+                const remSecs = parseIso(raw.duration);
+                const tsIso = raw.startTime.endsWith("Z")
+                    ? raw.startTime
+                    : raw.startTime + "Z";
+                const start = new Date(tsIso);
+                const running = raw.status === "WORK";
+                const uid = Number(raw.senderId);
                 if (isNaN(uid)) return;
 
                 setParticipants(ps =>
-                    ps.map(u => u.id===uid?{...u,status:raw.status}:u)
+                    ps.map(u => u.id === uid ? { ...u, status: raw.status } : u)
                 );
                 setTimers(ts => ({
                     ...ts,
                     [uid]: { start, duration: remSecs, running }
                 }));
 
-                // notify GroupPage with receive-time
                 onSync?.({
-                    senderId:  raw.senderId,
+                    senderId: raw.senderId,
                     senderName: raw.senderName,
-                    status:    raw.status,
+                    status: raw.status,
                     startTime: start.toISOString(),
-                    duration:  raw.secondDuration
+                    duration: raw.duration,
+                    secondDuration: raw.secondDuration
                 });
                 break;
             }
         }
     }, [localUserId, onSync]);
 
-    // 3) connect & subscribe (only after localUserId is known)
+    // 3) connect & subscribe
     useEffect(() => {
-        if (!token || !localUserId || typeof window==="undefined") return;
-
-        const sock   = new SockJS(`${getApiDomain()}/ws`);
+        if (!token || !localUserId || typeof window === "undefined") return;
+        const sock = new SockJS(`${getApiDomain()}/ws`);
         const client = new Client({
             webSocketFactory: () => sock,
-            connectHeaders:  { Authorization: token },
-            debug:           ()=>{},
-            onStompError:    f => console.error("STOMP error:", f.headers["message"])
+            connectHeaders: { Authorization: token },
+            debug: () => {},
+            onStompError: frame => console.error("STOMP error:", frame.headers["message"])
         });
 
         client.onConnect = () => {
-            client.subscribe(`/topic/group.${groupId}`, (m:IMessage) => {
+            client.subscribe(`/topic/group.${groupId}`, (m: IMessage) => {
                 try {
                     const msg = JSON.parse(m.body) as WSMessage;
-                    // drop exactly one own SYNC echo
                     if (
-                        msg.type==="SYNC" &&
-                        String(msg.senderId)===String(localUserId) &&
+                        msg.type === "SYNC" &&
+                        String(msg.senderId) === String(localUserId) &&
                         ignoreOwnSyncRef.current
                     ) {
                         ignoreOwnSyncRef.current = false;
                         return;
                     }
                     handleMessage(msg);
-                } catch(e) {
+                } catch (e) {
                     console.error("Invalid WS payload", e);
                 }
             });
@@ -213,29 +211,30 @@ export function useGroupParticipants(
         return () => { client.deactivate(); };
     }, [groupId, token, localUserId, handleMessage]);
 
-    // 4) publish only
-    const requestSync = useCallback(() => {
+    // 4) publish sync
+    const requestSync = useCallback((currentRemSec: number, otherPhaseSec: number) => {
         if (!clientRef.current || !localUserId) return;
         ignoreOwnSyncRef.current = true;
 
-        const me  = Number(localUserId);
-        const ti  = timers[me];
-        const rem = ti
-            ? Math.ceil((ti.start.getTime() + ti.duration*1000 - Date.now())/1000)
-            : 0;
-        const mins = Math.floor(rem/60), secs = rem%60;
-        const isoDur = `PT${mins}M${secs}S`;
+        const durMin = Math.floor(currentRemSec / 60);
+        const durSec = currentRemSec % 60;
+        const durationIso = `PT${durMin}M${durSec}S`;
+
+        const othMin = Math.floor(otherPhaseSec / 60);
+        const othSec = otherPhaseSec % 60;
+        const secondDurationIso = `PT${othMin}M${othSec}S`;
 
         clientRef.current.publish({
             destination: "/app/group.sync",
-            headers:     { Authorization: token! },
-            body:        JSON.stringify({
-                senderId:       me.toString(),
+            headers: { Authorization: token! },
+            body: JSON.stringify({
+                senderId: localUserId,
                 groupId,
-                secondDuration: isoDur
+                duration: durationIso,
+                secondDuration: secondDurationIso
             })
         });
-    }, [groupId, localUserId, timers, token]);
+    }, [groupId, localUserId, token]);
 
     return { participants, timers, loading, error, requestSync };
 }

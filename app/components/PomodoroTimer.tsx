@@ -6,7 +6,11 @@ import { Button } from "antd";
 import "../styles/components/Timer.css";
 import toast from "react-hot-toast";
 
-interface TimerSettings { session: number; break: number; }
+interface TimerSettings {
+  session: number;
+  break:   number;
+}
+
 interface TimerState {
   timeLeft:               number;
   isRunning:              boolean;
@@ -23,13 +27,20 @@ export interface PomodoroTimerProps {
   initialSession?:        number;
   initialBreak?:          number;
   onTimerStatusChange:    (isRunning: boolean) => void;
-  onTimerUpdate?:         (info: { status: "WORK"|"BREAK"|"ONLINE"|"OFFLINE"; startTime: string; duration: number }) => void;
-  onSessionStatusChange?: (isSession: boolean) => void;
-  fullscreen?:            boolean;
-  externalSync?:          {
+  onTimerUpdate?:         (info: {
     status:    "WORK" | "BREAK" | "ONLINE" | "OFFLINE";
     startTime: string;
     duration:  number;
+    // optional: when you send a sync you can include next-phase length
+    secondDuration?: number;
+  }) => void;
+  onSessionStatusChange?: (isSession: boolean) => void;
+  fullscreen?:            boolean;
+  externalSync?: {
+    status:         "WORK" | "BREAK" | "ONLINE" | "OFFLINE";
+    startTime:      string;
+    duration:       number;
+    secondDuration: number;
   } | null;
 }
 
@@ -83,12 +94,16 @@ export function PomodoroTimer({
       const nextDuration  = (nextIsSession
           ? prev.activeSettings.session
           : prev.activeSettings.break) * 60;
-      const nowISO        = new Date().toISOString();
+      const nowISO = new Date().toISOString();
 
+      // notify parent of the phase switch
       onTimerUpdate?.({
-        status:    nextIsSession ? "WORK" : "BREAK",
-        startTime: nowISO,
-        duration:  nextDuration
+        status:        nextIsSession ? "WORK" : "BREAK",
+        startTime:     nowISO,
+        duration:      nextDuration,
+        secondDuration: nextIsSession
+            ? prev.activeSettings.break * 60
+            : prev.activeSettings.session * 60
       });
       setJustSwitched(nextIsSession);
 
@@ -107,35 +122,46 @@ export function PomodoroTimer({
     setJustSwitched(null);
   }, [justSwitched, onSessionStatusChange]);
 
-  // sync effect unchanged…
+  // apply an external sync — override both the current timer and your stored session/break lengths
   useEffect(() => {
     if (!externalSync) return;
     const running   = externalSync.status === "WORK" || externalSync.status === "BREAK";
     const isSession = externalSync.status === "WORK";
+
     setState(s => ({
       ...s,
-      isRunning: running,
-      isSession: isSession,
-      timeLeft:  externalSync.duration
+      isRunning:      running,
+      isSession:      isSession,
+      timeLeft:       externalSync.duration,
+      activeSettings: {
+        session: externalSync.status === "WORK"
+            ? externalSync.duration / 60
+            : externalSync.secondDuration / 60,
+        break:   externalSync.status === "BREAK"
+            ? externalSync.duration / 60
+            : externalSync.secondDuration / 60
+      }
     }));
     onTimerStatusChange(running);
     onSessionStatusChange?.(isSession);
   }, [externalSync, onTimerStatusChange, onSessionStatusChange]);
 
   const fmt = (sec: number) => {
-    const m = Math.floor(sec/60).toString().padStart(2,"0");
-    const s = (sec%60).toString().padStart(2,"0");
+    const m = Math.floor(sec/60).toString().padStart(2, "0");
+    const s = (sec%60).toString().padStart(2, "0");
     return `${m}:${s}`;
   };
 
-  // ←—— HERE’S THE ONLY CHANGE ———→
   const start = () => {
     setState(s => ({ ...s, isRunning: true, showSettings: false }));
     const status = state.isSession ? "WORK" : "BREAK";
     onTimerUpdate?.({
       status,
-      startTime: new Date().toISOString(),
-      duration:  state.timeLeft
+      startTime:     new Date().toISOString(),
+      duration:      state.timeLeft,
+      secondDuration: state.isSession
+          ? state.activeSettings.break * 60
+          : state.activeSettings.session * 60
     });
   };
 
@@ -153,9 +179,9 @@ export function PomodoroTimer({
     audioRef.current?.pause();
     setState(s => ({
       ...s,
-      isRunning:    false,
-      isSession:    true,
-      timeLeft:     s.activeSettings.session * 60
+      isRunning: false,
+      isSession: true,
+      timeLeft:  s.activeSettings.session * 60
     }));
     onTimerUpdate?.({
       status:    "ONLINE",
@@ -165,10 +191,10 @@ export function PomodoroTimer({
     toast.success("Timer reset!");
   };
 
-  const toggleSettings = () => setState(s=>({...s,showSettings:!s.showSettings}));
+  const toggleSettings = () => setState(s => ({ ...s, showSettings: !s.showSettings }));
   const applySettings  = () => {
     const dur = state.settings.session * 60;
-    setState(s=>({
+    setState(s => ({
       ...s,
       activeSettings: s.settings,
       timeLeft:       dur,
@@ -184,7 +210,7 @@ export function PomodoroTimer({
   };
 
   return (
-      <div className={`timer-container ${fullScreenMode?"fullscreen":""}`}>
+      <div className={`timer-container ${fullScreenMode ? "fullscreen" : ""}`}>
         <div className={`timer-display ${
             state.isRunning
                 ? (state.isSession ? "timer-display-work" : "timer-display-break")
@@ -197,8 +223,8 @@ export function PomodoroTimer({
         </div>
 
         {fullScreenMode
-            ? <Button className="fullscreen-button" onClick={()=>setFullScreenMode(false)}>-</Button>
-            : <Button className="fullscreen-button" onClick={()=>setFullScreenMode(true)}>+</Button>
+            ? <Button className="fullscreen-button" onClick={() => setFullScreenMode(false)}>-</Button>
+            : <Button className="fullscreen-button" onClick={() => setFullScreenMode(true)}>+</Button>
         }
 
         <div className="timer-button-group">
@@ -222,7 +248,7 @@ export function PomodoroTimer({
                 <input
                     type="number"
                     value={state.settings.session}
-                    onChange={e=>setState(s=>({
+                    onChange={e => setState(s => ({
                       ...s,
                       settings: { ...s.settings, session: Math.max(1, Number(e.target.value)) }
                     }))}
@@ -234,7 +260,7 @@ export function PomodoroTimer({
                 <input
                     type="number"
                     value={state.settings.break}
-                    onChange={e=>setState(s=>({
+                    onChange={e => setState(s => ({
                       ...s,
                       settings: { ...s.settings, break: Math.max(1, Number(e.target.value)) }
                     }))}
