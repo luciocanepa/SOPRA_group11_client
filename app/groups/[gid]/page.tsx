@@ -3,16 +3,18 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Modal, Button } from "antd";
+import { Modal, Button, Card } from "antd";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { useApi } from "@/hooks/useApi";
 import { useGroupParticipants } from "@/hooks/useGroupParticipants";
 import { PomodoroTimer } from "@/components/PomodoroTimer";
 import { GroupParticipants } from "@/components/GroupParticipants";
+import { CalendarAPI } from "@/components/CalendarAPI";
+import { Group } from "@/types/group";
 import { InviteUser } from "@/components/InviteUser";
 import { ChatBox } from "@/components/Chat";
 import Navbar from "@/components/Navbar";
-import { Group } from "@/types/group";
+import ScheduledSessions from "@/components/ScheduledSessions";
 
 import "@/styles/pages/GroupPage.css";
 
@@ -24,6 +26,12 @@ interface SyncRequest {
     duration:  string; // PT##M##S at send-time
 }
 
+interface User {
+  id: string;
+  username: string;
+  timezone: string
+}
+
 export default function GroupPage() {
     const { gid } = useParams();
     const groupId = gid as string;
@@ -32,64 +40,148 @@ export default function GroupPage() {
     const { value: token }       = useLocalStorage<string>("token", "");
     const { value: localUserId } = useLocalStorage<string>("id", "");
 
-    const [group,        setGroup]        = useState<Group|null>(null);
-    const [inviteOpen,   setInviteOpen]   = useState(false);
-    const [calendarOpen, setCalendarOpen] = useState(false);
+  const [group, setGroup] = useState<Group | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [plannedSessionsOpen, setPlannedSessionsOpen] = useState(false);
+  const [isRunning, setIsRunning] = useState(false);
+  const [isGroupOwner, setIsGroupOwner] = useState(false);
 
-    const [isRunning,   setIsRunning]   = useState(false);
-    const [isSession,   setIsSession]   = useState(true);
-    const isBreak = isRunning && !isSession;
-    const [username,    setUsername]    = useState("");
-    const [loadingUser, setLoadingUser] = useState(true);
+  const [isSession, setIsSession] = useState(true);
+  const isBreak = isRunning && !isSession;
+  // For chat
+  const [username, setUsername] = useState<string>("");
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
+  const [loadingUser, setLoadingUser] = useState(true);
 
-    const [incomingSync, setIncomingSync] = useState<SyncRequest|null>(null);
-    const [acceptedSync, setAcceptedSync] = useState<{
-        status:    "ONLINE"|"OFFLINE"|"WORK"|"BREAK";
-        startTime: string;
-        duration:  number;
-    }|null>(null);
+  //const [groupData, setGroupData] = useState<Group | null>(null);
+  //const [userData, setUserData] = useState<User | null>(null);
 
-    const handleIncomingSync = (req: SyncRequest) => {
-        if (req.senderId === localUserId) return;
-        setIncomingSync(req);
+
+
+  const [incomingSync, setIncomingSync] = useState<SyncRequest|null>(null);
+  const [acceptedSync, setAcceptedSync] = useState<{
+      status:    "ONLINE"|"OFFLINE"|"WORK"|"BREAK";
+      startTime: string;
+      duration:  number;
+  }|null>(null);
+
+
+  const handleIncomingSync = (req: SyncRequest) => {
+    if (req.senderId === localUserId) return;
+    setIncomingSync(req);
+};
+
+  const handleStatus = useCallback((running: boolean) => {
+    setIsRunning(running);
+  }, []);
+
+  const handleSessionStatus = useCallback((session: boolean) => {
+    setIsSession(session);
+  }, []);
+
+
+
+  useEffect(() => {
+    if (!token) return;
+    api.get<Group>(`/groups/${groupId}`, token)
+        .then(g => setGroup(g))
+        .catch(console.error);
+}, [api, groupId, token]);
+
+useEffect(() => {
+    if (!token || !localUserId) {
+        setLoadingUser(false);
+        return;
+    }
+    api.get<{username:string}>(`/users/${localUserId}`, token)
+        .then(u => setUsername(u.username))
+        .catch(console.error)
+        .finally(() => setLoadingUser(false));
+}, [api, token, localUserId]);
+
+
+
+  const handleUpdate = useCallback(
+    async ({
+      status,
+      startTime,
+      duration,
+    }: {
+      status: string;
+      startTime: string;
+      duration: number;
+    }) => {
+      if (!token || !localUserId) return;
+      const mins = Math.floor(duration / 60);
+      const secs = duration % 60;
+      const isoDur = `PT${mins}M${secs}S`;
+      try {
+        await api.put(
+          `/users/${localUserId}/timer`,
+          { status, startTime, duration: isoDur },
+          token,
+        );
+      } catch (e) {
+        console.error("Timer update failed", e);
+      }
+    },
+    [api, token, localUserId],
+  );
+
+
+useEffect(() => {
+  const checkIfAdmin = async () => {
+    if (!token || !localUserId) return;
+    try {
+      const group: Group = await api.get<Group>(
+        `/groups/${groupId}`,
+        token,
+      );
+      const user: User = await api.get<User>(`/users/${localUserId}`, token)
+      setGroup(group)
+      setIsGroupOwner(group?.adminId === localUserId);
+      setUser(user);
+    } catch (error) {
+      console.error("Failed to fetch group admin data", error);
+    }
+  };
+  checkIfAdmin();
+
+}, [groupId, api, localUserId, token]);
+
+
+  useEffect(() => {
+    if (!token || !localUserId) return;
+    api
+      .get<Group>(`/groups/${groupId}`, token)
+      .then((data) => setGroup(data))
+      .catch(console.error);
+  }, [groupId, token, localUserId, api]);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!token || !localUserId) {
+        setIsLoadingUser(false);
+        return;
+      }
+
+      try {
+        const userData = await api.get<User>(`/users/${localUserId}`, token);
+        setUsername(userData.username);
+      } catch (error) {
+        console.error("Failed to fetch user data:", error);
+      } finally {
+        setIsLoadingUser(false);
+      }
     };
 
-    useEffect(() => {
-        if (!token) return;
-        api.get<Group>(`/groups/${groupId}`, token)
-            .then(g => setGroup(g))
-            .catch(console.error);
-    }, [api, groupId, token]);
+    fetchUserData();
+  }, [token, localUserId, api]);
 
-    useEffect(() => {
-        if (!token || !localUserId) {
-            setLoadingUser(false);
-            return;
-        }
-        api.get<{username:string}>(`/users/${localUserId}`, token)
-            .then(u => setUsername(u.username))
-            .catch(console.error)
-            .finally(() => setLoadingUser(false));
-    }, [api, token, localUserId]);
 
-    const handleUpdate = useCallback(async ({
-                                                status, startTime, duration
-                                            }: { status:string; startTime:string; duration:number }) => {
-        if (!token || !localUserId) return;
-        const m = Math.floor(duration/60), s = duration%60;
-        const iso = `PT${m}M${s}S`;
-        try {
-            await api.put(
-                `/users/${localUserId}/timer`,
-                { status, startTime, duration: iso },
-                token
-            );
-        } catch(e) {
-            console.error("Timer update failed", e);
-        }
-    }, [api, token, localUserId]);
-
-    const { loading, requestSync } =
+const { loading, requestSync } =
         useGroupParticipants(groupId, token, handleIncomingSync);
 
     const onAccept = () => {
@@ -124,6 +216,10 @@ export default function GroupPage() {
 
     const onDecline = () => setIncomingSync(null);
 
+
+
+
+
     return (
         <div className="page-container">
             <Navbar user={null} />
@@ -154,48 +250,74 @@ export default function GroupPage() {
                     />
                 </div>
 
-                <div className="group-dashboard-button-container">
-                    <Button
-                        className="secondary"
-                        onClick={() => { setInviteOpen(!inviteOpen); setCalendarOpen(false); }}
-                    >
-                        {inviteOpen ? "-" : "+"} Invite Users
-                    </Button>
-                    {inviteOpen && <InviteUser group={group} isVisible={inviteOpen} />}
 
-                    <Button
-                        className="secondary"
-                        onClick={() => { setCalendarOpen(!calendarOpen); setInviteOpen(false); }}
-                    >
-                        {calendarOpen ? "-" : "+"} Plan Session
-                    </Button>
+        <div className="group-dashboard-button-container">
+          <Button
+            className="secondary"
+            onClick={() => {
+              setInviteOpen(!inviteOpen);
+              setCalendarOpen(false);
+              setPlannedSessionsOpen(false);
+            }}
+          >
+            {inviteOpen ? "-" : "+"} Invite Users
+          </Button>
+          {inviteOpen && <InviteUser group={group} isVisible={inviteOpen} />}
 
-                    <Button
-                        className="secondary"
-                        onClick={requestSync}
-                        disabled={!isRunning || loading}
-                    >
-                        Sync Timer
-                    </Button>
+          <Button
+            className="secondary"
+            onClick={() => {
+              setCalendarOpen(!calendarOpen);
+              setInviteOpen(false);
+              setPlannedSessionsOpen(false);
+            }}
+          >
+            {calendarOpen ? "-" : "+"} Plan Session
+          </Button>
 
-                    {calendarOpen && (
-                        <div className="group-dashboard-actions-container">
-                            <p>📅 Google Calendar integration coming soon!</p>
-                        </div>
-                    )}
+          {calendarOpen && (
+            <CalendarAPI
+              isOpen={calendarOpen}
+              onClose={() => setCalendarOpen(false)}
+              groupName={group?.name || "Unnamed Group"}
+              userTimezone={user?.timezone || "Europe/Zurich"}
+              userId={user?.id || ""}
+              groupId={group?.id || 0}
+            />
+          )}
 
-                    {token && localUserId && group?.adminId === parseInt(localUserId) && (
-                        <Button
-                            className="secondary"
-                            onClick={() => router.push(`/groups/${groupId}/edit`)}
-                        >
-                            Manage Group ↗
-                        </Button>
-                    )}
-                </div>
-            </div>
 
-            <Modal
+          <Button
+            className="secondary"
+            onClick={() => {
+              setPlannedSessionsOpen(!plannedSessionsOpen);
+              setCalendarOpen(false);
+              setInviteOpen(false);
+            }}
+          >
+          {plannedSessionsOpen ? "-" : "+"} View Upcoming Study Sessions
+          </Button>
+          {plannedSessionsOpen && (
+            <ScheduledSessions
+              isOpen={plannedSessionsOpen} 
+              //onClose={() => setPlannedSessionsOpen(false)}
+              groupId={groupId}
+              userTimezone={user?.timezone || "Europe/Zurich"}
+            />
+          )}
+
+
+          {token && localUserId && group?.adminId === parseInt(localUserId) && (
+            <Button
+              className="secondary"
+              onClick={() => router.push(`/edit/group/${groupId}`)}
+            >
+              Manage Group ↗
+            </Button>
+          )}
+        </div>
+      </div>
+      <Modal
                 open={!!incomingSync}
                 title="Sync Timer?"
                 okText="Accept"
