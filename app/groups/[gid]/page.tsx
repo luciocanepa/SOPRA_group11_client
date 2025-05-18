@@ -305,7 +305,13 @@ const { loading, requestSync } =
               userTimezone={user?.timezone || "Europe/Zurich"}
             />
           )}
-
+          <Button
+              className="secondary"
+              onClick={requestSync}
+              disabled={!isRunning || loading}
+          >
+              Sync Timer
+          </Button>
 
           {token && localUserId && group?.adminId === parseInt(localUserId) && (
             <Button
