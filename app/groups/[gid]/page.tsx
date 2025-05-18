@@ -83,9 +83,6 @@ export default function GroupPage() {
 
 
 
-
-
-  //########
   useEffect(() => {
     if (!token) return;
     api.get<Group>(`/groups/${groupId}`, token)
@@ -103,10 +100,6 @@ useEffect(() => {
         .catch(console.error)
         .finally(() => setLoadingUser(false));
 }, [api, token, localUserId]);
-
-// ######
-
-
 
 
 
@@ -136,7 +129,7 @@ useEffect(() => {
     },
     [api, token, localUserId],
   );
-///########
+
 
 useEffect(() => {
   const checkIfAdmin = async () => {
@@ -187,7 +180,6 @@ useEffect(() => {
     fetchUserData();
   }, [token, localUserId, api]);
 
-//########################
 
 const { loading, requestSync } =
         useGroupParticipants(groupId, token, handleIncomingSync);
@@ -258,6 +250,7 @@ const { loading, requestSync } =
                     />
                 </div>
 
+
         <div className="group-dashboard-button-container">
           <Button
             className="secondary"
@@ -276,6 +269,7 @@ const { loading, requestSync } =
             onClick={() => {
               setCalendarOpen(!calendarOpen);
               setInviteOpen(false);
+              setPlannedSessionsOpen(false);
             }}
           >
             {calendarOpen ? "-" : "+"} Plan Session

@@ -170,7 +170,7 @@ const ManageProfile: React.FC = () => {
       //       <div>Redirecting back to your profile.</div>
       //     </div>
       // );
-      router.push(`/edit/${user?.id}`);
+      router.push(`/users/${user?.id}/edit`);
     } catch (error) {
         console.error(error);
       toast.error(
