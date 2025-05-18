@@ -34,14 +34,14 @@ interface UserProps {
   userTimezone: string;
 }
 
-export default function UpcomingSessions({ isOpen, groupId, userTimezone }: UserProps) {
+export default function UpcomingSessions({ groupId, userTimezone }: UserProps) {
   const [loading, setLoading] = useState(true);
   const api = useApi();
   const [entry, setEntry] = useState<CalendarEntries[] | null>([]);
   const { value: token } = useLocalStorage<string>("token", "");
   const gid = Number(groupId);
-  const { isReady, isSignedIn, signInWithGoogle, logOutOfGoogle } = useGoogleCalendar();
-  const [ , setIsOpen] = useState(true)
+  const { isReady, signInWithGoogle  } = useGoogleCalendar();
+  //const [ , setIsOpen] = useState(true)
 
 
   useEffect(() => {

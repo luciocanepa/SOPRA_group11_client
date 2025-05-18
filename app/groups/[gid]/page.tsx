@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Modal, Button, Card } from "antd";
+import { Modal, Button } from "antd";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { useApi } from "@/hooks/useApi";
 import { useGroupParticipants } from "@/hooks/useGroupParticipants";
@@ -46,13 +46,13 @@ export default function GroupPage() {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [plannedSessionsOpen, setPlannedSessionsOpen] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
-  const [isGroupOwner, setIsGroupOwner] = useState(false);
+  const [ , setIsGroupOwner] = useState(false);
 
   const [isSession, setIsSession] = useState(true);
   const isBreak = isRunning && !isSession;
   // For chat
   const [username, setUsername] = useState<string>("");
-  const [isLoadingUser, setIsLoadingUser] = useState(true);
+  const [ , setIsLoadingUser] = useState(true);
   const [loadingUser, setLoadingUser] = useState(true);
 
   //const [groupData, setGroupData] = useState<Group | null>(null);
@@ -310,7 +310,7 @@ const { loading, requestSync } =
           {token && localUserId && group?.adminId === parseInt(localUserId) && (
             <Button
               className="secondary"
-              onClick={() => router.push(`/edit/group/${groupId}`)}
+              onClick={() => router.push(`/groups/${groupId}/edit`)}
             >
               Manage Group ↗
             </Button>

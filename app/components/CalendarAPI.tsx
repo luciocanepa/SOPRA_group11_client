@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Modal, DatePicker, TimePicker, Form, Button } from "antd";
 import { gapi } from "gapi-script";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { useGoogleCalendar } from "@/hooks/useGoogleCalendarAPI";
@@ -34,8 +34,8 @@ interface CalendarForm {
   endTime: dayjs.Dayjs;
 }
 
-export function CalendarAPI({ isOpen, onClose, groupName, userTimezone, userId, groupId }: CalendarPlannerProps) {
-  const { isReady, isSignedIn, signInWithGoogle, logOutOfGoogle } = useGoogleCalendar();
+export function CalendarAPI({ isOpen, onClose, groupName, userTimezone, groupId }: CalendarPlannerProps) {
+  const {  isSignedIn, signInWithGoogle, logOutOfGoogle } = useGoogleCalendar();
   const [form] = Form.useForm<CalendarForm>();
   const api = useApi();
   const { value: token } = useLocalStorage<string>("token", "");
