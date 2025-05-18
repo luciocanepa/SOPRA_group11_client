@@ -152,3 +152,12 @@ body {
 .disabled button {
   opacity: 0.5;
 }
+
+.select {
+  background-color: none;
+  color: var(--button-secondary) !important;
+  border-radius: 5px;
+  border: 1px solid var(--button-secondary) !important;
+
+  transition: background-color 0.4s ease;
+}

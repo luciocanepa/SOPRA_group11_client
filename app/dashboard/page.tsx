@@ -154,12 +154,12 @@ const Dashboard: React.FC = () => {
     };
 
     fetchGroups();
-  }, [apiService, loggedInUserGroups, token, id]);
+  }, [apiService, token, id]);
 
   useEffect(() => {
     const fetchInvitations = async () => {
       if (!token || !id) return;
-
+      
       try {
         const fetchedInvitations: Invitation[] = await apiService.get<
           Invitation[]

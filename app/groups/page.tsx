@@ -212,6 +212,7 @@ const GroupCreation: React.FC = () => {
           <Form.Item name="image" label="Group Picture">
             <Upload
               name="logo"
+              listType="picture"
               beforeUpload={(file) => {
                 uploadingImage(file);
                 return false;
