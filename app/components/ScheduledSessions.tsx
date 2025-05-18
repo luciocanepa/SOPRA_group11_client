@@ -8,6 +8,8 @@ import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { useGoogleCalendar } from "@/hooks/useGoogleCalendarAPI";
 import "@/styles/components/ScheduledSessions.css"
+import toast from "react-hot-toast";
+
 import "@/styles/pages/GroupPage.css"
 import "@/styles/globals.css"
 
@@ -46,7 +48,7 @@ export default function UpcomingSessions({ isOpen, groupId, userTimezone }: User
     const fetchSessions = async () => {
       try {
         
-        const response = await api.get<CalendarEntries[]>(`/calendar-entries/groups/${gid}`, token);
+        const response = await api.get<CalendarEntries[]>(`/groups/${gid}/calendar-entries`, token);
         //const data = await res.json();
         setEntry(response);
         console.log("Fetched entries:", response);
@@ -67,7 +69,11 @@ export default function UpcomingSessions({ isOpen, groupId, userTimezone }: User
 const handleAddToCalendar = async (session: CalendarEntries) => {
   try {
     if (!isReady) {
-      alert("Google Calendar is not initialized yet.");
+      toast.error(
+        <div>
+          <div><strong>Google Calendar is not initialized yet.</strong></div>
+        </div>
+      );
       return;
     }
 
@@ -98,10 +104,18 @@ const handleAddToCalendar = async (session: CalendarEntries) => {
     });
 
     console.log("Event created:", response);
-    alert(`Study session successfully added to your calendar with regards to your timezone: ${userTimezone}`);
+    toast.success(
+      <div>
+        <div><strong>Sucessfully added to Calendar!</strong></div>
+        <div> In regards to your timezone: {userTimezone}</div>
+      </div>)
     } catch (e) {
     console.error("Calendar event error:", e);
-    alert("Failed to add event to calendar.");
+    toast.error(
+      <div>
+        <div><strong>Failed to add event to calendar.</strong></div>
+      </div>
+    );
   }
 };
 
