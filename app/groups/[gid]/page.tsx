@@ -293,6 +293,25 @@ const { loading, requestSync } =
           )}
 
 
+          <Button
+            className="secondary"
+            onClick={() => {
+              setPlannedSessionsOpen(!plannedSessionsOpen);
+              setCalendarOpen(false);
+              setInviteOpen(false);
+            }}
+          >
+          {plannedSessionsOpen ? "-" : "+"} View Upcoming Study Sessions
+          </Button>
+          {plannedSessionsOpen && (
+            <ScheduledSessions
+              isOpen={plannedSessionsOpen} 
+              //onClose={() => setPlannedSessionsOpen(false)}
+              groupId={groupId}
+              userTimezone={user?.timezone || "Europe/Zurich"}
+            />
+          )}
+
 
           {token && localUserId && group?.adminId === parseInt(localUserId) && (
             <Button
