@@ -133,7 +133,7 @@ export default function Navbar({ user }: { user: User | null }) {
           <Button
             className="button secondary"
             id="navbar-profile-button"
-            onClick={() => router.push(`/edit/${loggedInUser?.id}`)}
+            onClick={() => router.push(`/users/${loggedInUser?.id}/edit`)}
           >
             Edit profile
           </Button>
