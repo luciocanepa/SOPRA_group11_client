@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Modal, DatePicker, TimePicker, Form, Button } from "antd";
+import { useEffect } from "react";
+import { DatePicker, TimePicker, Form, Button } from "antd";
 import { gapi } from "gapi-script";
 import dayjs from "dayjs";
 import { useApi } from "@/hooks/useApi";
@@ -25,7 +25,7 @@ interface CalendarPlannerProps {
   groupName: string;
   userTimezone: string;
   userId: string
-  groupId: Number;
+  groupId: number;
 }
 
 interface CalendarForm {
