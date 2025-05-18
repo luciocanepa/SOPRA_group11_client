@@ -18,6 +18,7 @@ import "@/styles/pages/GroupPage.css";
 
 interface SyncRequest {
     senderId:  string;
+    senderName: string;
     status:    "ONLINE" | "OFFLINE" | "WORK" | "BREAK";
     startTime: string; // when WE received the SYNC
     duration:  string; // PT##M##S at send-time
@@ -203,7 +204,7 @@ export default function GroupPage() {
                 onCancel={onDecline}
             >
                 <p>
-                    User <strong>{incomingSync?.senderId}</strong> would like to sync their timer with you. Accept?
+                    <strong>{incomingSync?.senderName}</strong> would like to sync their timer with you. Accept?
                 </p>
             </Modal>
 

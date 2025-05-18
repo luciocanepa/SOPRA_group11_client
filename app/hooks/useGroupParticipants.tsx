@@ -56,6 +56,7 @@ export function useGroupParticipants(
     token:   string | null,
     onSync?: (req: {
         senderId:  string;
+        senderName: string;
         status:    Participant["status"];
         startTime: string;   // NOW when the message was received
         duration:  string;   // PT##M##S remaining at send-time
@@ -165,6 +166,7 @@ export function useGroupParticipants(
                 // notify GroupPage with receive-time
                 onSync?.({
                     senderId:  raw.senderId,
+                    senderName: raw.senderName,
                     status:    raw.status,
                     startTime: start.toISOString(),
                     duration:  raw.secondDuration
