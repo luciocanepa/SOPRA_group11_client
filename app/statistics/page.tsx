@@ -175,7 +175,7 @@ export default function Statistics() {
     if (!token) return;
     const fetchGroups = async () => {
       try {
-        const data = await apiService.get<Group[]>(`/groups`, token);
+        const data = await apiService.get<Group[]>(`/users/${id}/groups`, token);
         setGroups(data);
       } catch (error) {
         if (error instanceof Error) {
