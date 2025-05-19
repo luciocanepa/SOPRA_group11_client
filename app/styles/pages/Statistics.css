@@ -1,5 +1,5 @@
 .statistics-card {
-  width: 90vw !important; 
+  width: 90vw !important;
   height: 10vh !important;
   margin-top: 0 !important;
 }
@@ -28,7 +28,7 @@
   padding: 0;
 }
 
-.mode-toggle{
+.mode-toggle {
   width: 10vw;
   display: flex;
   flex-direction: row;

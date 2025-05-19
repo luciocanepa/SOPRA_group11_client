@@ -42,10 +42,10 @@ const GroupCreation: React.FC = () => {
       } catch (error) {
         if (error instanceof Error) {
           toast.error(
-              <div>
-                <strong>Failed to fetch user:</strong>
-                <div>{error.message}</div>
-              </div>
+            <div>
+              <strong>Failed to fetch user:</strong>
+              <div>{error.message}</div>
+            </div>,
           );
         } else {
           console.error("An unknown error occurred while fetching groups.");
@@ -67,17 +67,25 @@ const GroupCreation: React.FC = () => {
         adminId: loggedInUser?.id,
       };
 
-      const newGroup = await apiService.post<Group>("/groups", requestBody, token);
+      const newGroup = await apiService.post<Group>(
+        "/groups",
+        requestBody,
+        token,
+      );
 
       for (const user of invitedUsers) {
-        await apiService.post(`/groups/${newGroup.id}/invitations`, { inviteeId: user.id }, token);
+        await apiService.post(
+          `/groups/${newGroup.id}/invitations`,
+          { inviteeId: user.id },
+          token,
+        );
       }
 
       toast.success(
-          <div>
-            <strong>Group created successfully!</strong>
-            <div>Redirecting to Group Dashboard</div>
-          </div>
+        <div>
+          <strong>Group created successfully!</strong>
+          <div>Redirecting to Group Dashboard</div>
+        </div>,
       );
       setTimeout(() => {
         router.push(`/groups/${newGroup.id}`);
@@ -86,17 +94,17 @@ const GroupCreation: React.FC = () => {
       setButtonEnabled(true);
       if (error instanceof Error) {
         toast.error(
-            <div>
-              <strong>Group creation failed:</strong>
-              <div>{error.message}</div>
-            </div>
+          <div>
+            <strong>Group creation failed:</strong>
+            <div>{error.message}</div>
+          </div>,
         );
       } else {
         toast.error(
-            <div>
-              <strong>Group creation failed:</strong>
-              <div>Unknown error</div>
-            </div>
+          <div>
+            <strong>Group creation failed:</strong>
+            <div>Unknown error</div>
+          </div>,
         );
       }
     }
@@ -114,10 +122,10 @@ const GroupCreation: React.FC = () => {
 
     reader.onerror = (error) => {
       toast.error(
-          <div>
-            <strong>Upload failed:</strong>
-            <div>{file.name} could not be uploaded.</div>
-          </div>
+        <div>
+          <strong>Upload failed:</strong>
+          <div>{file.name} could not be uploaded.</div>
+        </div>,
       );
       console.error("Upload error:", error);
     };
@@ -195,7 +203,9 @@ const GroupCreation: React.FC = () => {
             </Upload>
           </Form.Item>
 
-          <div className={`form-final-button-container ${buttonEnabled ? "" : "disabled"}`}>
+          <div
+            className={`form-final-button-container ${buttonEnabled ? "" : "disabled"}`}
+          >
             <Form.Item>
               <Button htmlType="submit" className="green">
                 Create Group

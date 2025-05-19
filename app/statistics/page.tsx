@@ -29,7 +29,7 @@ export default function Statistics() {
     start: Date;
     end: Date;
   }
-  
+
   interface Group {
     id: string;
     name: string;
@@ -45,10 +45,14 @@ export default function Statistics() {
   const { value: token } = useLocalStorage<string>("token", "");
   const { value: id } = useLocalStorage<string>("id", "");
   const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
-  const [currentWeek, setCurrentWeek] = useState<WeekRange>(getCurrentWeekRange(),);
+  const [currentWeek, setCurrentWeek] = useState<WeekRange>(
+    getCurrentWeekRange(),
+  );
   const [groups, setGroups] = useState<Group[]>([]);
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
-  const [groupActivityData, setGroupActivityData] = useState<GroupActivity[]>([]);
+  const [groupActivityData, setGroupActivityData] = useState<GroupActivity[]>(
+    [],
+  );
 
   // Get current week range (Monday to Sunday)
   function getCurrentWeekRange(): WeekRange {
@@ -68,7 +72,7 @@ export default function Statistics() {
     for (let i = 0; i < str.length; i++) {
       hash = str.charCodeAt(i) + ((hash << 5) - hash);
     }
-    
+
     // Generate colors with fixed saturation and lightness
     const h = Math.abs(hash) % 360;
     return `hsl(${h}, 80%, 60%)`;
@@ -90,39 +94,41 @@ export default function Statistics() {
 
   // Prepare chart data
   const chartData = useMemo(() => {
-  const days = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
-  const currentDate = new Date(currentWeek.start);
+    const days = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
+    const currentDate = new Date(currentWeek.start);
 
-  return days.map((day, index) => {
-    const date = new Date(currentDate);
-    date.setDate(currentDate.getDate() + index);
-    const dateString = date.toISOString().split("T")[0];
-    
-    // Show user data when no group is selected
-    if (!selectedGroupId) {
-      const activity = activities.find((a) => a.date === dateString);
+    return days.map((day, index) => {
+      const date = new Date(currentDate);
+      date.setDate(currentDate.getDate() + index);
+      const dateString = date.toISOString().split("T")[0];
+
+      // Show user data when no group is selected
+      if (!selectedGroupId) {
+        const activity = activities.find((a) => a.date === dateString);
+        return {
+          day,
+          duration: activity ? activity.duration : 0,
+          fullDate: formatDate(date),
+          hasData: !!activity,
+        };
+      }
+
+      // Show group data when a group is selected
+      const userDurations: Record<string, number> = {};
+      groupActivityData.forEach((user) => {
+        const activity = user.aggregatedActivities.find(
+          (a) => a.date === dateString,
+        );
+        userDurations[user.username] = activity ? activity.duration : 0;
+      });
+
       return {
         day,
-        duration: activity ? activity.duration : 0,
         fullDate: formatDate(date),
-        hasData: !!activity,
+        ...userDurations,
       };
-    }
-    
-    // Show group data when a group is selected
-    const userDurations: Record<string, number> = {};
-    groupActivityData.forEach((user) => {
-      const activity = user.aggregatedActivities.find((a) => a.date === dateString);
-      userDurations[user.username] = activity ? activity.duration : 0;
     });
-
-    return {
-      day,
-      fullDate: formatDate(date),
-      ...userDurations,
-    };
-  });
-}, [activities, currentWeek, selectedGroupId, groupActivityData]);
+  }, [activities, currentWeek, selectedGroupId, groupActivityData]);
 
   // Handle week navigation
   const handleWeekChange = (direction: "prev" | "next") => {
@@ -169,7 +175,7 @@ export default function Statistics() {
     if (!token) return;
     const fetchGroups = async () => {
       try {
-        const data = await apiService.get<Group[]>(`/groups`,token);
+        const data = await apiService.get<Group[]>(`/groups`, token);
         setGroups(data);
       } catch (error) {
         if (error instanceof Error) {
@@ -180,32 +186,34 @@ export default function Statistics() {
       }
     };
     fetchGroups();
-  },[token, apiService]);
+  }, [token, apiService]);
 
   useEffect(() => {
-  const fetchGroupActivities = async () => {
-    if (!selectedGroupId || !token) return;
+    const fetchGroupActivities = async () => {
+      if (!selectedGroupId || !token) return;
 
-    try {
-      const start = currentWeek.start.toISOString().split("T")[0];
-      const end = currentWeek.end.toISOString().split("T")[0];
+      try {
+        const start = currentWeek.start.toISOString().split("T")[0];
+        const end = currentWeek.end.toISOString().split("T")[0];
 
-      const data = await apiService.get<GroupActivity[]>(
-        `/groups/${selectedGroupId}/statistics?aggregate=true&startDate=${start}&endDate=${end}`,
-        token
-      );
-      setGroupActivityData(data);
-    } catch (error) {
+        const data = await apiService.get<GroupActivity[]>(
+          `/groups/${selectedGroupId}/statistics?aggregate=true&startDate=${start}&endDate=${end}`,
+          token,
+        );
+        setGroupActivityData(data);
+      } catch (error) {
         if (error instanceof Error) {
-          alert(`Something went wrong while getting group activities:\n${error.message}`,);
+          alert(
+            `Something went wrong while getting group activities:\n${error.message}`,
+          );
         } else {
           console.error("Fetching group activities has failed");
         }
       }
-  };
+    };
 
-  fetchGroupActivities();
-}, [selectedGroupId, currentWeek, token]);
+    fetchGroupActivities();
+  }, [selectedGroupId, currentWeek, token]);
 
   return (
     <>
@@ -219,16 +227,19 @@ export default function Statistics() {
               <Select
                 className="select"
                 popupMatchSelectWidth={false}
-                value = {selectedGroupId ?? ""}
-                onChange={(groupId) => setSelectedGroupId(groupId === "" ? null : groupId)}
-                options={[{label: "my statistics", value: ""},
+                value={selectedGroupId ?? ""}
+                onChange={(groupId) =>
+                  setSelectedGroupId(groupId === "" ? null : groupId)
+                }
+                options={[
+                  { label: "my statistics", value: "" },
                   ...groups.map((group) => ({
                     label: group.name,
                     value: group.id,
-                  }))
+                  })),
                 ]}
               />
-            </div> 
+            </div>
             <div className="week-navigation">
               <Button
                 className="secondary"
@@ -275,22 +286,22 @@ export default function Statistics() {
                       />
                     ))}
                   </Bar>
-                ): (
-                    groupActivityData.map((user) => (
-                      <Bar
-                        key={user.username}
-                        dataKey={user.username}
-                        name={user.username}
-                      >
-                        {chartData.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={stringToColor(user.username)}
-                          />
-                        ))}
-                      </Bar>
-                    ))
-                  )}
+                ) : (
+                  groupActivityData.map((user) => (
+                    <Bar
+                      key={user.username}
+                      dataKey={user.username}
+                      name={user.username}
+                    >
+                      {chartData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={stringToColor(user.username)}
+                        />
+                      ))}
+                    </Bar>
+                  ))
+                )}
               </BarChart>
             </ResponsiveContainer>
           </div>

@@ -43,10 +43,12 @@ const Login: () => JSX.Element = () => {
         setUserId(response.id);
         // console.log("Login successful! Redirecting to dashboard.");
         toast.success(
+          <div>
             <div>
-              <div><strong>Login successful!</strong></div>
-              <div>Redirecting to Dashboard.</div>
+              <strong>Login successful!</strong>
             </div>
+            <div>Redirecting to Dashboard.</div>
+          </div>,
         );
         setTimeout(() => {
           router.push("/dashboard");
@@ -57,18 +59,22 @@ const Login: () => JSX.Element = () => {
       if (error instanceof Error) {
         // console.error("Login failed:", error.message);
         toast.error(
+          <div>
             <div>
-              <div><strong>Login failed:</strong></div>
-              <div>User not found or wrong password.</div>
+              <strong>Login failed:</strong>
             </div>
+            <div>User not found or wrong password.</div>
+          </div>,
         );
       } else {
         // console.error("An unknown error occurred during login.");
         toast.error(
+          <div>
             <div>
-              <div><strong>Login failed:</strong></div>
-              <div>Unknown error</div>
+              <strong>Login failed:</strong>
             </div>
+            <div>Unknown error</div>
+          </div>,
         );
       }
     }

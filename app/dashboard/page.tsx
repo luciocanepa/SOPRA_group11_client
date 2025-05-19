@@ -159,7 +159,7 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const fetchInvitations = async () => {
       if (!token || !id) return;
-      
+
       try {
         const fetchedInvitations: Invitation[] = await apiService.get<
           Invitation[]

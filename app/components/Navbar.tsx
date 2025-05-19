@@ -73,13 +73,13 @@ export default function Navbar({ user }: { user: User | null }) {
         >
           Dashboard
         </Button>
-          <Button
-              className="button secondary"
-              onClick={() => setIsModalOpen(true)}
-              style={{ marginLeft: "18px" }}
-          >
-            Info
-          </Button>
+        <Button
+          className="button secondary"
+          onClick={() => setIsModalOpen(true)}
+          style={{ marginLeft: "18px" }}
+        >
+          Info
+        </Button>
       </div>
       <div className="navbar-user-container">
         {loggedInUser && (
@@ -104,7 +104,9 @@ export default function Navbar({ user }: { user: User | null }) {
           </>
         )}
 
-        <div className={`navbar-button-container ${buttonEnabled ? "" : "disabled"}`}>
+        <div
+          className={`navbar-button-container ${buttonEnabled ? "" : "disabled"}`}
+        >
           <Button
             className="button secondary"
             id="navbar-profile-button"
@@ -112,26 +114,30 @@ export default function Navbar({ user }: { user: User | null }) {
           >
             Edit profile
           </Button>
-          <Button className="red" onClick={handleLogout} disabled={!buttonEnabled}>
+          <Button
+            className="red"
+            onClick={handleLogout}
+            disabled={!buttonEnabled}
+          >
             Logout
           </Button>
         </div>
       </div>
 
       <Modal
-          open={isModalOpen}
-          onCancel={() => setIsModalOpen(false)}
-          footer={null}
-          width={600}
-          centered
-          styles={{
-            body: {
-              padding: "1.5rem",
-              height: "380px",
-              overflowY: "auto",
-            },
-          }}
-          destroyOnClose
+        open={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
+        footer={null}
+        width={600}
+        centered
+        styles={{
+          body: {
+            padding: "1.5rem",
+            height: "380px",
+            overflowY: "auto",
+          },
+        }}
+        destroyOnClose
       >
         <InfoCarousel />
       </Modal>

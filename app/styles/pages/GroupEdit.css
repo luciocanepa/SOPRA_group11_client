@@ -1,42 +1,42 @@
 .toast-container {
-    background-color: white;
-    border-left: 6px solid var(--button-primary);
-    padding: 16px 20px;
-    border-radius: 8px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    color: #333;
-    font-family: "Poppins", sans-serif;
-    max-width: 320px;
-    align-items: center;
-    text-align: center;
+  background-color: white;
+  border-left: 6px solid var(--button-primary);
+  padding: 16px 20px;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  color: #333;
+  font-family: "Poppins", sans-serif;
+  max-width: 320px;
+  align-items: center;
+  text-align: center;
 }
 
 .toast-container p {
-    margin-bottom: 12px;
-    font-size: 15px;
-    line-height: 1.4;
+  margin-bottom: 12px;
+  font-size: 15px;
+  line-height: 1.4;
 }
 
 .toast-container button {
-    margin-right: 8px;
-    background-color: var(--button-green);
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s ease;
+  margin-right: 8px;
+  background-color: var(--button-green);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
 }
 
 .toast-container button:hover {
-    background-color: var(--button-green-hover);
+  background-color: var(--button-green-hover);
 }
 
 .toast-container button:last-child {
-    background-color: var(--button-red);
+  background-color: var(--button-red);
 }
 
 .toast-container button:last-child:hover {
-    background-color: var(--button-red-hover);
+  background-color: var(--button-red-hover);
 }

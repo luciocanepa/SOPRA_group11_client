@@ -4,19 +4,18 @@
   color: black !important;
   background-color: white !important;
 }
-  
+
 .ant-picker-time-panel-cell-inner:hover {
   background-color: #f5f5f5 !important;
   color: black !important;
 }
-  
+
 .ant-picker-time-panel-cell-selected .ant-picker-time-panel-cell-inner {
   background-color: #e6e6e6 !important;
   color: black !important;
   font-weight: bold;
 }
-  
-  
+
 /*OK button red instead of green in TimePicker*/
 .ant-picker-ok button {
   background-color: #730000 !important;
@@ -28,8 +27,6 @@
   background-color: #3e0000 !important;
   border-color: #3e0000 !important;
 }
-
-
 
 /* general syling of buttons and their placement*/
 
@@ -57,9 +54,6 @@
   text-align: center;
 }
 
-
-
-
 /*buttons*/
 
 .button-row {
@@ -69,7 +63,7 @@
   margin-top: 24px;
 }
 
-.button{
+.button {
   width: auto !important;
   padding: 8px 24px !important;
   height: 53px !important;
