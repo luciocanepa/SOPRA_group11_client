@@ -14,7 +14,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
-import { Button, Card } from "antd";
+import { Button, Card, Select } from "antd";
 
 import "../styles/module.css";
 import "../styles/pages/Statistics.css";
@@ -30,6 +30,16 @@ export default function Statistics() {
     end: Date;
   }
 
+  interface Group {
+    id: string;
+    name: string;
+  }
+
+  interface GroupActivity {
+    username: string;
+    aggregatedActivities: Activity[];
+  }
+
   const apiService = useApi();
   const [activities, setActivities] = useState<Activity[]>([]);
   const { value: token } = useLocalStorage<string>("token", "");
@@ -37,6 +47,11 @@ export default function Statistics() {
   const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
   const [currentWeek, setCurrentWeek] = useState<WeekRange>(
     getCurrentWeekRange(),
+  );
+  const [groups, setGroups] = useState<Group[]>([]);
+  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+  const [groupActivityData, setGroupActivityData] = useState<GroupActivity[]>(
+    [],
   );
 
   // Get current week range (Monday to Sunday)
@@ -49,6 +64,19 @@ export default function Statistics() {
     end.setDate(start.getDate() + 6);
     return { start, end };
   }
+
+  //get color over hash
+  const stringToColor = (str: string) => {
+    str = str + "x7H!k";
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+
+    // Generate colors with fixed saturation and lightness
+    const h = Math.abs(hash) % 360;
+    return `hsl(${h}, 80%, 60%)`;
+  };
 
   // Format week range for display
   const weekRangeDisplay = useMemo(() => {
@@ -73,16 +101,34 @@ export default function Statistics() {
       const date = new Date(currentDate);
       date.setDate(currentDate.getDate() + index);
       const dateString = date.toISOString().split("T")[0];
-      const activity = activities.find((a) => a.date === dateString);
+
+      // Show user data when no group is selected
+      if (!selectedGroupId) {
+        const activity = activities.find((a) => a.date === dateString);
+        return {
+          day,
+          duration: activity ? activity.duration : 0,
+          fullDate: formatDate(date),
+          hasData: !!activity,
+        };
+      }
+
+      // Show group data when a group is selected
+      const userDurations: Record<string, number> = {};
+      groupActivityData.forEach((user) => {
+        const activity = user.aggregatedActivities.find(
+          (a) => a.date === dateString,
+        );
+        userDurations[user.username] = activity ? activity.duration : 0;
+      });
 
       return {
         day,
-        duration: activity ? activity.duration : 0, // Convert to hours
         fullDate: formatDate(date),
-        hasData: !!activity,
+        ...userDurations,
       };
     });
-  }, [activities, currentWeek]);
+  }, [activities, currentWeek, selectedGroupId, groupActivityData]);
 
   // Handle week navigation
   const handleWeekChange = (direction: "prev" | "next") => {
@@ -125,6 +171,50 @@ export default function Statistics() {
     fetchAllActivities();
   }, [id, token, apiService]);
 
+  useEffect(() => {
+    if (!token) return;
+    const fetchGroups = async () => {
+      try {
+        const data = await apiService.get<Group[]>(`/users/${id}/groups`, token);
+        setGroups(data);
+      } catch (error) {
+        if (error instanceof Error) {
+          alert(`Something went wrong while getting Groups:\n${error.message}`);
+        } else {
+          console.error("Fetching groups has failed");
+        }
+      }
+    };
+    fetchGroups();
+  }, [token, apiService]);
+
+  useEffect(() => {
+    const fetchGroupActivities = async () => {
+      if (!selectedGroupId || !token) return;
+
+      try {
+        const start = currentWeek.start.toISOString().split("T")[0];
+        const end = currentWeek.end.toISOString().split("T")[0];
+
+        const data = await apiService.get<GroupActivity[]>(
+          `/groups/${selectedGroupId}/statistics?aggregate=true&startDate=${start}&endDate=${end}`,
+          token,
+        );
+        setGroupActivityData(data);
+      } catch (error) {
+        if (error instanceof Error) {
+          alert(
+            `Something went wrong while getting group activities:\n${error.message}`,
+          );
+        } else {
+          console.error("Fetching group activities has failed");
+        }
+      }
+    };
+
+    fetchGroupActivities();
+  }, [selectedGroupId, currentWeek, token]);
+
   return (
     <>
       <Navbar user={loggedInUser} />
@@ -133,6 +223,23 @@ export default function Statistics() {
         <Card className="card statistics-card">
           <div className="statistics-header">
             <h2>Work Time Statistics</h2>
+            <div className="mode-toggle">
+              <Select
+                className="select"
+                popupMatchSelectWidth={false}
+                value={selectedGroupId ?? ""}
+                onChange={(groupId) =>
+                  setSelectedGroupId(groupId === "" ? null : groupId)
+                }
+                options={[
+                  { label: "my statistics", value: "" },
+                  ...groups.map((group) => ({
+                    label: group.name,
+                    value: group.id,
+                  })),
+                ]}
+              />
+            </div>
             <div className="week-navigation">
               <Button
                 className="secondary"
@@ -163,23 +270,38 @@ export default function Statistics() {
                   }}
                 />
                 <Tooltip
-                  formatter={(value) => [`${value} minutes`, "Duration"]}
+                  formatter={(value, name) => [`${value} minutes`, name]}
                   labelFormatter={(label) => {
-                    const dayData = chartData.find((d) => d.day === label);
-                    return dayData
-                      ? formatDate(new Date(dayData.fullDate))
-                      : label;
+                    const data = chartData.find((d) => d.day === label);
+                    return data?.fullDate || label;
                   }}
                 />
-                <Bar dataKey="duration" name="Work Duration">
-                  {chartData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={entry.hasData ? "#2D7DA4" : "#E0E0E0"}
-                      stroke={entry.hasData ? "#2D7DA4" : "#BDBDBD"}
-                    />
-                  ))}
-                </Bar>
+                {!selectedGroupId ? (
+                  <Bar dataKey="duration" name="Work Duration">
+                    {chartData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={entry.hasData ? "#2D7DA4" : "#E0E0E0"}
+                        stroke={entry.hasData ? "#2D7DA4" : "#BDBDBD"}
+                      />
+                    ))}
+                  </Bar>
+                ) : (
+                  groupActivityData.map((user) => (
+                    <Bar
+                      key={user.username}
+                      dataKey={user.username}
+                      name={user.username}
+                    >
+                      {chartData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={stringToColor(user.username)}
+                        />
+                      ))}
+                    </Bar>
+                  ))
+                )}
               </BarChart>
             </ResponsiveContainer>
           </div>

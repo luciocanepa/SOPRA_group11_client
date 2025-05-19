@@ -27,8 +27,8 @@ const Register: () => JSX.Element = () => {
   const [enabled, setEnabled] = useState(true);
 
   const handleRegister = async (values: RegisterForm) => {
-    if(!enabled) return;
-    setEnabled(false)
+    if (!enabled) return;
+    setEnabled(false);
     try {
       const response = await apiService.post<User>(
         "/users/register",
@@ -43,10 +43,12 @@ const Register: () => JSX.Element = () => {
         setUserId(response.id);
         // console.log("Registration successful! Redirecting to dashboard.");
         toast.success(
+          <div>
             <div>
-              <div><strong>Registration successful!</strong></div>
-              <div>Redirecting to Dashboard.</div>
+              <strong>Registration successful!</strong>
             </div>
+            <div>Redirecting to Dashboard.</div>
+          </div>,
         );
         setTimeout(() => {
           router.push("/dashboard");
@@ -56,18 +58,22 @@ const Register: () => JSX.Element = () => {
       setEnabled(true);
       if (error instanceof Error) {
         toast.error(
+          <div>
             <div>
-              <div><strong>Registration failed:</strong></div>
-              <div>This username is already taken.</div>
+              <strong>Registration failed:</strong>
             </div>
+            <div>This username is already taken.</div>
+          </div>,
         );
       } else {
         // console.error("An unknown error occurred during registration.");
         toast.error(
+          <div>
             <div>
-              <div><strong>Registration failed:</strong></div>
-              <div>Unknown error occurred. Please try again.</div>
+              <strong>Registration failed:</strong>
             </div>
+            <div>Unknown error occurred. Please try again.</div>
+          </div>,
         );
       }
     }

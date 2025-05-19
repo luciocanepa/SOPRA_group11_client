@@ -23,6 +23,8 @@ const ManageProfile: React.FC = () => {
   const { id } = useParams();
   const [isAuthorizedToEdit, setIsAuthorizedToEdit] = useState<boolean>(false);
 
+  const [buttonEnabled, setButtonEnabled] = useState<boolean>(true);
+
   const [isEdit, setIsEdit] = useState({
     username: false,
     name: false,
@@ -52,10 +54,12 @@ const ManageProfile: React.FC = () => {
 
     reader.onerror = () => {
       toast.error(
+        <div>
           <div>
-              <div><strong>Upload failed:</strong></div>
-              <div>{file.name} could not be uploaded.</div>
+            <strong>Upload failed:</strong>
           </div>
+          <div>{file.name} could not be uploaded.</div>
+        </div>,
       );
     };
   };
@@ -70,10 +74,12 @@ const ManageProfile: React.FC = () => {
           setIsAuthorizedToEdit(true);
         } else {
           toast.error(
+            <div>
               <div>
-                <div><strong>Access Denied:</strong></div>
-                <div>You are not authorized to edit this profile.</div>
+                <strong>Access Denied:</strong>
               </div>
+              <div>You are not authorized to edit this profile.</div>
+            </div>,
           );
         }
         if (user.profilePicture) {
@@ -88,21 +94,25 @@ const ManageProfile: React.FC = () => {
           timezone: user.timezone ?? undefined,
         });
       } catch (error) {
-          if (error instanceof Error) {
-              toast.error(
-                  <div>
-                      <div><strong>Failed to fetch user:</strong></div>
-                      <div>{error.message}</div>
-                  </div>
-              );
-          } else {
-              toast.error(
-                  <div>
-                      <div><strong>Failed to fetch user:</strong></div>
-                      <div>An unknown error occurred.</div>
-                  </div>
-              );
-          }
+        if (error instanceof Error) {
+          toast.error(
+            <div>
+              <div>
+                <strong>Failed to fetch user:</strong>
+              </div>
+              <div>{error.message}</div>
+            </div>,
+          );
+        } else {
+          toast.error(
+            <div>
+              <div>
+                <strong>Failed to fetch user:</strong>
+              </div>
+              <div>An unknown error occurred.</div>
+            </div>,
+          );
+        }
       }
     };
 
@@ -110,15 +120,18 @@ const ManageProfile: React.FC = () => {
   }, [id, token, apiService, form]);
 
   const handleUserEdit = async () => {
-    if (!token) return;
+    if (!token || !buttonEnabled) return;
+    setButtonEnabled(false);
     // console.log(form.getFieldsValue());
     if (!isAuthorizedToEdit) {
       // console.log("not authorized");
       toast.error(
+        <div>
           <div>
-            <div><strong>Unauthorized:</strong></div>
-            <div>You are not authorized to edit this profile.</div>
+            <strong>Unauthorized:</strong>
           </div>
+          <div>You are not authorized to edit this profile.</div>
+        </div>,
       );
       return;
     }
@@ -152,10 +165,12 @@ const ManageProfile: React.FC = () => {
       await apiService.put(`/users/${user?.id}`, edits, token);
 
       toast.success(
+        <div>
           <div>
-            <div><strong>Profile updated successfully!</strong></div>
-            <div>Your changes have been saved.</div>
+            <strong>Profile updated successfully!</strong>
           </div>
+          <div>Your changes have been saved.</div>
+        </div>,
       );
       setIsEdit({
         username: false,
@@ -170,15 +185,18 @@ const ManageProfile: React.FC = () => {
       //       <div>Redirecting back to your profile.</div>
       //     </div>
       // );
-      router.push(`/users/${user?.id}/edit`);
+      router.back();
     } catch (error) {
-        console.error(error);
+      console.error(error);
+      setButtonEnabled(true);
       toast.error(
+        <div>
           <div>
-            <div><strong>Profile update failed:</strong></div>
-            <div>Username may already be taken.</div>
-            <div>Please try a different one.</div>
+            <strong>Profile update failed:</strong>
           </div>
+          <div>Username may already be taken.</div>
+          <div>Please try a different one.</div>
+        </div>,
       );
     }
   };
@@ -362,6 +380,7 @@ const ManageProfile: React.FC = () => {
           <Form.Item name="profilePicture" label="Profile Picture">
             <Upload
               name="logo"
+              listType="picture"
               beforeUpload={(file) => {
                 uploadingImage(file);
                 return false;
@@ -373,7 +392,9 @@ const ManageProfile: React.FC = () => {
             </Upload>
           </Form.Item>
 
-          <div className="form-final-button-container">
+          <div
+            className={`form-final-button-container ${buttonEnabled ? "" : "disabled"}`}
+          >
             <Form.Item>
               <Button htmlType="submit" className="green">
                 Save

@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { gapi } from "gapi-script";
 
-const CLIENT_ID = "132315875574-t1suu2183q7vo2imc8qlfuqa0kenrpq3.apps.googleusercontent.com";
+const CLIENT_ID =
+  "132315875574-t1suu2183q7vo2imc8qlfuqa0kenrpq3.apps.googleusercontent.com";
 const SCOPES = "https://www.googleapis.com/auth/calendar.events";
 
 export function useGoogleCalendar() {
@@ -15,7 +16,9 @@ export function useGoogleCalendar() {
           await gapi.client.init({
             clientId: CLIENT_ID,
             scope: SCOPES,
-            discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"],
+            discoveryDocs: [
+              "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest",
+            ],
           });
           await gapi.client.load("calendar", "v3");
 

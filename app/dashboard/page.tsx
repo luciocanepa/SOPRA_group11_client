@@ -154,7 +154,7 @@ const Dashboard: React.FC = () => {
     };
 
     fetchGroups();
-  }, [apiService, loggedInUserGroups, token, id]);
+  }, [apiService, token, id]);
 
   useEffect(() => {
     const fetchInvitations = async () => {

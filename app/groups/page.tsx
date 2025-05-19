@@ -30,6 +30,8 @@ const GroupCreation: React.FC = () => {
     { id: string; username: string }[]
   >([]);
 
+  const [buttonEnabled, setButtonEnabled] = useState<boolean>(true);
+
   useEffect(() => {
     const fetchLoggedInUser = async () => {
       if (!token || !id) return;
@@ -40,10 +42,10 @@ const GroupCreation: React.FC = () => {
       } catch (error) {
         if (error instanceof Error) {
           toast.error(
-              <div>
-                <strong>Failed to fetch user:</strong>
-                <div>{error.message}</div>
-              </div>
+            <div>
+              <strong>Failed to fetch user:</strong>
+              <div>{error.message}</div>
+            </div>,
           );
         } else {
           console.error("An unknown error occurred while fetching groups.");
@@ -55,6 +57,8 @@ const GroupCreation: React.FC = () => {
   }, [apiService, token, id]);
 
   const handleGroupCreation = async (values: FormFieldProps) => {
+    if (!token || !buttonEnabled) return;
+    setButtonEnabled(false);
     try {
       const requestBody = {
         ...values,
@@ -63,61 +67,50 @@ const GroupCreation: React.FC = () => {
         adminId: loggedInUser?.id,
       };
 
-      const newGroup = await apiService.post<Group>("/groups", requestBody, token);
+      const newGroup = await apiService.post<Group>(
+        "/groups",
+        requestBody,
+        token,
+      );
 
       for (const user of invitedUsers) {
-        await apiService.post(`/groups/${newGroup.id}/invitations`, { inviteeId: user.id }, token);
+        await apiService.post(
+          `/groups/${newGroup.id}/invitations`,
+          { inviteeId: user.id },
+          token,
+        );
       }
 
       toast.success(
-          <div>
-            <strong>Group created successfully!</strong>
-            <div>Redirecting to Group Dashboard</div>
-          </div>
+        <div>
+          <strong>Group created successfully!</strong>
+          <div>Redirecting to Group Dashboard</div>
+        </div>,
       );
       setTimeout(() => {
         router.push(`/groups/${newGroup.id}`);
       }, 800);
     } catch (error) {
+      setButtonEnabled(true);
       if (error instanceof Error) {
         toast.error(
-            <div>
-              <strong>Group creation failed:</strong>
-              <div>{error.message}</div>
-            </div>
+          <div>
+            <strong>Group creation failed:</strong>
+            <div>{error.message}</div>
+          </div>,
         );
       } else {
         toast.error(
-            <div>
-              <strong>Group creation failed:</strong>
-              <div>Unknown error</div>
-            </div>
+          <div>
+            <strong>Group creation failed:</strong>
+            <div>Unknown error</div>
+          </div>,
         );
       }
     }
   };
 
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-  /*const uploadingImage = async (info: any) => {
-        const formData = new FormData();
-        formData.append("file", info.file);
-    
-        try {
-            const response = await apiService.post<{ imageUrl: string }>("/upload", formData);
-            setUploadedImage(response.imageUrl);
-            message.success(`${info.file.name} uploaded successfully`);
-        } catch (error) {
-            message.error(`${info.file.name} upload failed.`);
-        }
-    };*/ //if we would like to store the picture in the backend with an URL
-  /*                name="logo"
-                action="/upload.do" // Change this to your upload URL
-                onChange={uploadingImage}
-                beforeUpload={() => false} // Prevent automatic upload*/ //--> this part would belong to the upload part in the form
-  /*           valuePropName="fileList"
-            getValueFromEvent={(e) => Array.isArray(e) ? e : e && e.fileList}*/ //--> belongs to form.item after name and label
-
-  // -->   solution apprach with bas64String for the image (above would be with a post so an url would get stored)
   const uploadingImage = (file: File) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
@@ -129,10 +122,10 @@ const GroupCreation: React.FC = () => {
 
     reader.onerror = (error) => {
       toast.error(
-          <div>
-            <strong>Upload failed:</strong>
-            <div>{file.name} could not be uploaded.</div>
-          </div>
+        <div>
+          <strong>Upload failed:</strong>
+          <div>{file.name} could not be uploaded.</div>
+        </div>,
       );
       console.error("Upload error:", error);
     };
@@ -195,23 +188,10 @@ const GroupCreation: React.FC = () => {
             />
           </Form.Item>
 
-          {/* <Form.Item
-            name="members"
-            label="Members"
-            rules={[
-              {
-                required: false,
-                message:
-                  "Please input usernames of the members you want to add, use a comma to seperate!",
-              },
-            ]}
-          >
-            <Input placeholder="Enter usernames, comma-separated" />
-          </Form.Item> */}
-
           <Form.Item name="image" label="Group Picture">
             <Upload
               name="logo"
+              listType="picture"
               beforeUpload={(file) => {
                 uploadingImage(file);
                 return false;
@@ -223,7 +203,9 @@ const GroupCreation: React.FC = () => {
             </Upload>
           </Form.Item>
 
-          <div className="form-final-button-container">
+          <div
+            className={`form-final-button-container ${buttonEnabled ? "" : "disabled"}`}
+          >
             <Form.Item>
               <Button htmlType="submit" className="green">
                 Create Group
