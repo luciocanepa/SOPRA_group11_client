@@ -217,33 +217,87 @@ export function PomodoroTimer({
         {state.showSettings && (
             <div className="settings-popup">
               <h2 className="popup-title">Timer Settings</h2>
+
               <div className="settings-row">
-                <label>Session (minutes):</label>
+                <label htmlFor="session-input">Session (minutes):</label>
                 <input
-                    type="number"
-                    value={state.settings.session}
-                    onChange={e=>setState(s=>({
-                      ...s,
-                      settings: { ...s.settings, session: Math.max(1, Number(e.target.value)) }
-                    }))}
-                    min={1}
+                    id="session-input"
+                    type="text"
+                    value={String(state.settings.session)}
+                    className={
+                      !state.settings.session || state.settings.session < 1
+                          ? "timer-input-error"
+                          : ""
+                    }
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === "") {
+                        setState(s => ({ ...s, settings: { ...s.settings, session: 0 } }));
+                      } else if (/^\d+$/.test(val)) {
+                        setState(s => ({ ...s, settings: { ...s.settings, session: Math.floor(Number(val)) } }));
+                      }
+                    }}
+                    onBlur={(e) => {
+                      const val = e.target.value.trim();
+                      const num = Number(val);
+                      if (!val || isNaN(num) || num < 1) {
+                        setState(s => ({ ...s, settings: { ...s.settings, session: 0 } }));
+                      } else {
+                        setState(s => ({ ...s, settings: { ...s.settings, session: Math.floor(num) } }));
+                      }
+                    }}
+                    placeholder="Enter minutes"
                 />
               </div>
+
               <div className="settings-row">
-                <label>Break (minutes):</label>
+                <label htmlFor="break-input">Break (minutes):</label>
                 <input
-                    type="number"
-                    value={state.settings.break}
-                    onChange={e=>setState(s=>({
-                      ...s,
-                      settings: { ...s.settings, break: Math.max(1, Number(e.target.value)) }
-                    }))}
-                    min={1}
+                    id="break-input"
+                    type="text"
+                    value={String(state.settings.break)}
+                    className={
+                      !state.settings.break || state.settings.break < 1
+                          ? "timer-input-error"
+                          : ""
+                    }
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === "") {
+                        setState(s => ({ ...s, settings: { ...s.settings, break: 0 } }));
+                      } else if (/^\d+$/.test(val)) {
+                        setState(s => ({ ...s, settings: { ...s.settings, break: Math.floor(Number(val)) } }));
+                      }
+                    }}
+                    onBlur={(e) => {
+                      const val = e.target.value.trim();
+                      const num = Number(val);
+                      if (!val || isNaN(num) || num < 1) {
+                        setState(s => ({ ...s, settings: { ...s.settings, break: 0 } }));
+                      } else {
+                        setState(s => ({ ...s, settings: { ...s.settings, break: Math.floor(num) } }));
+                      }
+                    }}
+                    placeholder="Enter minutes"
                 />
               </div>
+
               <div className="settings-popup-button-group">
-                <Button className="green" onClick={applySettings}>Apply</Button>
-                <Button className="red"   onClick={toggleSettings}>Cancel</Button>
+                <Button
+                    className="green"
+                    onClick={() => {
+                      if (state.settings.session < 1 || state.settings.break < 1) {
+                        toast.error("Input a number ≥1 in both fields.");
+                        return;
+                      }
+                      applySettings();
+                    }}
+                >
+                  Apply
+                </Button>
+                <Button className="red" onClick={toggleSettings}>
+                  Cancel
+                </Button>
               </div>
             </div>
         )}
