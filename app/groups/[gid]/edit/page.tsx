@@ -24,6 +24,8 @@ const ManageGroup: React.FC = () => {
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [removedUsers, setRemovedUsers] = useState<User[]>([]);
 
+  const [buttonEnabled, setButtonEnabled] = useState<boolean>(true);
+
   const [isEdit, setIsEdit] = useState({
     name: false,
     description: false,
@@ -91,7 +93,8 @@ const ManageGroup: React.FC = () => {
   }, [gid, token, id, apiService, form]);
 
   const handleGroupEdit = async () => {
-  if (!token) return;
+  if (!token || !buttonEnabled) return;
+  setButtonEnabled(false);
   if (!isAuthorizedToEdit) {
       toast.error(
           <div>
@@ -128,8 +131,9 @@ const ManageGroup: React.FC = () => {
         name: false,
       });
 
-      router.push(`/groups/${group?.id}/edit`);
+      router.back();
     } catch (error) {
+      setButtonEnabled(true);
       toast.error(
           <div>
             <strong>Failed to update the group.</strong>
@@ -300,7 +304,7 @@ const ManageGroup: React.FC = () => {
               </Upload>
             </Form.Item>
 
-            <div className="form-final-button-container">
+            <div className={`form-final-button-container ${buttonEnabled ? "" : "disabled"}`}>
               <Form.Item>
                 <Button htmlType="submit" className="green">
                   Save

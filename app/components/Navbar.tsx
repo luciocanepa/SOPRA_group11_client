@@ -66,31 +66,6 @@ export default function Navbar({ user }: { user: User | null }) {
   };
   return (
     <div className="navbar-container">
-      {/* {activeGroup && (
-        <>
-          {activeGroup?.image && (
-            <Image
-              src={`data:image/png;base64,${activeGroup?.image}`}
-              alt="Profile"
-              id="navbar-profile-picture"
-              width={40}
-              height={40}
-            />
-          )}
-          {!activeGroup?.image && (
-            <Image
-              src={"/group_tomato.JPG"}
-              alt="Profile"
-              id="navbar-profile-picture"
-              width={40}
-              height={40}
-            />
-          )}
-          <h1>
-            {activeGroup?.name} ({loggedInUser?.name || loggedInUser?.username})
-          </h1>
-        </>
-      )} */}
       <div className="navbar-container-left">
         <Button
           className="button secondary"

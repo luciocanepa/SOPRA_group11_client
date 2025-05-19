@@ -42,6 +42,8 @@ export function InviteUser({
       message: string;
     }[]
   >([]);
+
+  const [buttonEnabled, setButtonEnabled] = useState<boolean>(true);
   // Fetch all users on component mount
   useEffect(() => {
     if (!token) return;
@@ -85,6 +87,8 @@ export function InviteUser({
   };
 
   const handleInvite = async () => {
+    if (!token || !buttonEnabled) return;
+    setButtonEnabled(false);
     const matchingUser = getUserByUsername(username);
 
     if (!matchingUser) {
@@ -138,6 +142,7 @@ export function InviteUser({
       setUsername("");
       setFilteredOptions([]);
     } catch (error) {
+      setButtonEnabled(true);
       const errMsg = error instanceof Error ? error.message : "Unknown error";
       setInviteResults((prev) => [
         ...prev,
@@ -149,6 +154,7 @@ export function InviteUser({
       ]);
       message.error(`Invitation failed: ${errMsg}`);
     } finally {
+      setButtonEnabled(true);
       setLoading(false);
     }
   };
@@ -167,7 +173,7 @@ export function InviteUser({
         />
 
         <Button
-          className="green"
+          className={`green ${buttonEnabled ? "" : "disabled"}`}
           onClick={handleInvite}
           loading={loading}
           disabled={!username}

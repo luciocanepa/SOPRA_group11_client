@@ -23,6 +23,8 @@ const ManageProfile: React.FC = () => {
   const { id } = useParams();
   const [isAuthorizedToEdit, setIsAuthorizedToEdit] = useState<boolean>(false);
 
+  const [buttonEnabled, setButtonEnabled] = useState<boolean>(true);
+
   const [isEdit, setIsEdit] = useState({
     username: false,
     name: false,
@@ -110,7 +112,8 @@ const ManageProfile: React.FC = () => {
   }, [id, token, apiService, form]);
 
   const handleUserEdit = async () => {
-    if (!token) return;
+    if (!token || !buttonEnabled) return;
+    setButtonEnabled(false);
     // console.log(form.getFieldsValue());
     if (!isAuthorizedToEdit) {
       // console.log("not authorized");
@@ -170,9 +173,10 @@ const ManageProfile: React.FC = () => {
       //       <div>Redirecting back to your profile.</div>
       //     </div>
       // );
-      router.push(`/users/${user?.id}/edit`);
+      router.back();
     } catch (error) {
         console.error(error);
+        setButtonEnabled(true);
       toast.error(
           <div>
             <div><strong>Profile update failed:</strong></div>
@@ -374,7 +378,7 @@ const ManageProfile: React.FC = () => {
             </Upload>
           </Form.Item>
 
-          <div className="form-final-button-container">
+          <div className={`form-final-button-container ${buttonEnabled ? "" : "disabled"}`}>
             <Form.Item>
               <Button htmlType="submit" className="green">
                 Save
