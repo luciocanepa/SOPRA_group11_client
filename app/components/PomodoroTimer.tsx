@@ -28,10 +28,9 @@ export interface PomodoroTimerProps {
   initialBreak?:          number;
   onTimerStatusChange:    (isRunning: boolean) => void;
   onTimerUpdate?:         (info: {
-    status:    "WORK" | "BREAK" | "ONLINE" | "OFFLINE";
-    startTime: string;
-    duration:  number;
-    // optional: when you send a sync you can include next-phase length
+    status:        "WORK" | "BREAK" | "ONLINE" | "OFFLINE";
+    startTime:     string;
+    duration:      number;
     secondDuration?: number;
   }) => void;
   onSessionStatusChange?: (isSession: boolean) => void;
@@ -54,12 +53,12 @@ export function PomodoroTimer({
                                 externalSync,
                               }: PomodoroTimerProps) {
   const [state, setState] = useState<TimerState>({
-    timeLeft:               initialSession * 60,
-    isRunning:              false,
-    isSession:              true,
-    showSettings:           false,
-    settings:               { session: initialSession, break: initialBreak },
-    activeSettings:         { session: initialSession, break: initialBreak },
+    timeLeft:     initialSession * 60,
+    isRunning:    false,
+    isSession:    true,
+    showSettings: false,
+    settings:     { session: initialSession, break: initialBreak },
+    activeSettings: { session: initialSession, break: initialBreak },
     notificationPermission: "default" as NotificationPermission,
     notificationsEnabled:   false,
     alarmEnabled:           true,
@@ -68,16 +67,19 @@ export function PomodoroTimer({
   const [fullScreenMode, setFullScreenMode] = useState(fullscreen);
   const audioRef = useRef<HTMLAudioElement|null>(null);
 
+  // Load alarm
   useEffect(() => {
     audioRef.current = new Audio("/sounds/alarm.mp3");
     audioRef.current.load();
     return () => { audioRef.current?.pause(); };
   }, []);
 
+  // notify running state
   useEffect(() => {
     onTimerStatusChange(state.isRunning);
   }, [state.isRunning, onTimerStatusChange]);
 
+  // countdown when running
   useEffect(() => {
     if (!state.isRunning) return;
     const iv = setInterval(() => {
@@ -86,21 +88,21 @@ export function PomodoroTimer({
     return () => clearInterval(iv);
   }, [state.isRunning]);
 
+  // phase switch
   useEffect(() => {
     if (state.timeLeft > 0) return;
     audioRef.current?.play().catch(() => {});
     setState(prev => {
       const nextIsSession = !prev.isSession;
-      const nextDuration  = (nextIsSession
+      const nextDuration  = ( nextIsSession
           ? prev.activeSettings.session
-          : prev.activeSettings.break) * 60;
+          : prev.activeSettings.break ) * 60;
       const nowISO = new Date().toISOString();
 
-      // notify parent of the phase switch
       onTimerUpdate?.({
-        status:        nextIsSession ? "WORK" : "BREAK",
-        startTime:     nowISO,
-        duration:      nextDuration,
+        status: nextIsSession ? "WORK" : "BREAK",
+        startTime: nowISO,
+        duration:  nextDuration,
         secondDuration: nextIsSession
             ? prev.activeSettings.break * 60
             : prev.activeSettings.session * 60
@@ -116,39 +118,37 @@ export function PomodoroTimer({
     });
   }, [state.timeLeft, onTimerUpdate]);
 
+  // notify session switch
   useEffect(() => {
     if (justSwitched === null) return;
     onSessionStatusChange?.(justSwitched);
     setJustSwitched(null);
   }, [justSwitched, onSessionStatusChange]);
 
-  // apply an external sync — override both the current timer and your stored session/break lengths
+  // external sync override
   useEffect(() => {
     if (!externalSync) return;
-    const running   = externalSync.status === "WORK" || externalSync.status === "BREAK";
-    const isSession = externalSync.status === "WORK";
+    const running = externalSync.status === "WORK" || externalSync.status === "BREAK";
+    const isSess  = externalSync.status === "WORK";
+    const otherMins = externalSync.secondDuration / 60;
 
     setState(s => ({
       ...s,
-      isRunning:      running,
-      isSession:      isSession,
-      timeLeft:       externalSync.duration,
+      isRunning: running,
+      isSession: isSess,
+      timeLeft:  externalSync.duration,
       activeSettings: {
-        session: externalSync.status === "WORK"
-            ? externalSync.duration / 60
-            : externalSync.secondDuration / 60,
-        break:   externalSync.status === "BREAK"
-            ? externalSync.duration / 60
-            : externalSync.secondDuration / 60
+        session: isSess ? s.activeSettings.session : otherMins,
+        break:   !isSess ? s.activeSettings.break : otherMins
       }
     }));
     onTimerStatusChange(running);
-    onSessionStatusChange?.(isSession);
+    onSessionStatusChange?.(isSess);
   }, [externalSync, onTimerStatusChange, onSessionStatusChange]);
 
   const fmt = (sec: number) => {
-    const m = Math.floor(sec/60).toString().padStart(2, "0");
-    const s = (sec%60).toString().padStart(2, "0");
+    const m = Math.floor(sec/60).toString().padStart(2,"0");
+    const s = (sec%60).toString().padStart(2,"0");
     return `${m}:${s}`;
   };
 
@@ -157,8 +157,8 @@ export function PomodoroTimer({
     const status = state.isSession ? "WORK" : "BREAK";
     onTimerUpdate?.({
       status,
-      startTime:     new Date().toISOString(),
-      duration:      state.timeLeft,
+      startTime: new Date().toISOString(),
+      duration:  state.timeLeft,
       secondDuration: state.isSession
           ? state.activeSettings.break * 60
           : state.activeSettings.session * 60
