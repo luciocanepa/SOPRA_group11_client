@@ -61,7 +61,7 @@ export default function UpcomingSessions({ groupId, userTimezone }: UserProps) {
       }
     };
     fetchSessions();
-  }, [gid, token]);
+  }, [gid, token, api]);
 
   const handleAddToCalendar = async (session: CalendarEntries) => {
     try {

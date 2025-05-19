@@ -7,7 +7,7 @@ export default function TermsOfService() {
   
         <h2 className="text-xl font-semibold mt-6 mb-2">1. Acceptance of Terms</h2>
         <p>
-          By accessing or using the Pomodoro Timer Web Application ("the App"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, please do not use the App.
+          By accessing or using the Pomodoro Timer Web Application (&quot;the App&quot;), you agree to be bound by these Terms of Service (&quot;Terms&quot;). If you do not agree to these Terms, please do not use the App.
         </p>
   
         <h2 className="text-xl font-semibold mt-6 mb-2">2. Description of Service</h2>
@@ -35,7 +35,7 @@ export default function TermsOfService() {
   
         <h2 className="text-xl font-semibold mt-6 mb-2">6. Limitation of Liability</h2>
         <p>
-          The App is provided "as is" without warranties of any kind, either express or implied. We do not guarantee that the App will be uninterrupted or error-free.
+          The App is provided &quot;as is&quot; without warranties of any kind, either express or implied. We do not guarantee that the App will be uninterrupted or error-free.
         </p>
         <p>
           To the maximum extent permitted by law, we shall not be liable for any damages arising from your use of the App.

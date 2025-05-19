@@ -186,7 +186,7 @@ export default function Statistics() {
       }
     };
     fetchGroups();
-  }, [token, apiService]);
+  }, [token, apiService, id]);
 
   useEffect(() => {
     const fetchGroupActivities = async () => {
@@ -213,7 +213,7 @@ export default function Statistics() {
     };
 
     fetchGroupActivities();
-  }, [selectedGroupId, currentWeek, token]);
+  }, [selectedGroupId, currentWeek, token, apiService]);
 
   return (
     <>

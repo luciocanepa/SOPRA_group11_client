@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { DatePicker, TimePicker, Form, Button } from "antd";
 import { gapi } from "gapi-script";
 import dayjs from "dayjs";
@@ -46,11 +46,15 @@ export function CalendarAPI({
   const api = useApi();
   const { value: token } = useLocalStorage<string>("token", "");
 
+  const resetCalendarForm = useCallback(() => {
+    form.resetFields();
+  }, [form]);
+
   useEffect(() => {
     if (isOpen) {
       resetCalendarForm();
     }
-  }, [isOpen]);
+  }, [isOpen, resetCalendarForm]);
 
   const addEventToCalendar = async (values: CalendarForm) => {
     if (!values.selectedDate || !values.startTime) {
@@ -145,10 +149,6 @@ export function CalendarAPI({
         </div>,
       );
     }
-  };
-
-  const resetCalendarForm = () => {
-    form.resetFields();
   };
 
   return (

@@ -7,7 +7,7 @@ export default function PrivacyPolicyPage() {
   
         <h2 className="text-xl font-semibold mt-6 mb-2">1. Introduction</h2>
         <p>
-        This Pomodoro Timer Web Application ("we", "our", or "the app") was created as part of a university project. Our main goal is to help students coordinate shared study sessions using a Pomodoro timer and Google Calendar integration.
+        This Pomodoro Timer Web Application (&quot;we&quot;, &quot;our&quot;, or &quot;the app&quot;) was created as part of a university project. Our main goal is to help students coordinate shared study sessions using a Pomodoro timer and Google Calendar integration.
 
 We value your privacy and are committed to protecting your personal information. This Privacy Policy describes what data we access, how we use it, and your choices.
         </p>
