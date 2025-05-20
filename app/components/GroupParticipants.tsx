@@ -10,19 +10,20 @@ import {
   TimerInfo,
 } from "@/hooks/useGroupParticipants";
 import "@/styles/components/GroupParticipants.css";
+
 interface GroupParticipantsProps {
   groupId: string;
   adminId?: string | number | null;
 }
 
 export function GroupParticipants({
-  groupId,
-  adminId,
-}: GroupParticipantsProps) {
+                                    groupId,
+                                    adminId,
+                                  }: GroupParticipantsProps) {
   const { value: token } = useLocalStorage<string>("token", "");
   const { participants, timers, loading, error } = useGroupParticipants(
-    groupId,
-    token,
+      groupId,
+      token,
   );
 
   // tick for countdown
@@ -33,24 +34,28 @@ export function GroupParticipants({
   }, []);
 
   // Format remaining time, pausing when not running
-  const formatRemaining = (timer: TimerInfo, status: Participant["status"]) => {
+  const formatRemaining = (
+      timer: TimerInfo,
+      status: Participant["status"]
+  ) => {
     if (status === "ONLINE" || status === "OFFLINE") {
       return "—";
     }
     if (!timer.running) {
       // paused: show static remaining
       const m = Math.floor(timer.duration / 60)
-        .toString()
-        .padStart(2, "0");
+          .toString()
+          .padStart(2, "0");
       const s = (timer.duration % 60).toString().padStart(2, "0");
       return `${m}:${s}`;
     }
     // running: calculate countdown
     const end = timer.start.getTime() + timer.duration * 1000;
-    const secs = Math.max(0, Math.ceil((end - now) / 1000));
+    // <-- use floor here, not ceil -->
+    const secs = Math.max(0, Math.floor((end - now) / 1000));
     const m = Math.floor(secs / 60)
-      .toString()
-      .padStart(2, "0");
+        .toString()
+        .padStart(2, "0");
     const s = (secs % 60).toString().padStart(2, "0");
     return `${m}:${s}`;
   };
@@ -69,7 +74,7 @@ export function GroupParticipants({
       dataIndex: "username",
       key: "username",
       render: (username: string, record: Participant) =>
-        record.id === adminId ? `${username} (admin)` : username,
+          record.id === adminId ? `${username} (admin)` : username,
     },
     {
       title: "Status",
@@ -91,22 +96,21 @@ export function GroupParticipants({
   ];
 
   return (
-    <div className="group-members-container">
-      <h2 className="group-members-title">Group Members</h2>
-      {error ? (
-        <div className="group-members-error">Error: {error}</div>
-      ) : (
-        <Table
-          className="group-members-table"
-          columns={columns}
-          dataSource={data}
-          rowKey="id"
-          loading={loading}
-          pagination={false}
-          // scroll={{ y: "calc(45vh - 150px)" }}
-          sticky={true}
-        />
-      )}
-    </div>
+      <div className="group-members-container">
+        <h2 className="group-members-title">Group Members</h2>
+        {error ? (
+            <div className="group-members-error">Error: {error}</div>
+        ) : (
+            <Table
+                className="group-members-table"
+                columns={columns}
+                dataSource={data}
+                rowKey="id"
+                loading={loading}
+                pagination={false}
+                sticky={true}
+            />
+        )}
+      </div>
   );
 }
