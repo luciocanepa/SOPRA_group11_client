@@ -47,6 +47,7 @@ type SyncMsg = {
     status:         Participant["status"];
     startTime:      string;
     duration:       string; // remaining PT##M##S
+    originalDuration: string;
     secondDuration: string; // full PT##M##S of other phase
 };
 type WSMessage = TimerUpdateMsg | StatusMsg | SyncMsg;
@@ -60,6 +61,7 @@ export function useGroupParticipants(
         status:         Participant["status"];
         startTime:      string;
         duration:       string;
+        originalDuration: string;
         secondDuration: string;
     }) => void
 ) {
@@ -163,6 +165,7 @@ export function useGroupParticipants(
                     status: raw.status,
                     startTime: start.toISOString(),
                     duration: raw.duration,
+                    originalDuration: raw.originalDuration,
                     secondDuration: raw.secondDuration
                 });
                 break;
@@ -198,22 +201,36 @@ export function useGroupParticipants(
     }, [groupId, token, localUserId, handleMessage]);
 
     // 4) publish sync
-    const requestSync = useCallback((cur: number, oth: number) => {
+    const requestSync = useCallback((
+        remaining: number,
+        originalDuration: number,
+        secondDuration: number
+    ) => {
         if (!clientRef.current || !localUserId) return;
-        ignoreOwnSync.current = true;
-        const dm = Math.floor(cur/60), ds = cur%60;
-        const om = Math.floor(oth/60), os = oth%60;
+
+        const now = new Date().toISOString();
+
+        const rm = Math.floor(remaining / 60), rs = remaining % 60;
+        const om = Math.floor(originalDuration / 60), os = originalDuration % 60;
+        const sm = Math.floor(secondDuration / 60), ss = secondDuration % 60;
+
         clientRef.current.publish({
             destination: "/app/group.sync",
-            headers:     { Authorization: token! },
+            headers: { Authorization: token! },
             body: JSON.stringify({
-                senderId:       localUserId,
+                senderId: localUserId,
                 groupId,
-                duration:       `PT${dm}M${ds}S`,
-                secondDuration:`PT${om}M${os}S`
+                startTime: now,
+                duration: `PT${rm}M${rs}S`,
+                originalDuration: `PT${om}M${os}S`,
+                secondDuration: `PT${sm}M${ss}S`
             })
         });
+
+        ignoreOwnSync.current = true;
     }, [groupId, localUserId, token]);
+
+
 
     return { participants, timers, loading, error, requestSync };
 }

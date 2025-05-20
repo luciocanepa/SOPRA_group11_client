@@ -31,6 +31,7 @@ interface SyncRequest {
     status:         "ONLINE"|"OFFLINE"|"WORK"|"BREAK";
     startTime:      string;
     duration:       string;
+    originalDuration: string;
     secondDuration: string;
 }
 
@@ -51,12 +52,14 @@ export default function GroupPage() {
     const [isRunning, setIsRunning] = useState(false);
     const [isSession, setIsSession] = useState(true);
     const isBreak = isRunning && !isSession;
+    const [durations, setDurations] = useState({ session: 25 * 60, break: 5 * 60 });
 
     const [incomingSync, setIncomingSync] = useState<SyncRequest|null>(null);
     const [acceptedSync, setAcceptedSync] = useState<{
         status: "ONLINE"|"OFFLINE"|"WORK"|"BREAK";
         startTime:string;
         duration: number;
+        originalDuration: number;
         secondDuration:number;
     }|null>(null);
 
@@ -91,41 +94,68 @@ export default function GroupPage() {
 
     const onAccept = () => {
         if (!incomingSync) return;
-        const elapsed = Math.floor((Date.now()-new Date(incomingSync.startTime).getTime())/1000);
-        const baseRem  = parseIsoDuration(incomingSync.duration);
-        const otherSec = parseIsoDuration(incomingSync.secondDuration);
-        // immer baseRem - elapsed
-        const adjusted = Math.max(0, baseRem - elapsed);
+
+        const startTime = new Date(incomingSync.startTime).getTime();
+        const now = Date.now();
+        const elapsed = Math.floor((now - startTime) / 1000);
+
+        const remaining = Math.max(0, parseIsoDuration(incomingSync.duration) - elapsed);
+        const original = parseIsoDuration(incomingSync.originalDuration);
+        const fullOther = parseIsoDuration(incomingSync.secondDuration);
 
         const nowIso = new Date().toISOString();
-        const durIso = `PT${Math.floor(adjusted/60)}M${adjusted%60}S`;
+        const durIso = `PT${Math.floor(remaining / 60)}M${remaining % 60}S`;
 
-        api.put(`/users/${localUserId}/timer`,
-            { status: incomingSync.status, startTime: nowIso, duration: durIso }, token
-        ).catch(console.error);
+        api.put(`/users/${localUserId}/timer`, {
+            status: incomingSync.status,
+            startTime: nowIso,
+            duration: durIso
+        }, token).catch(console.error);
 
         setAcceptedSync({
             status: incomingSync.status,
             startTime: nowIso,
-            duration:  adjusted,
-            secondDuration: otherSec
+            duration: remaining,
+            originalDuration: original,
+            secondDuration: fullOther
         });
+
         setIncomingSync(null);
     };
+
     const onDecline = () => setIncomingSync(null);
 
-    const triggerManualSync = () => {
+    const triggerManualSync = async () => {
         const me = Number(localUserId);
         const ti = timers[me];
-        const rem = ti ? Math.ceil((ti.start.getTime()+ti.duration*1000-Date.now())/1000) : 0;
-        requestSync(rem, rem);
-        setAcceptedSync({
-            status: isSession?"WORK":"BREAK",
-            startTime: new Date().toISOString(),
-            duration: rem,
-            secondDuration: rem
-        });
+        if (!ti) return;
+
+        const rem = Math.ceil((ti.start.getTime() + ti.duration * 1000 - Date.now()) / 1000);
+
+        const nowIso = new Date().toISOString();
+        const isoDur = `PT${Math.floor(rem / 60)}M${rem % 60}S`;
+
+        try {
+            // Update the user's timer in the backend first
+            await api.put(`/users/${localUserId}/timer`, {
+                status: isSession ? "WORK" : "BREAK",
+                startTime: nowIso,
+                duration: isoDur
+            }, token);
+
+            // Then notify others via WebSocket
+            const current = isSession ? durations.session : durations.break;
+            const other   = isSession ? durations.break   : durations.session;
+
+            requestSync(rem, current, other);
+
+            // ❌ Do NOT setAcceptedSync for the sender anymore
+            // Sender already has timer running — avoid resyncing self
+        } catch (err) {
+            console.error("Sync failed", err);
+        }
     };
+
 
     useEffect(()=>{
         if (!acceptedSync) return;
@@ -147,6 +177,7 @@ export default function GroupPage() {
                         onTimerStatusChange={r=>setIsRunning(r)}
                         onSessionStatusChange={s=>setIsSession(s)}
                         onTimerUpdate={handleUpdate}
+                        onActiveDurationsChange={setDurations}
                         fullscreen={false}
                         externalSync={acceptedSync||undefined}
                     />

@@ -8,250 +8,281 @@ import toast from "react-hot-toast";
 
 interface TimerSettings {
   session: number;
-  break:   number;
+  break: number;
 }
 
-interface TimerState {
-  timeLeft:               number;
-  isRunning:              boolean;
-  isSession:              boolean;
-  showSettings:           boolean;
-  settings:               TimerSettings;
-  activeSettings:         TimerSettings;
-  notificationPermission: NotificationPermission;
-  notificationsEnabled:   boolean;
-  alarmEnabled:           boolean;
-}
-
-export interface PomodoroTimerProps {
-  initialSession?:        number;
-  initialBreak?:          number;
-  onTimerStatusChange:    (isRunning: boolean) => void;
-  onTimerUpdate?:         (info: {
-    status:        "WORK" | "BREAK" | "ONLINE" | "OFFLINE";
-    startTime:     string;
-    duration:      number;
+interface PomodoroTimerProps {
+  initialSession?: number;
+  initialBreak?: number;
+  onTimerStatusChange: (isRunning: boolean) => void;
+  onActiveDurationsChange?: (durations: { session: number; break: number }) => void;
+  onTimerUpdate?: (info: {
+    status: "WORK" | "BREAK" | "ONLINE" | "OFFLINE";
+    startTime: string;
+    duration: number;
     secondDuration?: number;
   }) => void;
   onSessionStatusChange?: (isSession: boolean) => void;
-  fullscreen?:            boolean;
+  fullscreen?: boolean;
   externalSync?: {
-    status:         "WORK" | "BREAK" | "ONLINE" | "OFFLINE";
-    startTime:      string;
-    duration:       number;
+    status: "WORK" | "BREAK" | "ONLINE" | "OFFLINE";
+    startTime: string;
+    duration: number;
+    originalDuration: number;
     secondDuration: number;
   } | null;
 }
 
 export function PomodoroTimer({
                                 initialSession = 25,
-                                initialBreak   = 5,
+                                initialBreak = 5,
                                 onTimerStatusChange,
                                 onTimerUpdate,
                                 onSessionStatusChange,
-                                fullscreen     = false,
+                                fullscreen = false,
                                 externalSync,
+                                onActiveDurationsChange,
                               }: PomodoroTimerProps) {
-  const [state, setState] = useState<TimerState>({
-    timeLeft:     initialSession * 60,
-    isRunning:    false,
-    isSession:    true,
-    showSettings: false,
-    settings:     { session: initialSession, break: initialBreak },
-    activeSettings: { session: initialSession, break: initialBreak },
-    notificationPermission: "default" as NotificationPermission,
-    notificationsEnabled:   false,
-    alarmEnabled:           true,
-  });
-  const [justSwitched, setJustSwitched] = useState<boolean|null>(null);
-  const [fullScreenMode, setFullScreenMode] = useState(fullscreen);
-  const audioRef = useRef<HTMLAudioElement|null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Load alarm
+  const [settings, setSettings] = useState<TimerSettings>({
+    session: initialSession,
+    break: initialBreak,
+  });
+
+  const [activeDurations, setActiveDurations] = useState({
+    session: initialSession * 60,
+    break: initialBreak * 60,
+  });
+
+  const [startTime, setStartTime] = useState<number | null>(null);
+  const [duration, setDuration] = useState(initialSession * 60);
+  const [timeLeft, setTimeLeft] = useState(initialSession * 60);
+  const [isSession, setIsSession] = useState(true);
+  const [isRunning, setIsRunning] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [fullScreenMode, setFullScreenMode] = useState(fullscreen);
+
+  const fmt = (sec: number) =>
+      `${Math.floor(sec / 60).toString().padStart(2, "0")}:${(sec % 60)
+          .toString()
+          .padStart(2, "0")}`;
+
+  // Ticking effect
+  useEffect(() => {
+    if (!isRunning || startTime === null) return;
+    const interval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      const remaining = Math.max(0, duration - elapsed);
+      setTimeLeft(remaining);
+
+      if (remaining === 0) {
+        clearInterval(interval);
+        audioRef.current?.play().catch(() => {});
+        const nextIsSession = !isSession;
+        const nextDuration = nextIsSession
+            ? activeDurations.session
+            : activeDurations.break;
+
+        const adjustedStart = Date.now() - 1000; // offset for drift
+        const nowISO = new Date(adjustedStart).toISOString();
+
+        onTimerUpdate?.({
+          status: nextIsSession ? "WORK" : "BREAK",
+          startTime: nowISO,
+          duration: nextDuration,
+          secondDuration: nextIsSession
+              ? activeDurations.break
+              : activeDurations.session,
+        });
+        onSessionStatusChange?.(nextIsSession);
+
+        setIsSession(nextIsSession);
+        setStartTime(Date.now());
+        setDuration(nextDuration);
+        setTimeLeft(nextDuration);
+      }
+    }, 1000);
+
+    timerRef.current = interval;
+    return () => clearInterval(timerRef.current!);
+  }, [isRunning, startTime, duration, isSession]);
+
+  // Load alarm sound
   useEffect(() => {
     audioRef.current = new Audio("/sounds/alarm.mp3");
-    audioRef.current.load();
-    return () => { audioRef.current?.pause(); };
+    return () => audioRef.current?.pause();
   }, []);
 
-  // notify running state
   useEffect(() => {
-    onTimerStatusChange(state.isRunning);
-  }, [state.isRunning, onTimerStatusChange]);
+    onTimerStatusChange(isRunning);
+  }, [isRunning]);
 
-  // countdown when running
-  useEffect(() => {
-    if (!state.isRunning) return;
-    const iv = setInterval(() => {
-      setState(st => ({ ...st, timeLeft: Math.max(st.timeLeft - 1, 0) }));
-    }, 1000);
-    return () => clearInterval(iv);
-  }, [state.isRunning]);
-
-  // phase switch
-  useEffect(() => {
-    if (state.timeLeft > 0) return;
-    audioRef.current?.play().catch(() => {});
-    setState(prev => {
-      const nextIsSession = !prev.isSession;
-      const nextDuration  = ( nextIsSession
-          ? prev.activeSettings.session
-          : prev.activeSettings.break ) * 60;
-      const nowISO = new Date().toISOString();
-
-      onTimerUpdate?.({
-        status: nextIsSession ? "WORK" : "BREAK",
-        startTime: nowISO,
-        duration:  nextDuration,
-        secondDuration: nextIsSession
-            ? prev.activeSettings.break * 60
-            : prev.activeSettings.session * 60
-      });
-      setJustSwitched(nextIsSession);
-
-      return {
-        ...prev,
-        isSession: nextIsSession,
-        timeLeft:  nextDuration,
-        isRunning: true
-      };
-    });
-  }, [state.timeLeft, onTimerUpdate]);
-
-  // notify session switch
-  useEffect(() => {
-    if (justSwitched === null) return;
-    onSessionStatusChange?.(justSwitched);
-    setJustSwitched(null);
-  }, [justSwitched, onSessionStatusChange]);
-
-  // external sync override
+  // Handle external sync
   useEffect(() => {
     if (!externalSync) return;
-    const running = externalSync.status === "WORK" || externalSync.status === "BREAK";
-    const isSess  = externalSync.status === "WORK";
-    const otherMins = externalSync.secondDuration / 60;
 
-    setState(s => ({
-      ...s,
-      isRunning: running,
-      isSession: isSess,
-      timeLeft:  externalSync.duration,
-      activeSettings: {
-        session: isSess ? s.activeSettings.session : otherMins,
-        break:   !isSess ? s.activeSettings.break : otherMins
-      }
-    }));
+    const running = externalSync.status === "WORK" || externalSync.status === "BREAK";
+    const isSess = externalSync.status === "WORK";
+
+    const remaining = externalSync.duration;
+    const fullCurrent = externalSync.originalDuration;
+    const fullOther = externalSync.secondDuration;
+
+    const newDurations = {
+      session: isSess ? fullCurrent : fullOther,
+      break:   isSess ? fullOther   : fullCurrent,
+    };
+
+    console.log("[SYNC] remaining:", remaining);
+    console.log("[SYNC] fullCurrent:", fullCurrent, "fullOther:", fullOther);
+
+    setIsRunning(running);
+    setIsSession(isSess);
+    setStartTime(Date.now());
+    setDuration(remaining);
+    setTimeLeft(remaining);
+    setActiveDurations(newDurations);
+    onActiveDurationsChange?.(newDurations);
+
     onTimerStatusChange(running);
     onSessionStatusChange?.(isSess);
-  }, [externalSync, onTimerStatusChange, onSessionStatusChange]);
+  }, [externalSync, onTimerStatusChange, onSessionStatusChange, onActiveDurationsChange]);
 
-  const fmt = (sec: number) => {
-    const m = Math.floor(sec/60).toString().padStart(2,"0");
-    const s = (sec%60).toString().padStart(2,"0");
-    return `${m}:${s}`;
-  };
 
   const start = () => {
-    setState(s => ({ ...s, isRunning: true, showSettings: false }));
-    const status = state.isSession ? "WORK" : "BREAK";
+    if (timeLeft <= 0) return;
+    const now = Date.now();
+    setStartTime(now);
+    setDuration(timeLeft);
+    setIsRunning(true);
+    setShowSettings(false);
+
     onTimerUpdate?.({
-      status,
-      startTime: new Date().toISOString(),
-      duration:  state.timeLeft,
-      secondDuration: state.isSession
-          ? state.activeSettings.break * 60
-          : state.activeSettings.session * 60
+      status: isSession ? "WORK" : "BREAK",
+      startTime: new Date(now).toISOString(),
+      duration: timeLeft,
+      secondDuration: isSession
+          ? activeDurations.break
+          : activeDurations.session,
     });
   };
 
   const stop = () => {
-    setState(s => ({ ...s, isRunning: false }));
+    if (startTime !== null) {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      const remaining = Math.max(0, duration - elapsed);
+      setTimeLeft(remaining);
+    }
+    setIsRunning(false);
+    setStartTime(null);
     onTimerStatusChange(false);
     onTimerUpdate?.({
-      status:    "ONLINE",
+      status: "ONLINE",
       startTime: new Date().toISOString(),
-      duration:  state.timeLeft
+      duration: timeLeft,
     });
   };
 
   const reset = () => {
-    audioRef.current?.pause();
-    setState(s => ({
-      ...s,
-      isRunning: false,
-      isSession: true,
-      timeLeft:  s.activeSettings.session * 60
-    }));
+    const dur = settings.session * 60;
+    setIsRunning(false);
+    setIsSession(true);
+    setStartTime(null);
+    setDuration(dur);
+    setTimeLeft(dur);
+    setActiveDurations({
+      session: dur,
+      break: settings.break * 60,
+    });
     onTimerUpdate?.({
-      status:    "ONLINE",
+      status: "ONLINE",
       startTime: new Date().toISOString(),
-      duration:  initialSession * 60
+      duration: dur,
     });
     toast.success("Timer reset!");
   };
 
-  const toggleSettings = () => setState(s => ({ ...s, showSettings: !s.showSettings }));
-  const applySettings  = () => {
-    const dur = state.settings.session * 60;
-    setState(s => ({
-      ...s,
-      activeSettings: s.settings,
-      timeLeft:       dur,
-      isSession:      true,
-      showSettings:   false
-    }));
+  const applySettings = () => {
+    const session = settings.session * 60;
+    const breakDur = settings.break * 60;
+    setActiveDurations({ session, break: breakDur });
+    onActiveDurationsChange?.({ session, break: breakDur });
+    setTimeLeft(session);
+    setIsSession(true);
+    setIsRunning(false);
+    setShowSettings(false);
     onTimerUpdate?.({
-      status:    "ONLINE",
+      status: "ONLINE",
       startTime: new Date().toISOString(),
-      duration:  dur
+      duration: session,
     });
     toast.success("Settings applied!");
   };
 
   return (
       <div className={`timer-container ${fullScreenMode ? "fullscreen" : ""}`}>
-        <div className={`timer-display ${
-            state.isRunning
-                ? (state.isSession ? "timer-display-work" : "timer-display-break")
-                : (state.isSession ? "timer-display-session" : "timer-display-break")
-        }`}>
+        <div
+            className={`timer-display ${
+                isRunning
+                    ? isSession
+                        ? "timer-display-work"
+                        : "timer-display-break"
+                    : isSession
+                        ? "timer-display-session"
+                        : "timer-display-break"
+            }`}
+        >
           <h3 className="title">
-            {state.isSession ? "Time until break:" : "Break Time"}
+            {isSession ? "Time until break:" : "Break Time"}
           </h3>
-          {fmt(state.timeLeft)}
+          {fmt(timeLeft)}
         </div>
 
-        {fullScreenMode
-            ? <Button className="fullscreen-button" onClick={() => setFullScreenMode(false)}>-</Button>
-            : <Button className="fullscreen-button" onClick={() => setFullScreenMode(true)}>+</Button>
-        }
+        <Button
+            className="fullscreen-button"
+            onClick={() => setFullScreenMode(!fullScreenMode)}
+        >
+          {fullScreenMode ? "-" : "+"}
+        </Button>
 
         <div className="timer-button-group">
           <div className="timer-button-group-left">
-            <Button onClick={start} disabled={state.isRunning} className="green">Start</Button>
-            <Button onClick={stop}  disabled={!state.isRunning} className="red">Stop</Button>
-            <Button onClick={reset} className="secondary">Reset</Button>
+            <Button onClick={start} disabled={isRunning || timeLeft <= 0} className="green">
+              Start
+            </Button>
+            <Button onClick={stop} disabled={!isRunning} className="red">
+              Stop
+            </Button>
+            <Button onClick={reset} className="secondary">
+              Reset
+            </Button>
           </div>
-          {!state.isRunning && (
-              <Button onClick={toggleSettings} className="secondary">
-                {state.showSettings ? "-" : "+"} Timer Settings
+          {!isRunning && (
+              <Button
+                  onClick={() => setShowSettings(!showSettings)}
+                  className="secondary"
+              >
+                {showSettings ? "-" : "+"} Timer Settings
               </Button>
           )}
         </div>
 
-        {state.showSettings && (
+        {showSettings && (
             <div className="settings-popup">
               <h2 className="popup-title">Timer Settings</h2>
               <div className="settings-row">
                 <label>Session (minutes):</label>
                 <input
                     type="number"
-                    value={state.settings.session}
-                    onChange={e => setState(s => ({
-                      ...s,
-                      settings: { ...s.settings, session: Math.max(1, Number(e.target.value)) }
-                    }))}
+                    value={settings.session}
+                    onChange={(e) =>
+                        setSettings((s) => ({
+                          ...s,
+                          session: Math.max(1, Number(e.target.value)),
+                        }))
+                    }
                     min={1}
                 />
               </div>
@@ -259,17 +290,23 @@ export function PomodoroTimer({
                 <label>Break (minutes):</label>
                 <input
                     type="number"
-                    value={state.settings.break}
-                    onChange={e => setState(s => ({
-                      ...s,
-                      settings: { ...s.settings, break: Math.max(1, Number(e.target.value)) }
-                    }))}
+                    value={settings.break}
+                    onChange={(e) =>
+                        setSettings((s) => ({
+                          ...s,
+                          break: Math.max(1, Number(e.target.value)),
+                        }))
+                    }
                     min={1}
                 />
               </div>
               <div className="settings-popup-button-group">
-                <Button className="green" onClick={applySettings}>Apply</Button>
-                <Button className="red"   onClick={toggleSettings}>Cancel</Button>
+                <Button className="green" onClick={applySettings}>
+                  Apply
+                </Button>
+                <Button className="red" onClick={() => setShowSettings(false)}>
+                  Cancel
+                </Button>
               </div>
             </div>
         )}
