@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { AutoComplete, Button, message } from "antd";
+import { AutoComplete, Button, message, Input } from "antd";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Group } from "@/types/group";
+import "../styles/components/InviteUser.css";
 
 interface InviteUserProps {
   group: Group | null; // optional for local
@@ -168,9 +169,10 @@ export function InviteUser({
           onSearch={handleSearch}
           onSelect={setUsername}
           onChange={setUsername}
-          placeholder="Enter username"
           value={username}
-        />
+        >
+        <Input placeholder="Enter username" />
+        </AutoComplete>
 
         <Button
           className={`green ${buttonEnabled ? "" : "disabled"}`}
