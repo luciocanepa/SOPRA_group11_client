@@ -202,6 +202,7 @@ export function PomodoroTimer({
       duration: dur,
     });
     toast.success("Timer reset!");
+    onSessionStatusChange?.(true);
   };
 
   const applySettings = () => {
