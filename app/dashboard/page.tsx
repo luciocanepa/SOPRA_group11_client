@@ -52,6 +52,7 @@ const Dashboard: React.FC = () => {
         "notifiedInvitations",
         JSON.stringify(notifiedIds.filter((id: number) => id !== invitationId)),
       );
+      fetchGroups();
     } catch (error) {
       if (error instanceof Error) {
         console.error("Error accepting invitation:", error.message);
@@ -131,8 +132,7 @@ const Dashboard: React.FC = () => {
     fetchLoggedInUser();
   }, [apiService, token, id]);
 
-  useEffect(() => {
-    const fetchGroups = async () => {
+  const fetchGroups = async () => {
       if (!token || !id) return;
 
       try {
@@ -153,6 +153,7 @@ const Dashboard: React.FC = () => {
       }
     };
 
+  useEffect(() => {
     fetchGroups();
   }, [apiService, token, id]);
 

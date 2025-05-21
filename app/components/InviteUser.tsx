@@ -73,7 +73,7 @@ export function InviteUser({
     setUsername(searchText);
     const matches = allUsers
       .filter((user) =>
-        user.username.toLowerCase().includes(searchText.toLowerCase()),
+        user.username.includes(searchText),
       )
       .map((user) => ({ value: user.username }));
 
@@ -83,7 +83,7 @@ export function InviteUser({
   // Check if the username exists
   const getUserByUsername = (username: string) => {
     return allUsers.find(
-      (user) => user.username.toLowerCase() === username.toLowerCase(),
+      (user) => user.username === username,
     );
   };
 
