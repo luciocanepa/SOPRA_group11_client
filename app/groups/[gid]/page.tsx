@@ -75,6 +75,15 @@ export default function GroupPage() {
 
     const handleIncomingSync = useCallback((req: SyncRequest) => {
         if (req.senderId===localUserId) return;
+
+        // browser notification
+        if ("Notification" in window && Notification.permission === "granted") {
+            new Notification("Sync Request", {
+                body: `${req.senderName} wants to sync their timer.`,
+                icon: "/tomato_guy.png",
+            });
+        }
+
         setIncomingSync(req);
     }, [localUserId]);
 

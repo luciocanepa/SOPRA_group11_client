@@ -179,6 +179,7 @@ const Dashboard: React.FC = () => {
           if (Notification.permission === "granted") {
             new Notification("New Group Invitation", {
               body: `You've been invited to join "${inv.groupName}".`,
+              icon: "/tomato_guy.png",
             });
           }
         });

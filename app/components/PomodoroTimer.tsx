@@ -114,6 +114,7 @@ export function PomodoroTimer({
         if (notificationsEnabled) {
           new Notification(nextIsSession ? "Time to STUDY!" : "Time to BREAK!", {
             body: nextIsSession ? "Your break has ended." : "Your study session has ended.",
+            icon: "/tomato_guy.png",
           });
         }
 
