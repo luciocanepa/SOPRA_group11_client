@@ -63,13 +63,32 @@ export function PomodoroTimer({
   const [isRunning, setIsRunning] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [fullScreenMode, setFullScreenMode] = useState(fullscreen);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
   const fmt = (sec: number) =>
       `${Math.floor(sec / 60).toString().padStart(2, "0")}:${(sec % 60)
           .toString()
           .padStart(2, "0")}`;
 
-  // Ticking effect
+  useEffect(() => {
+    audioRef.current = new Audio("/sounds/alarm.mp3");
+    audioRef.current.load();
+
+    if ("Notification" in window && Notification.permission === "granted") {
+      setNotificationsEnabled(true);
+    } else if (Notification.permission === "default") {
+      Notification.requestPermission().then((permission) => {
+        setNotificationsEnabled(permission === "granted");
+      });
+    }
+
+    return () => audioRef.current?.pause();
+  }, []);
+
+  useEffect(() => {
+    onTimerStatusChange(isRunning);
+  }, [isRunning]);
+
   useEffect(() => {
     if (!isRunning || startTime === null) return;
     const interval = setInterval(() => {
@@ -79,7 +98,11 @@ export function PomodoroTimer({
 
       if (remaining === 0) {
         clearInterval(interval);
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
         audioRef.current?.play().catch(() => {});
+      }
+
         const nextIsSession = !isSession;
         const nextDuration = nextIsSession
             ? activeDurations.session
@@ -87,6 +110,12 @@ export function PomodoroTimer({
 
         const adjustedStart = Date.now() - 1000; // offset for drift
         const nowISO = new Date(adjustedStart).toISOString();
+
+        if (notificationsEnabled) {
+          new Notification(nextIsSession ? "Time to STUDY!" : "Time to BREAK!", {
+            body: nextIsSession ? "Your break has ended." : "Your study session has ended.",
+          });
+        }
 
         onTimerUpdate?.({
           status: nextIsSession ? "WORK" : "BREAK",
@@ -109,17 +138,7 @@ export function PomodoroTimer({
     return () => clearInterval(timerRef.current!);
   }, [isRunning, startTime, duration, isSession]);
 
-  // Load alarm sound
-  useEffect(() => {
-    audioRef.current = new Audio("/sounds/alarm.mp3");
-    return () => audioRef.current?.pause();
-  }, []);
 
-  useEffect(() => {
-    onTimerStatusChange(isRunning);
-  }, [isRunning]);
-
-  // Handle external sync
   useEffect(() => {
     if (!externalSync) return;
 
@@ -135,8 +154,6 @@ export function PomodoroTimer({
       break:   isSess ? fullOther   : fullCurrent,
     };
 
-    console.log("[SYNC] remaining:", remaining);
-    console.log("[SYNC] fullCurrent:", fullCurrent, "fullOther:", fullOther);
 
     setIsRunning(running);
     setIsSession(isSess);
