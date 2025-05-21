@@ -180,7 +180,7 @@ export function InviteUser({
           loading={loading}
           disabled={!username}
         >
-          Send Invitation
+          Send
         </Button>
       </div>
 
