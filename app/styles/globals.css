@@ -93,7 +93,7 @@ body {
 }
 
 .secondary {
-  background-color: none;
+  background: white !important;
   color: var(--button-secondary) !important;
   border-radius: 5px;
   border: 1px solid var(--button-secondary) !important;
@@ -106,6 +106,19 @@ body {
   color: var(--button-secondary-hover) !important;
   border: 1px solid var(--button-secondary-hover) !important;
   cursor: pointer;
+}
+
+.secondary.disabled {
+  color: #9d9d9d !important;
+  border: 1px solid #9d9d9d !important;
+  cursor: not-allowed;
+}
+
+.secondary.disabled:hover {
+  background-color: white !important;
+  color: #9d9d9d !important;
+  border: 1px solid #9d9d9d !important;
+  cursor: not-allowed;
 }
 
 .link {

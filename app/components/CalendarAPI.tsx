@@ -12,9 +12,7 @@ import timezone from "dayjs/plugin/timezone";
 import toast from "react-hot-toast";
 
 import "@/styles/globals.css";
-//import "@/styles/pages/login.css";
-//import "@/styles/pages/calendarAPI.css";
-//import "@/styles/pages/GroupPage.css";
+import "../styles/components/CalendarAPI.css";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -153,11 +151,11 @@ export function CalendarAPI({
 
   return (
     <div className="group-dashboard-actions-container">
-      <h4>Plan your next Study Session</h4>
+      <div className="calendar-api-container">
       {!isSignedIn ? (
-        <div>
+        <div className="calendar-api-container-signin">
           <p>Sign in to get a direct access to your Google Calendar</p>
-          <Button className="secondary" onClick={signInWithGoogle}>
+          <Button className="green" onClick={signInWithGoogle}>
             Sign in with Google
           </Button>
         </div>
@@ -173,48 +171,47 @@ export function CalendarAPI({
             name="selectedDate"
             rules={[{ required: true, message: "Please select a date" }]}
           >
-            <DatePicker style={{ width: "100%" }} />
+            <DatePicker className="date-picker" />
           </Form.Item>
 
-          <div style={{ display: "flex", gap: "16px" }}>
+          <div className="time-picker-container">
             <Form.Item
               label="Start Time"
               name="startTime"
               rules={[
                 { required: true, message: "Please select a start time" },
               ]}
-              style={{ flex: "1" }}
+              className="time-picker-item"
             >
-              <TimePicker format="HH:mm" style={{ width: "100%" }} />
+              <TimePicker format="HH:mm" className="full-width" />
             </Form.Item>
 
             <Form.Item
               label="End Time (optional)"
               name="endTime"
-              style={{ flex: "1" }}
+              className="time-picker-item"
             >
-              <TimePicker format="HH:mm" style={{ width: "100%" }} />
+              <TimePicker format="HH:mm" className="full-width" />
             </Form.Item>
           </div>
 
-          <div style={{ display: "flex", gap: "16px", marginTop: "12px" }}>
+          <div className="button-container">
             <Button
-              className="secondary"
+              className="green"
               htmlType="submit"
-              style={{ flex: "1" }}
             >
               Add to Calendar
             </Button>
             <Button
               className="secondary"
               onClick={logOutOfGoogle}
-              style={{ flex: "1" }}
             >
               Log out of Google
             </Button>
           </div>
-        </Form>
-      )}
+          </Form>
+        )}
+      </div>
     </div>
   );
 }

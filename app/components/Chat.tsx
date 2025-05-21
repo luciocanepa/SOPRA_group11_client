@@ -5,6 +5,8 @@ import { useChatMessages } from "@/hooks/useChatMessages";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Button } from "antd";
 
+import "../styles/components/Chat.css";
+
 interface ChatBoxProps {
   groupId: string;
   userId: string;

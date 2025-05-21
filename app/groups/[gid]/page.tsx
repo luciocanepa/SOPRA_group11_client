@@ -192,12 +192,12 @@ export default function GroupPage() {
                     />
                 </div>
                 <div className="group-dashboard-button-container">
-                    <Button className="secondary"
+                    <Button className={`secondary ${inviteOpen ? "open" : ""}`}
                             onClick={()=>{ setInviteOpen(v=>!v); setCalendarOpen(false); setPlannedSessionsOpen(false); }}>
                         {inviteOpen? "-" : "+"} Invite Users
                     </Button>
                     {inviteOpen && <InviteUser group={group} isVisible={inviteOpen}/>}
-                    <Button className="secondary"
+                    <Button className={`secondary ${calendarOpen ? "open" : ""}`}
                             onClick={()=>{ setCalendarOpen(v=>!v); setInviteOpen(false); setPlannedSessionsOpen(false); }}>
                         {calendarOpen? "-" : "+"} Plan Session
                     </Button>
@@ -211,7 +211,7 @@ export default function GroupPage() {
                             groupId={group?.id||0}
                         />
                     )}
-                    <Button className="secondary"
+                    <Button className={`secondary ${plannedSessionsOpen ? "open" : ""}`}
                             onClick={()=>{ setPlannedSessionsOpen(v=>!v); setCalendarOpen(false); setInviteOpen(false); }}>
                         {plannedSessionsOpen? "-" : "+"} View Upcoming Study Sessions
                     </Button>
@@ -222,7 +222,7 @@ export default function GroupPage() {
                             userTimezone={user?.timezone||"Europe/Zurich"}
                         />
                     )}
-                    <Button className="secondary"
+                    <Button className={`secondary ${!isRunning||loading ? "disabled" : ""}`}
                             disabled={!isRunning||loading}
                             onClick={triggerManualSync}
                     >Sync Timer</Button>

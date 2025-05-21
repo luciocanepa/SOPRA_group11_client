@@ -1,13 +1,43 @@
 .upcoming-events {
-  max-height: 250px;
-  overflow-y: auto;
+  min-width: 25vw;
+  max-width: 25vw;
+  width: 25vw;
+
+  padding: 10px;
+
+  max-height: 25vh !important;
+  overflow-y: scroll;
+  scrollbar-width: none;
 }
 
-.upcoming-events .ant-card {
-  margin-bottom: 16px;
+.upcoming-events #timezone-info {
+  font-size: 12px !important;
+  color: #666 !important;
 }
 
-.ant-card {
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.upcoming-events #session-info {
+  font-weight: bold !important;
+}
+
+.upcoming-events #no-sessions {
+  font-size: 14px !important;
+}
+
+.upcoming-events .ant-spin-container {
+  margin-top: 10px !important;
+  margin-bottom: 10px !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+  border-top: 1px solid gray !important;
+}
+
+.upcoming-events .ant-list:last-child {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.upcoming-events .ant-spin-container button {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+  width: 15vw !important;
 }

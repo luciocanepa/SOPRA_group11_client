@@ -1,40 +1,39 @@
 .invite-user-fields {
     display: flex;
     flex-direction: row;
-    align-items: center; /* Align items center for even vertical alignment */
-    gap: 0.75rem;
-    width: 100%;
-    max-width: 500px;
+    align-items: center;
+    justify-content: center;
+
+    width: 25vw;
+    min-width: 25vw;
+    max-width: 25vw;
+    height: 2vh !important;
+    padding: 30px 0 !important;
 }
 
-/* Container around the input */
+.ant-select,
 .invite-input {
-    flex: 1;
-    min-width: 200px;
-    max-width: 300px;
+    width: 15vw !important;
+    min-width: 15vw !important;
+    max-width: 15vw !important;
     box-sizing: border-box;
 }
 
-/* Style the actual Ant Design input inside AutoComplete */
 .invite-input input {
-    width: 100% !important;
+    width: 15vw;
+    min-width: 15vw;
+    max-width: 15vw;
+    height: 2rem !important;
+    padding-left: 10px !important;
+
     background-color: white !important;
     color: black !important;
     font-size: 1rem;
-    padding: 8px 12px;
-    border-radius: 6px;
-    box-sizing: border-box;
-    height: 38px;
-    line-height: 1.5;
-    display: flex;
-    align-items: center;
 }
 
-
-/* Fix dropdown menu width for consistency */
-.ant-select-dropdown {
-    min-width: 250px !important;
-    max-width: 300px !important;
+.invite-input .ant-input::placeholder {
+    color: #555;
+    opacity: 1;
 }
 
 /* Style dropdown options */
@@ -45,10 +44,10 @@
 /* Optional: Style your AntD button to match input height */
 /* Match height to input */
 .invite-user-fields .green {
+    width: 8vw !important;
     height: auto;
-    padding-top: 8px;
-    padding-bottom: 8px;
-    margin-top: 1.15rem;
+    margin-left: 5px !important;
+    margin-bottom: 0 !important;
 }
 
 /* Instead of targeting raw input, target Ant's input class */
@@ -61,10 +60,4 @@
     border-radius: 6px;
     height: 38px;
     box-sizing: border-box;
-}
-
-/* And ensure the placeholder is styled properly */
-.invite-input .ant-input::placeholder {
-    color: #555;
-    opacity: 1;
 }

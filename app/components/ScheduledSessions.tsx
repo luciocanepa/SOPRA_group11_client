@@ -11,7 +11,7 @@ import "@/styles/components/ScheduledSessions.css";
 import toast from "react-hot-toast";
 
 import "@/styles/pages/GroupPage.css";
-import "@/styles/globals.css";
+import "../styles/components/ScheduledSessions.css";
 
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
@@ -134,21 +134,17 @@ export default function UpcomingSessions({ groupId, userTimezone }: UserProps) {
   return (
     <div className="group-dashboard-actions-container">
       <div className="upcoming-events">
-        <h4 style={{ marginBottom: "10px" }}>Upcoming Study Sessions</h4>
         {entry && entry?.length > 0 && (
-          <>
-            <p style={{ fontSize: "13px" }}>
-              Date and Time are set according to your timezone:
+            <p id="timezone-info">
+              Date and Time for the timezone: {userTimezone}
             </p>
-            <p style={{ fontSize: "13px", marginBottom: "10px" }}>
-              {userTimezone}
-            </p>
-          </>
         )}
-        {entry?.length === 0 && <p>No upcoming sessions.</p>}
+        {entry?.length === 0 && <p id="no-sessions">No upcoming sessions.</p>}
         {entry?.map((session) => (
-          <List key={session.id} style={{ marginBottom: 16 }}>
-            <p>{session.createdByUsername} scheduled a session:</p>
+          <List key={session.id}>
+            <p id="session-info">
+              {session.createdByUsername} scheduled a session:
+            </p>
             <p>
               {dayjs
                 .tz(session.startTime, "Europe/Zurich")
@@ -164,7 +160,7 @@ export default function UpcomingSessions({ groupId, userTimezone }: UserProps) {
               onClick={() => handleAddToCalendar(session)}
               className="secondary"
             >
-              Add this event to your Calendar
+              Add to Google Calendar
             </Button>
           </List>
         ))}

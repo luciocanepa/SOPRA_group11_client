@@ -1,0 +1,68 @@
+.calendar-api-container {
+    width: 25vw;
+    min-width: 25vw;
+    max-width: 25vw;
+    padding: 10px;
+}
+
+.calendar-api-container .ant-form-item {
+    margin-bottom: 10px !important;
+}
+
+.calendar-api-container .date-picker {
+    min-width: 22vw !important;
+    max-width: 22vw !important;
+}
+
+.calendar-api-container-signin {
+    width: 25vw;
+    min-width: 25vw;
+    max-width: 25vw;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.calendar-api-container-signin button {
+    min-width: 15vw !important;
+    max-width: 15vw !important;
+    margin-top: 10px !important;
+    margin-bottom: 0 !important;
+}
+
+.calendar-api-container-signin p {
+    font-size: 14px !important;
+}
+
+.time-picker-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.time-picker-container .ant-form-item {
+    min-width: 12vw !important;
+    max-width: 12vw !important;
+}
+
+.time-picker-container .ant-picker-input {
+    min-width: 8vw !important;
+    max-width: 8vw !important;
+}
+
+.calendar-api-container .button-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: 10px !important;
+    height: 5vh;
+}
+
+.calendar-api-container .button-container button {
+    min-width: 10vw !important;
+    max-width: 10vw !important;
+    margin-right: 10px !important;
+    margin-bottom: 0 !important;
+}
