@@ -29,11 +29,15 @@ const slides = [
     text: "During breaks, chat with your group.\n\n",
   },
   {
-    title: "6. Track Your Progress",
+    title: "6. Schedule via Google Calendar",
+    text: "Click 'Plan Session'. On first use, click 'Advanced' and continue. Set a date and time, then press 'Add to Calendar'. \nIt appears in the app and on Google Calendar!"
+  },
+  {
+    title: "7. Track Your Progress",
     text: "See how many sessions you've completed, how long you've focused, and how your productivity is growing over time.",
   },
   {
-    title: "7. Personalize Everything",
+    title: "8. Personalize Everything",
     text: "Edit your profile, upload a picture, change group settings - make your workspace feel right.",
   },
 ];

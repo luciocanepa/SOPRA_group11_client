@@ -21,23 +21,27 @@ const slides = [
   },
   {
     title: "3. See All Your Groups",
-    text: "Your dashboard shows every group you're part of - with quick access to timers, chats, and members.",
+    text: "Your dashboard shows every group you're part of - with quick \naccess to timers, chats, and members.",
   },
   {
     title: "4. Sync & Break Together",
-    text: "Use the Sync Break to break together. Everyone stays in sync - work and break at the same time.",
+    text: "Use the Sync Timer to study and break together. \nEveryone stays in sync - work and break at the same time.",
   },
   {
     title: "5. Chat & Collaborate",
     text: "During breaks, chat with your group.",
   },
   {
-    title: "6. Track Your Progress",
+    title: "6. Schedule via Google Calendar",
+    text: "Click 'Plan Session'. On first use, click 'Advanced' and continue.\nSet a date and time, then press 'Add to Calendar'.\nYour Session appears in the app and on Google Calendar!"
+  },
+  {
+    title: "7. Track Your Progress",
     text: "See how many sessions you've completed, how long you've focused, and how your productivity is growing over time.",
   },
   {
-    title: "7. Personalize Everything",
-    text: "Edit your profile, upload a picture, change group settings - make your workspace feel right.",
+    title: "8. Personalize Everything",
+    text: "Edit your profile, upload a picture, change group settings. \nMake your workspace feel right.",
   },
 ];
 
@@ -68,13 +72,13 @@ export default function LandingPage() {
           collaboratively.
         </p>
         <div className="button-container">
-          <Button className="login-register-button">
+          <Button className="secondary">
             <Link href="/login" onClick={() => router.push("/login")}>
               Login
             </Link>
           </Button>
 
-          <Button className="login-register-button">
+          <Button className="secondary">
             <Link href="/register" onClick={() => router.push("/register")}>
               Register
             </Link>
@@ -85,14 +89,14 @@ export default function LandingPage() {
       <main className="content-columns">
         <div className="info-card">
           <h2>Why This App Exists</h2>
-          <p className="red-text">
+          <p className="text1">
             Remote work and solo studying are isolating.
             <br />
             Focus drops. Distractions rise.
           </p>
-          <p className="green-text">
+          <p className="text2">
             We built this app to help people stay connected <br />
-            and focused by using the power of the Pomodoro method in real time.
+            and focused by using the power of the Pomodoro method <br />in real time.
           </p>
         </div>
 
@@ -105,7 +109,7 @@ export default function LandingPage() {
 
             <div className="slide">
               <h3>{slides[currentIndex].title}</h3>
-              <p>{slides[currentIndex].text}</p>
+              <p style={{ whiteSpace: "pre-line" }}>{slides[currentIndex].text}</p>
             </div>
             <div className="nav-zone nav-left" onClick={prevSlide}>
               ←
