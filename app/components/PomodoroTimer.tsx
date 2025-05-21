@@ -5,6 +5,8 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "antd";
 import "../styles/components/Timer.css";
 import toast from "react-hot-toast";
+import { User } from "@/types/user";
+import { TimerInfo } from "@/hooks/useGroupParticipants";
 
 interface TimerSettings {
   session: number;
@@ -31,6 +33,8 @@ interface PomodoroTimerProps {
     originalDuration: number;
     secondDuration: number;
   } | null;
+  user?: User | null;
+  timers?: Record<number, TimerInfo>;
 }
 
 export function PomodoroTimer({
@@ -42,6 +46,8 @@ export function PomodoroTimer({
                                 fullscreen = false,
                                 externalSync,
                                 onActiveDurationsChange,
+    user,
+    timers,
                               }: PomodoroTimerProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -139,6 +145,63 @@ export function PomodoroTimer({
     return () => clearInterval(timerRef.current!);
   }, [isRunning, startTime, duration, isSession]);
 
+  const [hasInitializedFromTimers, setHasInitializedFromTimers] = useState(false);
+
+  useEffect(() => {
+    if (hasInitializedFromTimers || externalSync || !user || !timers) return;
+    const wasJustReset = localStorage.getItem("justReset") === "true";
+
+    if (wasJustReset) {
+      const session = settings.session * 60;
+      setIsSession(true);
+      setIsRunning(false);
+      setStartTime(null);
+      setDuration(session);
+      setTimeLeft(session);
+      setActiveDurations({
+        session,
+        break: settings.break * 60,
+      });
+
+      onSessionStatusChange?.(true);
+      onTimerStatusChange(false);
+      onTimerUpdate?.({
+        status: "ONLINE",
+        startTime: new Date().toISOString(),
+        duration: session,
+      });
+
+      setHasInitializedFromTimers(true);
+      localStorage.removeItem("justReset"); // ✅ clean up
+
+      return;
+    }
+
+    const userId = Number(user.id);
+    if (isNaN(userId)) return;
+
+    const myTimer = timers[userId];
+
+    if (!myTimer) return;
+
+    const now = Date.now();
+    const end = myTimer.start.getTime() + myTimer.duration * 1000;
+    const remaining = Math.max(0, Math.floor((end - now) / 1000));
+
+    setIsRunning(myTimer.running);
+    setStartTime(now);
+    setDuration(remaining);
+    setTimeLeft(remaining);
+
+    const sessionStatus = user.status === "WORK";
+    setIsSession(sessionStatus);
+    onTimerStatusChange(myTimer.running);
+    onSessionStatusChange?.(sessionStatus);
+
+    setHasInitializedFromTimers(true);
+  }, [user, timers, externalSync, hasInitializedFromTimers]);
+
+
 
   useEffect(() => {
     if (!externalSync) return;
@@ -171,6 +234,7 @@ export function PomodoroTimer({
 
   const start = () => {
     if (timeLeft <= 0) return;
+    localStorage.removeItem("justReset");
     const now = Date.now();
     setStartTime(now);
     setDuration(timeLeft);
@@ -188,6 +252,7 @@ export function PomodoroTimer({
   };
 
   const stop = () => {
+    localStorage.removeItem("justReset");
     if (startTime !== null) {
       const elapsed = Math.floor((Date.now() - startTime) / 1000);
       const remaining = Math.max(0, duration - elapsed);
@@ -214,6 +279,7 @@ export function PomodoroTimer({
       session: dur,
       break: settings.break * 60,
     });
+    localStorage.setItem("justReset", "true");
     onTimerUpdate?.({
       status: "ONLINE",
       startTime: new Date().toISOString(),
