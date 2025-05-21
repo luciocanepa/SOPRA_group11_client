@@ -189,6 +189,8 @@ export default function GroupPage() {
                         onActiveDurationsChange={setDurations}
                         fullscreen={false}
                         externalSync={acceptedSync||undefined}
+                        user={user}
+                        timers={timers}
                     />
                 </div>
                 <div className="group-dashboard-button-container">
