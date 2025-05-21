@@ -275,33 +275,74 @@ export function PomodoroTimer({
               <div className="settings-row">
                 <label>Session (minutes):</label>
                 <input
-                    type="number"
-                    value={settings.session}
-                    onChange={(e) =>
-                        setSettings((s) => ({
-                          ...s,
-                          session: Math.max(1, Number(e.target.value)),
-                        }))
+                    type="text"
+                    value={String(settings.session)}
+                    className={
+                      !settings.session || settings.session < 1
+                          ? "timer-input-error"
+                          : ""
                     }
-                    min={1}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === "") {
+                        setSettings((s) => ({ ...s, session: 0 }));
+                      } else if (/^\d+$/.test(val)) {
+                        setSettings((s) => ({ ...s, session: Math.floor(Number(val)) }));
+                      }
+                    }}
+                    onBlur={(e) => {
+                      const val = e.target.value.trim();
+                      const num = Number(val);
+                      if (!val || isNaN(num) || num < 1) {
+                        setSettings((s) => ({ ...s, session: 0 }));
+                      } else {
+                        setSettings((s) => ({ ...s, session: Math.floor(num) }));
+                      }
+                    }}
+                    placeholder="Enter minutes"
                 />
               </div>
               <div className="settings-row">
                 <label>Break (minutes):</label>
                 <input
-                    type="number"
-                    value={settings.break}
-                    onChange={(e) =>
-                        setSettings((s) => ({
-                          ...s,
-                          break: Math.max(1, Number(e.target.value)),
-                        }))
+                    type="text"
+                    value={String(settings.break)}
+                    className={
+                      !settings.break || settings.break < 1
+                          ? "timer-input-error"
+                          : ""
                     }
-                    min={1}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === "") {
+                        setSettings((s) => ({ ...s, break: 0 }));
+                      } else if (/^\d+$/.test(val)) {
+                        setSettings((s) => ({ ...s, break: Math.floor(Number(val)) }));
+                      }
+                    }}
+                    onBlur={(e) => {
+                      const val = e.target.value.trim();
+                      const num = Number(val);
+                      if (!val || isNaN(num) || num < 1) {
+                        setSettings((s) => ({ ...s, break: 0 }));
+                      } else {
+                        setSettings((s) => ({ ...s, break: Math.floor(num) }));
+                      }
+                    }}
+                    placeholder="Enter minutes"
                 />
               </div>
               <div className="settings-popup-button-group">
-                <Button className="green" onClick={applySettings}>
+                <Button
+                    className="green"
+                    onClick={() => {
+                      if (settings.session < 1 || settings.break < 1) {
+                        toast.error("Input a number ≥1 in both fields.");
+                        return;
+                      }
+                      applySettings();
+                    }}
+                >
                   Apply
                 </Button>
                 <Button className="red" onClick={() => setShowSettings(false)}>
