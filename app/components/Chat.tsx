@@ -10,9 +10,10 @@ import "../styles/components/Chat.css";
 interface ChatBoxProps {
   groupId: string;
   userId: string;
+  userTimezone: string;
 }
 
-export function ChatBox({ groupId, userId }: ChatBoxProps) {
+export function ChatBox({ groupId, userId, userTimezone }: ChatBoxProps) {
   const { value: token } = useLocalStorage<string>("token", "");
   const { messages, sendMessage, clearMessages } = useChatMessages(
     groupId,
@@ -45,10 +46,11 @@ export function ChatBox({ groupId, userId }: ChatBoxProps) {
 
       <div className="chat-messages">
         {messages.map((msg, idx) => {
-          const time = new Date(msg.timestamp).toLocaleTimeString([], {
+          const time = new Intl.DateTimeFormat("default", {
             hour: "2-digit",
             minute: "2-digit",
-          });
+            timeZone: userTimezone,
+          }).format(new Date(msg.timestamp));
           const isOwnMessage = String(msg.senderId) === String(userId);
 
           // console.log('Rendering message:', {
