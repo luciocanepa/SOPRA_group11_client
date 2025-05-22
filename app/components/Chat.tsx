@@ -50,7 +50,7 @@ export function ChatBox({ groupId, userId, userTimezone }: ChatBoxProps) {
             hour: "2-digit",
             minute: "2-digit",
             timeZone: userTimezone,
-          }).format(new Date(msg.timestamp));
+          }).format(new Date(Date.parse(msg.timestamp)));
           const isOwnMessage = String(msg.senderId) === String(userId);
 
           // console.log('Rendering message:', {
