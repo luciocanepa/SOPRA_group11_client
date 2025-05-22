@@ -18,7 +18,33 @@ Our goal was to build something that helps people stay connected and focused whi
 
 ## High level components
 
-...
+### 1. Authentication, User Profile and Dashboard
+**Role:** Handles user login, registration, and profile editing. And the dashboard displays user-specific information such as groups and invites.
+
+**Files:** [register](https://github.com/luciocanepa/SOPRA_group11_client/blob/main/app/register/page.tsx), [login](https://github.com/luciocanepa/SOPRA_group11_client/blob/main/app/login/page.tsx), [user dashboard](https://github.com/luciocanepa/SOPRA_group11_client/blob/main/app/dashboard/page.tsx), [profile editing](https://github.com/luciocanepa/SOPRA_group11_client/blob/main/app/users/%5Bid%5D/edit/page.tsx), [navigation bar](https://github.com/luciocanepa/SOPRA_group11_client/blob/main/app/components/Navbar.tsx)
+
+### 2. Group Dashboard and Member Status
+**Role:** Displays information about the current group, including members and their current status (online/offline/work/break), as well as real-time timer countdown in the cases of break/work status. The group dashboard also displays all the other components such as the timer, chat and important buttons such as the one to add more members.
+
+**Files:** [group dashboard](https://github.com/luciocanepa/SOPRA_group11_client/blob/main/app/groups/%5Bgid%5D/page.tsx), [group participants display](https://github.com/luciocanepa/SOPRA_group11_client/blob/main/app/components/GroupParticipants.tsx), [participants handling](https://github.com/luciocanepa/SOPRA_group11_client/blob/main/app/hooks/useGroupParticipants.tsx), [sending invitations](https://github.com/luciocanepa/SOPRA_group11_client/blob/main/app/components/InviteUser.tsx)
+
+### 3. Pomodoro Timer and Sync Functionality
+**Role:** Central component of our application is the timer.We are able to manage study and break intervals by custumizing it. Start, Stop and Reset as much as we like. When the timer is running we are able to send `Sync Timer` requests which allows group members to accept the sender's timer settings in order to spend the break together.
+
+**Files:** [timer](https://github.com/luciocanepa/SOPRA_group11_client/blob/main/app/components/PomodoroTimer.tsx), *([sync requests](https://github.com/luciocanepa/SOPRA_group11_client/blob/main/app/groups/%5Bgid%5D/page.tsx) handled in the group dashboard file)*
+
+### 4. Chat
+**Role:** Enables real-time messaging among group members, available only during breaks, before and after study sessions.
+
+**Files:** [chat](https://github.com/luciocanepa/SOPRA_group11_client/blob/main/app/components/Chat.tsx), [chat handling](https://github.com/luciocanepa/SOPRA_group11_client/blob/main/app/hooks/useChatMessages.tsx)
+
+### 5. Google Calendar API
+**Role:** Group members are able to log in with their Google accounts and schedule study sessions. The sessions will automatically be stored in their Google Calendar. Other group members can view the study sessions that have been scheduled within the group, and add them to their Calendar by button click.
+
+**Files:** [Google Account handling](https://github.com/luciocanepa/SOPRA_group11_client/blob/main/app/hooks/useGoogleCalendarAPI.ts), [schedule sessions](https://github.com/luciocanepa/SOPRA_group11_client/blob/main/app/components/CalendarAPI.tsx), [display sessions](https://github.com/luciocanepa/SOPRA_group11_client/blob/main/app/components/ScheduledSessions.tsx)
+
+### Correlation
+All our high-level components are correlated through our user flow which are made visible in the [Illustrations](#illustrations) section. Apart from the [first component](#1-authentication-user-profile-and-dashboard), all are displayed in the group dashboard. Thus showcasing the importance of collaborative work for our users through studying, chatting and planning future work together.
 
 ## Launch & deployment
 
