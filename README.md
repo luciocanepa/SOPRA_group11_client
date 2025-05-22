@@ -64,9 +64,92 @@ npm run dev
 - `verceldeployment.yml`: after build, send the pages over to vercel to expose them at [https://sopra-fs25-group-11-client.vercel.app/](https://sopra-fs25-group-11-client.vercel.app/)
 - `dockerize.yml`: workflow that creates the docker container for the application
 
-## Illustations
 
-...
+## Illustrations
+Here's a walkthrough of the core interface and features:
+
+### 1. *Homepage & Introduction*
+Users land on the homepage that explains the app’s purpose and how to get started. From there, they can choose to either login or sign up.
+![Homepage](public/images/homepage.png)
+
+---
+
+### 2. *Register & Log In*
+New users can sign up quickly with their unique username and their chosen password to start using the app.
+![Register](public/images/register.png)
+
+---
+
+### 3. *User Dashboard*
+Once logged in, users land on the dashboard, where they can see their existing groups, join them or create new ones, and navigate to key features such as statistics, or the individual Pomodoro Timer.
+![Dashboard](public/images/dashboard.png)
+
+---
+
+### 4. *Create Study Groups*
+Users can create a new group, set its name and description, upload a group image, and invite other users. They can also manage group details later.
+![Create Group](public/images/create_group.png)
+
+---
+
+### 5. *Manage Groups*
+The group admin can edit group information, remove users from the group, or delete the group entirely.
+![Manage Group](public/images/manage_group.png)
+---
+
+### 6. *Invite Users*
+As seen above, group members can invite users by username either on the group creation page or from the group dashboard.
+![Invite Users](public/images/invite.png)
+
+---
+
+### 7. *Schedule Study Sessions*
+On the group dashboard, users can schedule sessions and sync them with Google Calendar, making it easy to plan collaborative sessions.
+![Plan Session](public/images/calendar.png)  
+![Upcoming Sessions](public/images/upcoming_sessions.png)
+
+---
+
+### 8. *Syncing Timers Across Users*
+Timers can be synced between group members for real-time collaboration.
+![Sync Timer](public/images/sync_timer.png)
+
+---
+
+### 9. *Group Dashboard & Collaborative Pomodoro Timer*
+Each study group features a Pomodoro timer, a member list showing each member’s status and the time remaining on their timer, a chat window, and buttons for the other features mentioned above.
+![Group Dashboard](public/images/group_dashboard.png)
+
+---
+
+### 10. *Individual Timer View*
+Users can also use the timer in a focused, distraction-free single mode, which is accessible from the dashboard.
+![Individual Timer](public/images/individual_timer.png)
+
+---
+
+### 11. *Statistics - Track Study Progress*
+Users can view their study statistics by group and time, visualized clearly via bar charts.
+![Statistics](public/images/statistics.png)
+
+---
+
+### 12. *Edit Profile*
+Each user can update personal details, profile picture, timezone, and password from the profile page.
+![Edit Profile](public/images/edituser.png)
+
+---
+
+### 13. *Info Button / Info Carousel*
+![InfoButton](public/images/info.png)
+The info button explains the functionalities mentioned on the home page again.
+
+---
+
+### 14. *App Navigation*
+The dashboard, info carousel, user edit page, and logout are all accessible via a consistent navigation bar for a smooth user experience.
+![Navbar](public/images/navbar.png)
+
 
 ## Roadmap
 
