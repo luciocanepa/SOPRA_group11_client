@@ -252,7 +252,7 @@ export default function GroupPage() {
                 {loading
                     ? <p>Loading chat…</p>
                     : user&&localUserId
-                        ? <ChatBox groupId={groupId} userId={localUserId}/>
+                        ? <ChatBox groupId={groupId} userId={localUserId} userTimezone={user?.timezone||"Europe/Zurich"}/>
                         : <p>Please log in to access chat</p>
                 }
             </div>
