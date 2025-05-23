@@ -95,85 +95,89 @@ npm run dev
 Here's a walkthrough of the core interface and features:
 
 ### 1. *Homepage & Introduction*
-Users land on the homepage that explains the app’s purpose and how to get started. From there, they can choose to either login or sign up.
+Users land on the homepage that explains the app’s purpose and how to get started. From there, they can choose to either login or sign up.<br><br>
 ![Homepage](public/images/homepage.png)
 
 ---
 
 ### 2. *Register & Log In*
-New users can sign up quickly with their unique username and their chosen password to start using the app.
+New users can sign up quickly with their unique username and their chosen password to start using the app.<br><br>
 ![Register](public/images/register.png)
 
 ---
 
 ### 3. *User Dashboard*
-Once logged in, users land on the dashboard, where they can see their existing groups, join them or create new ones, and navigate to key features such as statistics, or the individual Pomodoro Timer.
+Once logged in, users land on the dashboard, where they can see their existing groups, join them or create new ones, and navigate to key features such as statistics, or the individual Pomodoro Timer.<br><br>
 ![Dashboard](public/images/dashboard.png)
 
 ---
 
 ### 4. *Create Study Groups*
-Users can create a new group, set its name and description, upload a group image, and invite other users. They can also manage group details later.
+Users can create a new group, set its name and description, upload a group image, and invite other users. They can also manage group details later.  <br><br>
 ![Create Group](public/images/create_group.png)
 
 ---
 
 ### 5. *Manage Groups*
-The group admin can edit group information, remove users from the group, or delete the group entirely.
+The group admin can edit group information, remove users from the group, or delete the group entirely.<br><br>
 ![Manage Group](public/images/manage_group.png)
+
 ---
 
 ### 6. *Invite Users*
-As seen above, group members can invite users by username either on the group creation page or from the group dashboard.
+As seen above, group members can invite users by username either on the group creation page or from the group dashboard.<br><br>
 ![Invite Users](public/images/invite.png)
 
 ---
 
 ### 7. *Schedule Study Sessions*
-On the group dashboard, users can schedule sessions and sync them with Google Calendar, making it easy to plan collaborative sessions.
-![Plan Session](public/images/calendar.png)  
-![Upcoming Sessions](public/images/upcoming_sessions.png)
+On the group dashboard, users can schedule sessions and sync them with Google Calendar, making it easy to plan collaborative sessions.<br>
+
+<p float="left">
+  <img src="public/images/calendar.png" width="45%" />
+  <img src="public/images/upcoming_sessions.png" width="45%" />
+</p>
 
 ---
 
 ### 8. *Syncing Timers Across Users*
-Timers can be synced between group members for real-time collaboration.
+Timers can be synced between group members for real-time collaboration.<br><br>
 ![Sync Timer](public/images/sync_timer.png)
 
 ---
 
 ### 9. *Group Dashboard & Collaborative Pomodoro Timer*
-Each study group features a Pomodoro timer, a member list showing each member’s status and the time remaining on their timer, a chat window, and buttons for the other features mentioned above.
+Each study group features a Pomodoro timer, a member list showing each member’s status and the time remaining on their timer, a chat window, and buttons for the other features mentioned above.<br><br>
 ![Group Dashboard](public/images/group_dashboard.png)
 
 ---
 
 ### 10. *Individual Timer View*
-Users can also use the timer in a focused, distraction-free single mode, which is accessible from the dashboard.
+Users can also use the timer in a focused, distraction-free single mode, which is accessible from the dashboard.<br><br>
 ![Individual Timer](public/images/individual_timer.png)
 
 ---
 
 ### 11. *Statistics - Track Study Progress*
-Users can view their study statistics by group and time, visualized clearly via bar charts.
+Users can view their study statistics by group and time, visualized clearly via bar charts.<br><br>
 ![Statistics](public/images/statistics.png)
 
 ---
 
 ### 12. *Edit Profile*
-Each user can update personal details, profile picture, timezone, and password from the profile page.
+Each user can update personal details, profile picture, timezone, and password from the profile page.<br><br>
 ![Edit Profile](public/images/edituser.png)
 
 ---
 
 ### 13. *Info Button / Info Carousel*
+The info button explains the functionalities mentioned on the home page again.<br><br>
 ![InfoButton](public/images/info.png)
-The info button explains the functionalities mentioned on the home page again.
 
 ---
 
 ### 14. *App Navigation*
-The dashboard, info carousel, user edit page, and logout are all accessible via a consistent navigation bar for a smooth user experience.
+The dashboard, info carousel, user edit page, and logout are all accessible via a consistent navigation bar for a smooth user experience.<br><br>
 ![Navbar](public/images/navbar.png)
 
 
