@@ -41,6 +41,7 @@ const Login: () => JSX.Element = () => {
       if (response && response.token && response.id) {
         setToken(response.token);
         setUserId(response.id);
+        localStorage.setItem("justReset", "true");
         // console.log("Login successful! Redirecting to dashboard.");
         toast.success(
           <div>
