@@ -212,7 +212,7 @@ We have built the core functionalities of our collaborative Pomodoro Application
 - Introduce short mini-games during break sessions (like tic tac toe, rock paper scissors or hangman)
 - Add a leaderboard or continuous streak counter 
 - Implement reward badges for consistent study behavior
-- Group-based achievements to build team motivation and measure your groups with others (e.g. a group gets a reward for each day, as long as all group members have spent some time studing.)
+- Group-based achievements to build team motivation and measure your groups with others (e.g. A group gets a reward each day, as long as all group members have spent some time studying.)
 
 
 
