@@ -87,6 +87,7 @@ const GroupCreation: React.FC = () => {
           <div>Redirecting to Group Dashboard</div>
         </div>,
       );
+      localStorage.setItem("justReset", "true");
       setTimeout(() => {
         router.push(`/groups/${newGroup.id}`);
       }, 800);

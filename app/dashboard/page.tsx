@@ -40,6 +40,8 @@ const Dashboard: React.FC = () => {
         token,
       );
 
+      localStorage.setItem("justReset", "true");
+
       setInvitations(
         invitations.filter((invitation) => invitation.id !== invitationId),
       );

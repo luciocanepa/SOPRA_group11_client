@@ -172,7 +172,7 @@ export function PomodoroTimer({
       });
 
       setHasInitializedFromTimers(true);
-      localStorage.removeItem("justReset"); // ✅ clean up
+      localStorage.removeItem("justReset");
 
       return;
     }
